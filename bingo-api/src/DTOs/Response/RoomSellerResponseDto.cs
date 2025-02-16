@@ -1,0 +1,39 @@
+
+using bingo_api.src.Entities;
+
+namespace bingo_api.src.DTOs.Response;
+
+public record RoomSellerResponseDto
+{
+
+
+    public Guid Id { get; set; }
+    public Guid RoomId { get; set; }
+    public RoomResponseDto Room { get; set; }
+    public Guid SellerId { get; set; }
+    public SellerResponseDto Seller { get; set; }
+    public string AssignedBy { get; set; }
+
+    public RoomSellerResponseDto(Guid id, Guid roomId, RoomResponseDto room, Guid sellerId, SellerResponseDto seller, string assignedBy)
+    {
+        Id = id;
+        RoomId = roomId;
+        Room = room;
+        SellerId = sellerId;
+        Seller = seller;
+        AssignedBy = assignedBy;
+    }
+
+    internal static RoomSellerResponseDto ConvertToDto(RoomSeller roomSeller)
+    {
+
+        return new RoomSellerResponseDto(
+             roomSeller.Id,
+             roomSeller.RoomId,
+             null,
+             roomSeller.SellerId,
+             null,
+             roomSeller.AssignedBy
+        );
+    }
+}

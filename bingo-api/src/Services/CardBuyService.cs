@@ -1,0 +1,114 @@
+using System.Transactions;
+using bingo_api.src.DTOs.Request;
+using bingo_api.src.Entities;
+using bingo_api.src.Interfaces.Repositories;
+using bingo_api.src.Interfaces.Services;
+
+namespace bingo_api.src.Services;
+
+public class CardBuyService : ICardBuyService
+{
+    private readonly ICardRepository cardRepository;
+    private readonly IPunterRepository punterRepository;
+    private readonly IRoundRepository roundRepository;
+
+    public CardBuyService(ICardRepository _cardRepository, IPunterRepository _punterRepositoryy, IRoundRepository _roundRepository)
+    {
+        this.cardRepository = _cardRepository;
+        this.punterRepository = _punterRepositoryy;
+        this.roundRepository = _roundRepository;
+    }
+    public async Task<bool> Buy(CardBuyRequestDto dto)
+    {
+
+        if (dto == null || dto.PunterId == Guid.Empty || dto.Quantity == 0)
+        {
+            throw new Exception("Nao encontrado");
+        }
+
+        Punter? punter = await this.punterRepository.GetByIdAsync(dto.PunterId);
+
+        if (punter is null)
+        {
+            throw new Exception("pUNTER Nao encontrado");
+        }
+        Round? round = await this.roundRepository.GetByIdAsync(dto.RoundId);
+
+        if (round is null)
+        {
+            throw new Exception("round Nao encontrado");
+        }
+
+        if (round.Started < DateTime.UtcNow)
+        {
+            throw new Exception("The round is already past the scheduled time.");
+        }
+
+        var value = round.CardValue * dto.Quantity;
+        if (punter.Balance < value)
+        {
+            throw new Exception("Saldo insuficiente. Por favor, recarregue sua conta para continuar.");
+        }
+
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            try
+            {
+                var cardsToInsert = new List<Card>();
+
+                for (int i = 0; i < dto.Quantity; i++)
+                {
+                    var card = new Card
+                    {
+                        Numbers = GetRandomNumbers(round.MaxBalls, round.CardRows, round.CardColumns),
+                        Code = new Random().Next(1, 100000),
+                        RoundId = round.Id,
+                        PunterId = punter.Id,
+                    };
+                    cardsToInsert.Add(card);
+                }
+
+                await this.cardRepository.AddRangeAsync(cardsToInsert);
+
+                round.CardSaleCount += dto.Quantity;
+                punter.Balance -= value;
+                await this.roundRepository.UpdateAsync(round);
+                await this.punterRepository.UpdateAsync(punter);
+                transaction.Complete();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+    }
+
+    private int[] GetRandomNumbers(int maxNumber, int linha, int coluna)
+    {
+        List<int> result = new List<int>();
+        Random random = new Random();
+        List<int> availableNumbers = Enumerable.Range(1, maxNumber).ToList();
+
+        for (int i = 0; i < linha; i++)
+        {
+            HashSet<int> uniqueRow = new HashSet<int>();
+
+            // Gera um conjunto de números únicos para a linha
+            while (uniqueRow.Count < coluna)
+            {
+                int randomIndex = random.Next(availableNumbers.Count);
+                int selectedNumber = availableNumbers[randomIndex];
+
+                uniqueRow.Add(selectedNumber);
+                availableNumbers.RemoveAt(randomIndex);
+            }
+
+            // Ordena a linha e adiciona ao resultado final
+            var sortedRow = uniqueRow.OrderBy(num => num).ToArray();
+            result.AddRange(sortedRow);
+        }
+
+        return result.ToArray();
+    }
+}
