@@ -1,54 +1,49 @@
 using bingo_api.src.Interfaces.Jobs;
 using bingo_api.src.Interfaces.Repositories;
 using Hangfire;
+using Hangfire.Server;
 
 namespace bingo_api.src.Jobs;
 
-public class RoundFetcherJob : IRoundFetcherJob
+public class RoundFetcherJob
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IWebSocketService webSocketService;
-    public RoundFetcherJob(IServiceProvider serviceProvider, IWebSocketService _webSocketService)
+    private readonly IRoundRepository _roundRepository;
+    private readonly ILogger<RoundFetcherJob> _logger;
+
+    public RoundFetcherJob(
+        IRoundRepository roundRepository,
+        ILogger<RoundFetcherJob> logger)
     {
-        _serviceProvider = serviceProvider;
-        webSocketService = _webSocketService;
+        _roundRepository = roundRepository;
+        _logger = logger;
     }
     public async Task Execute()
     {
-
-        var now = DateTime.UtcNow;
-        var futureTime = now.AddMinutes(50);
-        using (var scope = _serviceProvider.CreateScope())
+        try
         {
-            var roundRepository = scope.ServiceProvider.GetRequiredService<IRoundRepository>();
-
-            var rounds = await roundRepository.FilterByDateTimeRange(now.Date, now.TimeOfDay, futureTime.TimeOfDay);
-            if (rounds.Count() == 0)
+            _logger.LogInformation("Iniciando Job1 - Processamento de todos os rounds");
+            var now = DateTime.UtcNow;
+            var futureTime = now.AddMinutes(50);
+            var rounds = await _roundRepository.FilterByDateTimeRange(now.Date, now.TimeOfDay, futureTime.TimeOfDay);
+            foreach (var round in rounds)
             {
-                Console.WriteLine("nenhum");
-                Console.WriteLine(now.Date);
+                var jobId = BackgroundJob.Enqueue<RoundExecutionJob>(
+                    job => job.Execute(round.Id)
+                );
 
-                Console.WriteLine(now);
-                Console.WriteLine(futureTime);
+                _logger.LogInformation(
+                    "Job2 enfileirado para o Round {RoundId}. JobId: {JobId}",
+                    round.Id,
+                    jobId
+                );
             }
-            var executionTasks = rounds.Select(round =>
-                {
-                    Console.WriteLine($"Iniciando execução do round {round.Id}");
-                    var roundExecutionJob = scope.ServiceProvider.GetRequiredService<IRoundExecutionJob>();
-                    return roundExecutionJob.Execute(round.Id)
-                        .ContinueWith(task =>
-                        {
-                            if (task.IsFaulted)
-                            {
-                                Console.WriteLine($"Erro ao executar round {round.Id}: {task.Exception}");
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Round {round.Id} executado com sucesso!");
-                            }
-                        });
-                });
-            await Task.WhenAll(executionTasks);
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro no Job1 ao processar rounds");
+            throw;
+        }
+
     }
+ 
 }

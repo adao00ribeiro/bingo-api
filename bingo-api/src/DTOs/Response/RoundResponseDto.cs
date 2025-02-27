@@ -14,6 +14,8 @@ public record RoundResponseDto
     public int MaxBalls { get; set; }//utilizado para jogos de 90 ,80,75, 50 ,30
     public int CardRows { get; set; } // Número de linhas na cartela
     public int CardColumns { get; set; } // Número de colunas na cartela
+
+      public int CardsPurchased { get; set; }
     public DateTime StartedDate { get; set; }
     public DateTime FinishedDate { get; set; }
     public Guid RoomId { get; set; }
@@ -33,6 +35,7 @@ public record RoundResponseDto
         int maxBalls,
         int cardRows,
         int cardColumns,
+        int cardsPurchased,
         DateTime startedDate,
         DateTime finishedDate,
         Guid roomId,
@@ -48,6 +51,7 @@ public record RoundResponseDto
         MaxBalls = maxBalls;
         CardRows = cardRows;
         CardColumns = cardColumns;
+        CardsPurchased = cardsPurchased;
         StartedDate = startedDate;
         FinishedDate = finishedDate;
         RoomId = roomId;
@@ -70,6 +74,7 @@ public record RoundResponseDto
                 round.MaxBalls,
                 round.CardRows,
                 round.CardColumns,
+                round.CardsPurchased,
                 round.Started,
                 round.Finished,
                 round.RoomId,
