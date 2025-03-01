@@ -5,24 +5,22 @@ using bingo_api.src.Factory;
 using bingo_api.src.Interfaces.Jobs;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Structs;
-using Hangfire;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Jobs;
 
-public class RoundExecutionJob : IRoundExecutionJob
+public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
+ IServiceScopeFactory scopeFactory, 
+ IWebSocketService _webSocketService,
+ ICardWinnerRepository _cardWinnerRepository
+ 
+ ) : IRoundExecutionJob
 {
-    IServiceScopeFactory _scopeFactory;
-    private readonly ILogger<RoundExecutionJob> _logger;
-    private readonly IWebSocketService webSocketService;
-    private List<int> remainingNumbers ;
-    public RoundExecutionJob(ILogger<RoundExecutionJob> logger, IServiceScopeFactory scopeFactory, IWebSocketService _webSocketService)
-    {
-        _logger = logger;
-        _scopeFactory = scopeFactory;
-        webSocketService = _webSocketService;
-        remainingNumbers = new List<int>();
-    }
+    IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly ILogger<RoundExecutionJob> _logger = logger;
+    private readonly IWebSocketService webSocketService = _webSocketService;
+    private readonly ICardWinnerRepository cardWinnerRepository = _cardWinnerRepository;
+    private List<int> remainingNumbers = new List<int>();
 
     public async Task Execute(Guid roundId)
     {
@@ -93,7 +91,7 @@ public class RoundExecutionJob : IRoundExecutionJob
                     foreach (Prize p in prizes)
                     {
                         var prizeService = PrizeServiceFactory.CreateService(p);
-                        prizeService.Execute(cards);
+                        prizeService.Execute(cards , tempRound.CardRows, tempRound.CardColumns);
                     }
                     Console.WriteLine("Checado os premios");
                     var current_prize_result = (PrizeResult)null;

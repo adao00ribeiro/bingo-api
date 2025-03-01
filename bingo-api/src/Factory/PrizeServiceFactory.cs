@@ -1,7 +1,6 @@
 using bingo_api.src.Entities;
 using bingo_api.src.Enums;
-using bingo_api.src.Interfaces.Repositories.Shared;
-using bingo_api.src.Interfaces.Services;
+using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Services;
 using bingo_api.src.Services.Prizes;
 
@@ -9,7 +8,7 @@ namespace bingo_api.src.Factory;
 
 public static class PrizeServiceFactory
 {
-    public static IPrizeService CreateService(Prize prize)
+    public static PrizeBaseService CreateService(Prize prize)
     {
         return prize.Type switch
         {

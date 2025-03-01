@@ -1,101 +1,75 @@
 using bingo_api.src.Entities;
+using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Structs;
+using System.Linq;
 
-namespace bingo_api.src.Services.Prizes;
-
-public class PrizeDoubleLineService : IPrizeService
+namespace bingo_api.src.Services.Prizes
 {
-    private Prize prize;
-    private int rows;
-    private int columns;
-
-    public PrizeDoubleLineService(Prize _prize)
+    public class PrizeDoubleLineService : PrizeBaseService
     {
-        this.prize = _prize;
-        this.rows = _prize.Round.CardRows;
-        this.columns = _prize.Round.CardColumns;
-    }
+        public PrizeDoubleLineService(Prize prize)
+            : base(prize) { }
 
-    public void Execute(IEnumerable<Card> cards)
-    {
-        if (prize.HasWinners()) return;
-
-        var resultCards = cards.Where(CheckWinner).ToList();
-        prize.SetRefresWinner(resultCards.Any());
-
-        foreach (var card in resultCards)
+        protected override bool CheckWinner(Card card, int row, int col)
         {
-            prize.WinningCards.Add(new WinningCardsInfo
+            var isWinner = CheckDoubleLine(card, col);
+            if (isWinner)
             {
-                Punter = card.Punter,
-                Card = card,
-                ValueOfEachWinner = prize.Value / resultCards.Count()
-            });
-        }
-    }
-
-    private bool CheckWinner(Card card)
-    {
-        // Verifica se o cartão tem pelo menos duas linhas completamente marcadas
-        var markedRows = Enumerable.Range(0, rows)
-            .Where(row => IsLineMarked(card.CardMarkedNumbers, row))
-            .ToList();
-
-        bool isWinner = markedRows.Count >= 2; // Ganha se houver pelo menos duas linhas totalmente preenchidas
-
-        if (isWinner)
-        {
-            ExecuteTopFiveList(card, markedRows);
-        }
-
-        return isWinner;
-    }
-
-    private bool IsLineMarked(int[] cardMarkedNumbers, int row)
-    {
-        // Verifica se todos os números em uma linha específica estão marcados
-        for (int col = 0; col < columns; col++)
-        {
-            if (cardMarkedNumbers[row * columns + col] != 1)
-            {
-                return false;
+                ExecuteTopFiveList(card, row, col);
             }
+            return isWinner;
         }
-        return true;
-    }
 
-    private void ExecuteTopFiveList(Card card, List<int> markedRows)
-    {
-        var subNumbers = card.Numbers.Chunk(columns).ToList();
-        var missingNumbers = new List<int>();
-
-        foreach (var row in Enumerable.Range(0, rows))
+        private bool CheckDoubleLine(Card card, int col)
         {
-            if (!markedRows.Contains(row))
+            bool doubleLineWinner = false;
+
+            // Criando a matriz 2D a partir do array unidimensional
+            var matrix = card.CardMarkedNumbers
+                .Select((value, index) => new { value, index })
+                .GroupBy(x => x.index / col)
+                .Select(g => g.Select(x => x.value).ToList())
+                .ToList();
+
+            // Verificando todas as linhas para encontrar 2 linhas marcadas
+            for (int i = 0; i < matrix.Count - 1; i++) // Itera sobre a primeira linha
             {
-                for (int col = 0; col < columns; col++)
+                for (int j = i + 1; j < matrix.Count; j++) // Itera sobre a segunda linha
                 {
-                    if (card.CardMarkedNumbers[row * columns + col] != 1)
+                    var line1Marked = matrix[i].All(value => value == 1);
+                    var line2Marked = matrix[j].All(value => value == 1);
+
+                    // Se ambas as linhas tiverem todos os números marcados, é um vencedor
+                    if (line1Marked && line2Marked)
                     {
-                        missingNumbers.Add(subNumbers[row][col]);
+                        doubleLineWinner = true;
+                        break;
                     }
                 }
+
+                if (doubleLineWinner) break;
             }
+
+            return doubleLineWinner;
         }
 
-        int lackOfHits = missingNumbers.Count;
-        prize.SetTopFive(card, lackOfHits, missingNumbers);
-    }
-
-    public void SaveWinners()
-    {
-        if (!prize.HasWinners()) return;
-
-        decimal prizeValue = prize.Value / prize.WinningCards.Count;
-        foreach (var card in prize.WinningCards)
+        protected override void ExecuteTopFiveList(Card card, int row, int col)
         {
-            // Salvar informações dos vencedores, se necessário
+            var subNumbers = card.Numbers.Chunk(col).ToList();
+            var markedSubarrays = card.CardMarkedNumbers.Chunk(col).ToList();
+
+            for (int i = 0; i < subNumbers.Count; i++)
+            {
+                var subNumberArray = subNumbers[i];
+                var markedArray = markedSubarrays[i];
+
+                var markedNumbers = subNumberArray.Where((_, index) => markedArray[index] == 1).ToList();
+                var missingNumbers = subNumberArray.Except(markedNumbers).ToList();
+                var lackOfHits = missingNumbers.Count;
+
+                prize.SetTopFive(card, lackOfHits, missingNumbers);
+            }
         }
     }
 }

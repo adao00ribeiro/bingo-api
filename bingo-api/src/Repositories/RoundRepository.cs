@@ -38,9 +38,11 @@ public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
 }
     public override Task<Guid> AddAsync(Round objeto)
     {
-        if (objeto.Prizes?.Count() == 0)
+        if (objeto.Prizes?.Count == 0)
         {
             objeto.AddPrize(new Prize(10, EPrizeType.FourInLine));
+            objeto.AddPrize(new Prize(20, EPrizeType.SingleLine));
+            objeto.AddPrize(new Prize(30, EPrizeType.FullCard));
         }
         return base.AddAsync(objeto);
     }
