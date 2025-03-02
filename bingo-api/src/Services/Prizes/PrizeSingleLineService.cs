@@ -1,15 +1,16 @@
 using bingo_api.src.Entities;
+using bingo_api.src.Interfaces.Repositories;
+using bingo_api.src.Interfaces.Services;
 
 namespace bingo_api.src.Services.Prizes;
 
-public class PrizeFourInLineService : PrizeBaseService
+public class PrizeSingleLineService: PrizeBaseService
 {
-    public PrizeFourInLineService(Prize prize)
+    public PrizeSingleLineService(Prize prize)
        : base(prize) { }
-
     protected override bool CheckWinner(Card card, int row, int col)
     {
-        var isWinner = card.CardMarkedNumbers.Chunk(col).Any(row => row.Count(mark => mark == 1) == (col-1));
+        var isWinner = card.CardMarkedNumbers.Chunk(col).Any(row => row.Count(mark => mark == 1) == col);
         if (isWinner)
         {
             ExecuteTopFiveList(card, row, col);

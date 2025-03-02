@@ -5,188 +5,189 @@ using bingo_api.src.Factory;
 using bingo_api.src.Interfaces.Jobs;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Structs;
-using Hangfire;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Jobs;
 
-public class RoundExecutionJob : IRoundExecutionJob
+public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
+ IServiceScopeFactory scopeFactory, 
+ IWebSocketService _webSocketService,
+ ICardWinnerRepository _cardWinnerRepository
+ 
+ ) : IRoundExecutionJob
 {
-    private readonly ILogger _logger;
-    private readonly IBackgroundJobClient _backgroundJobClient;
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IWebSocketService webSocketService;
-    private List<int> remainingNumbers;
-    public RoundExecutionJob(IServiceScopeFactory scopeFactory, ILogger<RoundExecutionJob> logger, IBackgroundJobClient backgroundJobClient, IWebSocketService _webSocketService)
-    {
-        _logger = logger;
-        _backgroundJobClient = backgroundJobClient;
-        _scopeFactory = scopeFactory;
-        webSocketService = _webSocketService;
-    }
+    IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly ILogger<RoundExecutionJob> _logger = logger;
+    private readonly IWebSocketService webSocketService = _webSocketService;
+    private readonly ICardWinnerRepository cardWinnerRepository = _cardWinnerRepository;
+    private List<int> remainingNumbers = new List<int>();
 
-    public async Task Execute(Guid round_id)
+    public async Task Execute(Guid roundId)
     {
-        using (var scope = _scopeFactory.CreateScope())
+        try
         {
-            var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-            Round? tempRound = await context.Rounds
-            .Include(r => r.Cards)
-            .Include(r => r.Prizes)
-            .Include(r => r.Room)
-            .ThenInclude(room => room.Accumulated)
-            .FirstOrDefaultAsync(r => r.Id == round_id);
-
-            if (tempRound is null || tempRound?.Finished == null)
+            using (var scope = _scopeFactory.CreateScope())
             {
-                Console.WriteLine("round nao existe");
-                return;
-            }
-            var message = new RoundMessage(tempRound.Id);
-            if (tempRound.CardSaleCount == 0)
-            {
-                tempRound.Finished = DateTime.UtcNow;
-                context.Rounds.Entry(tempRound).State = EntityState.Modified;
-                await context.SaveChangesAsync();
-                message.Finished = true;
-                await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
-                return;
-            }
+                _logger.LogInformation("Iniciando Job2 - Processamento do Round {RoundId}", roundId);
 
+                var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+                Round? tempRound = await context.Rounds
+                .Include(r => r.Cards)
+                .Include(r => r.Prizes)
+                .Include(r => r.Room)
+                .ThenInclude(room => room.Accumulated)
+                .FirstOrDefaultAsync(r => r.Id == roundId);
 
-            var drawnNumbers = new HashSet<int>();
-            remainingNumbers = Enumerable.Range(1, tempRound.MaxBalls).ToList();
-            var prizes = tempRound.Prizes;
-            var allAwardsDrawn = false;
-            var bingoAccumulated = tempRound.Room.Accumulated;
-            var cards = tempRound.Cards;
-            var TimeBetweenBalls = tempRound.TimeBetweenBalls;
-
-            message.Id = tempRound.Id;
-            message.Finished = false;
-            message.Started = true;
-            message.MainBall = 0;
-            message.SecondBall = 0;
-            message.ThirdBall = 0;
-            message.ForthBall = 0;
-            message.MaxNumbers = drawnNumbers.Count();
-            message.Numbers = new List<int>();
-            message.Accumulated = bingoAccumulated;
-
-            await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
-
-            await Task.Delay(8000);
-
-            while (remainingNumbers.Any() && !allAwardsDrawn)
-            {
-                var number = GenerateRandomNumber();
-                drawnNumbers.Add(number);
-
-                foreach (var card in cards)
+                if (tempRound is null || tempRound?.Finished == null)
                 {
-                    card.CheckNumberOnTheCard(number);
+                    Console.WriteLine("round nao existe");
+                    return;
                 }
-            Console.WriteLine("Checado os cards");
-                foreach (Prize p in prizes)
+                var message = new RoundMessage(tempRound.Id);
+                if (tempRound.CardSaleCount == 0)
                 {
-                    var prizeService = PrizeServiceFactory.CreateService(p);
-                    prizeService.Execute(cards);
-                }
-                    Console.WriteLine("Checado os premios");
-                var current_prize_result = (PrizeResult)null;
-                foreach (Prize p in prizes)
-                {
-                    if (p.RefreshWinner)
-                    {
-                        TimeBetweenBalls = 16; // Se isso precisar ser dinâmico, considere passar como parâmetro ou definir lógica específica
-                        current_prize_result = p.GetObject();
-                        p.SetRefresWinner(false);
-                    }
-                }
-                var lastFour = drawnNumbers.TakeLast(4).Reverse().ToArray();
-
-                int mainBall = lastFour.Length > 0 ? lastFour[0] : 0;
-                int secondBall = lastFour.Length > 1 ? lastFour[1] : 0;
-                int thirdBall = lastFour.Length > 2 ? lastFour[2] : 0;
-                int fourthBall = lastFour.Length > 3 ? lastFour[3] : 0;
-                message.MainBall = mainBall;
-                message.SecondBall = secondBall;
-                message.ThirdBall = thirdBall;
-                message.ForthBall = fourthBall;
-                message.MaxNumbers = drawnNumbers.Count();
-                message.Numbers = drawnNumbers.ToList();
-                message.IsAccumulated = bingoAccumulated.Activated && (bingoAccumulated.MaximumNumberOfBalls >= drawnNumbers.Count());
-                message.Round = tempRound;
-                message.Prizes = prizes;
-                message.Results = prizes.Select(prize => prize.GetObject()).ToList();
-                message.CurrentPrizeResult = null;
-
-                await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
-                          Console.WriteLine("Enviado para o websocket");
-                if (current_prize_result is not null)
-                {
-                    message.CurrentPrizeResult = current_prize_result;
-                    await Task.Delay(2 * 1000);
+                    tempRound.Finished = DateTime.UtcNow;
+                    context.Rounds.Entry(tempRound).State = EntityState.Modified;
+                    await context.SaveChangesAsync();
+                    message.Finished = true;
                     await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                    return;
                 }
 
-                allAwardsDrawn = prizes.All(prize => prize.HasWinners());
 
-                await Task.Delay(tempRound.TimeBetweenBalls * 1000);
-            }
-            if (bingoAccumulated.Activated)
-            {
-                if (bingoAccumulated.MaximumNumberOfBalls >= tempRound.Numbers.Count())
+                var drawnNumbers = new HashSet<int>();
+                remainingNumbers = Enumerable.Range(1, tempRound.MaxBalls).ToList();
+                var prizes = tempRound.Prizes;
+                var allAwardsDrawn = false;
+                var bingoAccumulated = tempRound.Room?.Accumulated;
+                var cards = tempRound.Cards;
+                var TimeBetweenBalls = tempRound.TimeBetweenBalls;
+
+                message.Id = tempRound.Id;
+                message.Finished = false;
+                message.Started = true;
+                message.MainBall = 0;
+                message.SecondBall = 0;
+                message.ThirdBall = 0;
+                message.ForthBall = 0;
+                message.MaxNumbers = drawnNumbers.Count();
+                message.Numbers = new List<int>();
+                message.Accumulated = bingoAccumulated;
+
+                await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+
+                await Task.Delay(8000);
+
+                while (remainingNumbers.Any() && !allAwardsDrawn)
                 {
-                    foreach (var prize in prizes)
+                    var number = GenerateRandomNumber();
+                    drawnNumbers.Add(number);
+
+                    foreach (var card in cards)
                     {
-                        if (prize.Type == EPrizeType.FullCard)
+                        card.CheckNumberOnTheCard(number);
+                    }
+                    Console.WriteLine("Checado os cards");
+                    foreach (Prize p in prizes)
+                    {
+                        var prizeService = PrizeServiceFactory.CreateService(p);
+                        prizeService.Execute(cards , tempRound.CardRows, tempRound.CardColumns);
+                    }
+                    Console.WriteLine("Checado os premios");
+                    var current_prize_result = (PrizeResult)null;
+                    foreach (Prize p in prizes)
+                    {
+                        if (p.RefreshWinner)
                         {
-                            foreach (var wc in prize.WinningCards)
-                            {
-                                context.CardWinners.Add(new CardWinner(bingoAccumulated.CurrentValue / prize.WinningCards.Count(), wc.Card.Id, prize.Id));
-                            }
+                            TimeBetweenBalls = 16; // Se isso precisar ser dinâmico, considere passar como parâmetro ou definir lógica específica
+                            current_prize_result = p.GetObject();
+                            p.SetRefresWinner(false);
                         }
                     }
-                    bingoAccumulated.CurrentValue = bingoAccumulated.MinimumValue;
-                    bingoAccumulated.MaximumNumberOfBalls = 40;
-                }
-                else
-                {
-                    var cumulativeValueIncrease = (tempRound.CardValue * tempRound.CardSaleCount) * (bingoAccumulated.CumulativePercentage / 100);
-                    bingoAccumulated.CurrentValue += cumulativeValueIncrease;
+                    var lastFour = drawnNumbers.TakeLast(4).Reverse().ToArray();
 
-                    if (bingoAccumulated.IncrementBallCumulative)
+                    int mainBall = lastFour.Length > 0 ? lastFour[0] : 0;
+                    int secondBall = lastFour.Length > 1 ? lastFour[1] : 0;
+                    int thirdBall = lastFour.Length > 2 ? lastFour[2] : 0;
+                    int fourthBall = lastFour.Length > 3 ? lastFour[3] : 0;
+                    message.MainBall = mainBall;
+                    message.SecondBall = secondBall;
+                    message.ThirdBall = thirdBall;
+                    message.ForthBall = fourthBall;
+                    message.MaxNumbers = drawnNumbers.Count();
+                    message.Numbers = drawnNumbers.ToList();
+                    message.IsAccumulated = bingoAccumulated.Activated && (bingoAccumulated.MaximumNumberOfBalls >= drawnNumbers.Count());
+                    message.Round = tempRound;
+                    message.Prizes = prizes;
+                    message.Results = prizes.Select(prize => prize.GetObject()).ToList();
+                    message.CurrentPrizeResult = null;
+
+                    await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                    Console.WriteLine("Enviado para o websocket");
+                    if (current_prize_result is not null)
                     {
-                        bingoAccumulated.MaximumNumberOfBalls += 1;
+                        message.CurrentPrizeResult = current_prize_result;
+                        await Task.Delay(2 * 1000);
+                        await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                    }
+
+                    allAwardsDrawn = prizes.All(prize => prize.HasWinners());
+
+                    await Task.Delay(tempRound.TimeBetweenBalls * 1000);
+                }
+                if (bingoAccumulated.Activated)
+                {
+                    if (bingoAccumulated.MaximumNumberOfBalls >= tempRound.Numbers.Count())
+                    {
+                        foreach (var prize in prizes)
+                        {
+                            if (prize.Type == EPrizeType.FullCard)
+                            {
+                                foreach (var wc in prize.WinningCards)
+                                {
+                                    context.CardWinners.Add(new CardWinner(bingoAccumulated.CurrentValue / prize.WinningCards.Count(), wc.Card.Id, prize.Id));
+                                }
+                            }
+                        }
+                        bingoAccumulated.CurrentValue = bingoAccumulated.MinimumValue;
+                        bingoAccumulated.MaximumNumberOfBalls = 40;
+                    }
+                    else
+                    {
+                        var cumulativeValueIncrease = (tempRound.CardValue * tempRound.CardSaleCount) * (bingoAccumulated.CumulativePercentage / 100);
+                        bingoAccumulated.CurrentValue += cumulativeValueIncrease;
+
+                        if (bingoAccumulated.IncrementBallCumulative)
+                        {
+                            bingoAccumulated.MaximumNumberOfBalls += 1;
+                        }
+                    }
+
+                    context.Accumulated.Entry(bingoAccumulated).State = EntityState.Modified;
+                    await context.SaveChangesAsync();
+                    Console.WriteLine("Terminado o Job");
+                }
+                // tempRound.Finished = DateTime.UtcNow;
+                context.Rounds.Entry(tempRound).State = EntityState.Modified;
+                await context.SaveChangesAsync();
+
+                foreach (var prize in prizes)
+                {
+                    foreach (var wc in prize.WinningCards)
+                    {
+                        context.CardWinners.Add(new CardWinner(prize.Value / prize.WinningCards.Count(), wc.Card.Id, prize.Id));
+                        await context.SaveChangesAsync();
                     }
                 }
 
-                context.Accumulated.Entry(bingoAccumulated).State = EntityState.Modified;
-                await context.SaveChangesAsync();
-                  Console.WriteLine("Terminado o Job");
+                message.Finished = true;
+                await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
             }
-
-            // tempRound.Finished = DateTime.UtcNow;
-
-            context.Rounds.Entry(tempRound).State = EntityState.Modified;
-            await context.SaveChangesAsync();
-
-
-            foreach (var prize in prizes)
-            {
-
-                foreach (var wc in prize.WinningCards)
-                {
-
-                    context.CardWinners.Add(new CardWinner(prize.Value / prize.WinningCards.Count(), wc.Card.Id, prize.Id));
-                    await context.SaveChangesAsync();
-                }
-            }
-
-            message.Finished = true;
-            await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
-
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro no Job2 ao processar Round {RoundId}", roundId);
+            throw;
         }
     }
 

@@ -14,6 +14,8 @@ public class Card : Entity
     public IEnumerable<CardWinner>? CardWinners { get; set; }
 
     [NotMapped]
+    public int Score { get; set; } = 0;
+    [NotMapped]
     public int[] CardMarkedNumbers { get; set; }
     public void CheckNumberOnTheCard(int number)
     {
@@ -27,6 +29,7 @@ public class Card : Entity
         if (index >= 0) // Se o índice for válido (ou seja, o número foi encontrado)
         {
             CardMarkedNumbers[index] = 1;
+            Score += 1 ;
         }
     }
 

@@ -2,8 +2,6 @@ using bingo_api.src.Configurations;
 using bingo_api.src.Context;
 using bingo_api.src.Extensions;
 using bingo_api.src.IoC;
-using bingo_api.src.Services;
-
 using Hangfire;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Identity;
@@ -43,7 +41,6 @@ builder.Services.AddAuthorizationPolicies ( );
 builder.Services.AddAuthorization ( );
 builder.Services.RegisterServices ( builder.Configuration );
 builder.Services.AddHangfireServer ( );
-builder.Services.AddHostedService<MonitorService> ( );
 var app = builder.Build();
 app.MigrateDatabase<DataContext> ( );
 app.MigrateDatabase<IdentityDataContext> ( );
@@ -70,6 +67,7 @@ app.UseHttpsRedirection ( );
 app.UseRouting ( );
 app.UseAuthentication ( );
 app.UseAuthorization ( );
+app.UseHangfireJobs();
 app.UseHangfireDashboard ( "/hangfire" , new DashboardOptions
 {
     Authorization = HangFireDashboardAuthorization.AuthenticationFilters ( )

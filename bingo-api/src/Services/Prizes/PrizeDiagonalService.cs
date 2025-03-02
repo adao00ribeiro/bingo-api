@@ -1,89 +1,64 @@
 using bingo_api.src.Entities;
+using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Structs;
 
-namespace bingo_api.src.Services.Prizes;
-
-public class PrizeDiagonalService : IPrizeService
+namespace bingo_api.src.Services.Prizes
 {
-    private Prize prize;
-
-    public PrizeDiagonalService(Prize prize)
+    public class PrizeDiagonalService : PrizeBaseService
     {
-        this.prize = prize;
-    }
+        public PrizeDiagonalService(Prize prize)
+            : base(prize) { }
 
-    public void Execute(IEnumerable<Card> cards)
-    {
-        if (prize.HasWinners()) return;
-
-        var resultCards = cards.Where(CheckWinner).ToList();
-        prize.SetRefresWinner(resultCards.Any());
-
-        foreach (var card in resultCards)
+        protected override bool CheckWinner(Card card, int row, int col)
         {
-            prize.WinningCards.Add(new WinningCardsInfo
+            var isWinner = CheckDiagonal(card, col);
+            if (isWinner)
             {
-                Punter = card.Punter,
-                Card = card,
-                ValueOfEachWinner = prize.Value / resultCards.Count()
-            });
-        }
-    }
-
-    private bool CheckWinner(Card card)
-    {
-        // Verifica se há uma vitória na diagonal principal
-        bool isWinner = CheckDiagonal(card.CardMarkedNumbers);
-
-        if (isWinner)
-        {
-            ExecuteTopFiveList(card); // Atualiza o Top Five List com os dados do cartão vencedor
-        }
-
-        return isWinner;
-    }
-
-    private bool CheckDiagonal(int[] cardMarkedNumbers)
-    {
-        // Considerando uma cartela 5x5, verifica se os números marcados na diagonal são todos preenchidos
-        int size = 5; // Tamanho da linha (para cartelas 5x5)
-        for (int i = 0; i < size; i++)
-        {
-            if (cardMarkedNumbers[i * size + i] != 1) // Verifica a posição diagonal
-            {
-                return false;
+                ExecuteTopFiveList(card, row, col);
             }
+            return isWinner;
         }
-        return true;
-    }
 
-    private void ExecuteTopFiveList(Card card)
-    {
-        var subNumbers = card.Numbers.Chunk(5).ToList();
-        var markedSubarrays = card.CardMarkedNumbers.Chunk(5).ToList();
-        var missingNumbers = new List<int>();
-
-        for (int i = 0; i < subNumbers.Count; i++)
+        private bool CheckDiagonal(Card card, int col)
         {
-            if (markedSubarrays[i][i] != 1) // Se não está marcado na diagonal
+            // Transformando o array unidimensional em uma matriz 2D
+            var matrix = card.CardMarkedNumbers
+                .Select((value, index) => new { value, index })
+                .GroupBy(x => x.index / col)
+                .Select(g => g.Select(x => x.value).ToList())
+                .ToList();
+
+            // Verifica a diagonal principal (de cima esquerda para baixo direita)
+            bool diagonalMainWinner = true;
+            for (int i = 0; i < matrix.Count; i++)
             {
-                missingNumbers.Add(subNumbers[i][i]);
+                if (matrix[i][i] != 1)
+                {
+                    diagonalMainWinner = false;
+                    break;
+                }
             }
+
+            return diagonalMainWinner;
         }
 
-        int lackOfHits = missingNumbers.Count;
-        prize.SetTopFive(card, lackOfHits, missingNumbers);
-    }
-
-    public void SaveWinners()
-    {
-        if (!prize.HasWinners()) return;
-
-        decimal prizeValue = prize.Value / prize.WinningCards.Count;
-        foreach (var card in prize.WinningCards)
+        protected override void ExecuteTopFiveList(Card card, int row, int col)
         {
-            // Salvar informações dos vencedores, se necessário
+            var subNumbers = card.Numbers.Chunk(col).ToList();
+            var markedSubarrays = card.CardMarkedNumbers.Chunk(col).ToList();
+
+            for (int i = 0; i < subNumbers.Count; i++)
+            {
+                var subNumberArray = subNumbers[i];
+                var markedArray = markedSubarrays[i];
+
+                var markedNumbers = subNumberArray.Where((_, index) => markedArray[index] == 1).ToList();
+                var missingNumbers = subNumberArray.Except(markedNumbers).ToList();
+                var lackOfHits = missingNumbers.Count;
+
+                prize.SetTopFive(card, lackOfHits, missingNumbers);
+            }
         }
     }
 }

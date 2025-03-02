@@ -21,6 +21,14 @@ public class RoundController(IRoundRepository _roundRepository) : ApiControllerB
         var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
         return Ok(roundsResponse);
     }
+    [HttpPost("filter/rounds")]
+    public async Task<ActionResult<IEnumerable<RoundResponseDto>>> FilterByRoomIdAsync(FilterRoundByRoomIdDateDto dto)
+    {
+        Console.WriteLine(dto);
+        var rounds = await roundRepository.FilterByRoomIdAsync(dto.RoomId,dto.Date,dto.StartTime,dto.EndTime, dto.PunterId);
+        var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
+        return Ok(roundsResponse);
+    }
 
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(RoundRequestDto request)

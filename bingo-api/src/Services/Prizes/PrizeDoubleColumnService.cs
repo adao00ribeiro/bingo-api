@@ -1,91 +1,75 @@
 using bingo_api.src.Entities;
+using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Structs;
+using System.Linq;
 
-namespace bingo_api.src.Services.Prizes;
-
-public class PrizeDoubleColumnService : IPrizeService
+namespace bingo_api.src.Services.Prizes
 {
-    private Prize prize;
-    public PrizeDoubleColumnService(Prize prize)
+    public class PrizeDoubleColumnService : PrizeBaseService
     {
-        this.prize = prize;
-    }
-    public void Execute(IEnumerable<Card> cards)
-    {
-        if (prize.HasWinners()) return;
+        public PrizeDoubleColumnService(Prize prize)
+            : base(prize) { }
 
-        var resultCards = cards.Where(CheckWinner).ToList();
-        prize.SetRefresWinner(resultCards.Any());
-
-        foreach (var card in resultCards)
+        protected override bool CheckWinner(Card card, int row, int col)
         {
-            prize.WinningCards.Add(new WinningCardsInfo
+            var isWinner = CheckDoubleColumn(card, col);
+            if (isWinner)
             {
-                Punter = card.Punter,
-                Card = card,
-                ValueOfEachWinner = prize.Value / resultCards.Count()
-            });
-        }
-    }
-    private bool CheckWinner(Card card)
-    {
-        // Verifica se o cartão tem duas colunas completamente marcadas
-        var markedColumns = Enumerable.Range(0, 5) // Colunas 0 a 4 para cartela 5x5
-            .Where(col => IsColumnMarked(card.CardMarkedNumbers, 5, col))
-            .ToList();
-
-        bool isWinner = markedColumns.Count >= 2; // Ganha se houver pelo menos duas colunas totalmente preenchidas
-
-        if (isWinner)
-        {
-            ExecuteTopFiveList(card, markedColumns);
-        }
-
-        return isWinner;
-    }
-    private bool IsColumnMarked(int[] cardMarkedNumbers, int rows, int col)
-    {
-
-        for (int row = 0; row < rows; row++)
-        {
-            if (cardMarkedNumbers[row * rows + col] != 1)
-            {
-                return false;
+                ExecuteTopFiveList(card, row, col);
             }
+            return isWinner;
         }
-        return true;
-    }
-    private void ExecuteTopFiveList(Card card, List<int> markedColumns)
-    {
-        var subNumbers = card.Numbers.Chunk(5).ToList();
-        var missingNumbers = new List<int>();
 
-        foreach (var col in Enumerable.Range(0, 5))
+        private bool CheckDoubleColumn(Card card, int col)
         {
-            if (!markedColumns.Contains(col))
+            bool doubleColumnWinner = false;
+
+            // Criando a matriz 2D a partir do array unidimensional
+            var matrix = card.CardMarkedNumbers
+                .Select((value, index) => new { value, index })
+                .GroupBy(x => x.index / col)
+                .Select(g => g.Select(x => x.value).ToList())
+                .ToList();
+
+            // Verificando as colunas (neste caso, vamos verificar pares de colunas)
+            for (int c1 = 0; c1 < matrix[0].Count - 1; c1++) // Itera sobre a primeira coluna
             {
-                for (int row = 0; row < subNumbers.Count; row++)
+                for (int c2 = c1 + 1; c2 < matrix[0].Count; c2++) // Itera sobre a segunda coluna
                 {
-                    if (card.CardMarkedNumbers[row * 5 + col] != 1)
+                    var column1Marked = matrix.All(row => row[c1] == 1);
+                    var column2Marked = matrix.All(row => row[c2] == 1);
+
+                    // Se ambos os colunas tiverem todos os números marcados, é um vencedor
+                    if (column1Marked && column2Marked)
                     {
-                        missingNumbers.Add(subNumbers[row][col]);
+                        doubleColumnWinner = true;
+                        break;
                     }
                 }
+
+                if (doubleColumnWinner) break;
             }
+
+            return doubleColumnWinner;
         }
 
-        int lackOfHits = missingNumbers.Count;
-        prize.SetTopFive(card, lackOfHits, missingNumbers);
-    }
-    public void SaveWinners()
-    {
-        if (!prize.HasWinners()) return;
-
-        decimal prizeValue = prize.Value / prize.WinningCards.Count;
-        foreach (var card in prize.WinningCards)
+        protected override void ExecuteTopFiveList(Card card, int row, int col)
         {
-            // Salvar informações dos vencedores, se necessário
+            var subNumbers = card.Numbers.Chunk(col).ToList();
+            var markedSubarrays = card.CardMarkedNumbers.Chunk(col).ToList();
+
+            for (int i = 0; i < subNumbers.Count; i++)
+            {
+                var subNumberArray = subNumbers[i];
+                var markedArray = markedSubarrays[i];
+
+                var markedNumbers = subNumberArray.Where((_, index) => markedArray[index] == 1).ToList();
+                var missingNumbers = subNumberArray.Except(markedNumbers).ToList();
+                var lackOfHits = missingNumbers.Count;
+
+                prize.SetTopFive(card, lackOfHits, missingNumbers);
+            }
         }
     }
 }

@@ -63,8 +63,8 @@ public static class NativeInjectorConfig
         services.AddScoped<IRoundRepository, RoundRepository>();
 
         //jobs
-        services.AddScoped<IRoundFetcherJob, RoundFetcherJob>();
-        services.AddScoped<IRoundExecutionJob, RoundExecutionJob>();
+        services.AddScoped< RoundFetcherJob>();
+        services.AddScoped< RoundExecutionJob>();
 
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();
