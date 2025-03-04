@@ -2,20 +2,21 @@ using bingo_api.src.Entities;
 using bingo_api.src.Services.Prizes;
 using Xunit.Abstractions;
 
+
 namespace bingo_tests.src.Services.Prizes;
 
-public class PrizePlusShapeServiceTest
+public class PrizeSingleColumnServiceTest
 {
-   
+
         private readonly ITestOutputHelper _output;
-        private readonly PrizePlusShapeService _service;
+        private readonly PrizeSingleColumnService _service;
         private readonly Prize _prize;
 
-        public PrizePlusShapeServiceTest(ITestOutputHelper output)
+        public PrizeSingleColumnServiceTest(ITestOutputHelper output)
         {
             _output = output;
             _prize = new Prize(1000);
-            _service = new PrizePlusShapeService(_prize);
+            _service = new PrizeSingleColumnService(_prize);
         }
         [Fact]
         public void Execute3x5()
@@ -25,9 +26,9 @@ public class PrizePlusShapeServiceTest
             {
                 CardMarkedNumbers = new int[]
                 {
-                    1, 0, 1,0,1,
                     1, 1, 1,1,1,
-                    1, 0, 1,0,1
+                    1, 0, 0,0,0,
+                    1, 1, 1,1,1
                 },
                 Numbers = new int[]
                 {
@@ -57,9 +58,9 @@ public class PrizePlusShapeServiceTest
                 CardMarkedNumbers = new int[]
                 {
                     1, 1, 1, 1, 1,
+                    1, 1, 0, 1, 0,
                     1, 0, 1, 0, 1,
-                    1, 1, 1, 1, 1,
-                    1, 0, 1, 0, 1,
+                    1, 1, 0, 1, 1,
                     1, 1, 1, 1, 1
                 },
                 Numbers = new int[]
@@ -92,7 +93,7 @@ public class PrizePlusShapeServiceTest
                 CardMarkedNumbers = new int[]
                 {
                     1, 1, 1, 1,
-                    1, 1, 0, 1,
+                    1, 1, 0, 0,
                     1, 0, 1, 1,
                     1, 1, 1, 1
 
@@ -113,8 +114,8 @@ public class PrizePlusShapeServiceTest
             _service.Execute(cards, 4, 4);
 
             // Assert
-            Assert.False(_prize.HasWinners(), "No winners were found when there should be.");
-            Assert.Empty(_prize.WinningCards);
+            Assert.True(_prize.HasWinners(), "No winners were found when there should be.");
+            Assert.NotEmpty(_prize.WinningCards);
             // Assert.Equal("Player1", _prize.WinningCards.First().Punter);
             // Assert.Equal(1000M, _prize.WinningCards.First().ValueOfEachWinner);
         }
@@ -126,9 +127,9 @@ public class PrizePlusShapeServiceTest
             {
                 CardMarkedNumbers = new int[]
                 {
-                    0, 1, 0,
                     1, 1, 1,
                     0, 1, 0,
+                    1, 1, 1,
                 },
                 Numbers = new int[]
                 {
