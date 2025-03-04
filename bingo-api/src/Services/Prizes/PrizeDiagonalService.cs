@@ -1,7 +1,4 @@
 using bingo_api.src.Entities;
-using bingo_api.src.Interfaces.Repositories;
-using bingo_api.src.Interfaces.Services;
-using bingo_api.src.Structs;
 
 namespace bingo_api.src.Services.Prizes
 {
