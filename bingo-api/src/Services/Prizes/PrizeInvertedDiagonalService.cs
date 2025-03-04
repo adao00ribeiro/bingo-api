@@ -10,6 +10,10 @@ namespace bingo_api.src.Services.Prizes
 
         protected override bool CheckWinner(Card card, int rows, int cols)
         {
+            if (rows != cols)
+            {
+                return false;
+            }
             var isWinner = CheckInvertedDiagonal(card, rows, cols);
             if (isWinner)
             {
@@ -22,7 +26,7 @@ namespace bingo_api.src.Services.Prizes
         {
             // A diagonal invertida vai do canto inferior esquerdo ao canto superior direito
             // Os índices seriam: (rows-1)*cols, (rows-2)*cols+1, ..., 0*cols+(cols-1)
-            
+
             for (int i = 0; i < rows; i++)
             {
                 int index = (rows - 1 - i) * cols + i;
@@ -31,7 +35,7 @@ namespace bingo_api.src.Services.Prizes
                     return false;
                 }
             }
-            
+
             return true;
         }
 
@@ -41,14 +45,14 @@ namespace bingo_api.src.Services.Prizes
             var diagonalNumbers = new List<int>();
             var markedNumbers = new List<int>();
             var missingNumbers = new List<int>();
-            
+
             // Coletar índices e números da diagonal invertida
             for (int i = 0; i < rows; i++)
             {
                 int index = (rows - 1 - i) * cols + i;
                 diagonalIndices.Add(index);
                 diagonalNumbers.Add(card.Numbers[index]);
-                
+
                 if (card.CardMarkedNumbers[index] == 1)
                 {
                     markedNumbers.Add(card.Numbers[index]);
@@ -58,9 +62,9 @@ namespace bingo_api.src.Services.Prizes
                     missingNumbers.Add(card.Numbers[index]);
                 }
             }
-            
+
             var lackOfHits = missingNumbers.Count;
-            
+
             prize.SetTopFive(card, lackOfHits, missingNumbers);
         }
     }
