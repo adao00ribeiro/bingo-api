@@ -10,6 +10,11 @@ public class PrizeTShapeService : PrizeBaseService
 
     protected override bool CheckWinner(Card card, int row, int col)
     {
+        if (col != 5 && col != 3)
+        {
+            return false;
+        }
+
         var isWinner = CheckTShape(card.CardMarkedNumbers, row, col);
         if (isWinner)
         {
