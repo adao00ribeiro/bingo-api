@@ -38,7 +38,11 @@ public class RoundController(IRoundRepository _roundRepository) : ApiControllerB
         var id = await roundRepository.AddAsync(round);
         return CreatedAtAction(nameof(GetById), new { id = id }, id);
     }
-
+    [HttpPost("bulk")]
+    public async Task<ActionResult<bool>> CreateBulk(RoundBulkRequestDto dto)
+    {
+        return Ok(await roundRepository.GenerateRounds(dto));
+    }
     [HttpGet("id/{id}")]
     public async Task<ActionResult<RoundResponseDto>> GetById(Guid id)
     {

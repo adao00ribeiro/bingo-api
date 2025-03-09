@@ -15,7 +15,7 @@ builder.Services.AddCors ( options =>
 {
     options.AddPolicy ( "AllowAll" , policy =>
     {
-        policy.WithOrigins ( "http://srv695438.hstgr.cloud" , "http://localhost" , "http://localhost:4200" , "http://localhost:4300" , "https://localhost:4200" , "https://localhost:4300" )
+        policy.WithOrigins ( "https://743a771ca0f108ba1df8daef491c66d0.serveo.net" , "http://localhost" , "http://localhost:4200" , "http://localhost:4300" , "https://localhost:4200" , "https://localhost:4300" )
               .AllowAnyMethod ( )
               .AllowAnyHeader ( )
               .AllowCredentials ( );
@@ -29,6 +29,7 @@ builder.Services.AddControllers ( ).AddJsonOptions ( options =>
     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.Converters.Add ( new System.Text.Json.Serialization.JsonStringEnumConverter ( ) );
+    options.JsonSerializerOptions.Converters.Add ( new JsonTimeOnlyConverter() );
 } );
 builder.Services.AddEndpointsApiExplorer ( );
 builder.Services.AddLogging ( );

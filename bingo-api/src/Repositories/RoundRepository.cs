@@ -1,4 +1,5 @@
 using bingo_api.src.Context;
+using bingo_api.src.DTOs.Request;
 using bingo_api.src.Entities;
 using bingo_api.src.Enums;
 using bingo_api.src.Interfaces.Repositories;
@@ -15,10 +16,10 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     {
     }
 
-public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
-    Guid roomId, DateTime date, TimeSpan startTime, TimeSpan endTime, Guid PunterId)
-{
-    var query = @"SELECT r.*, COUNT(c.""Id"") AS CardsPurchased
+    public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
+        Guid roomId, DateTime date, TimeSpan startTime, TimeSpan endTime, Guid PunterId)
+    {
+        var query = @"SELECT r.*, COUNT(c.""Id"") AS CardsPurchased
     FROM ""Rounds"" r
     LEFT JOIN ""Cards"" c ON c.""RoundId"" = r.""Id"" AND c.""PunterId"" = @PunterId
     WHERE r.""RoomId"" = @RoomId
@@ -27,15 +28,15 @@ public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
     AND r.""Finished"" IS NULL
     GROUP BY r.""Id""";
 
-    return await Context.Rounds
-        .FromSqlRaw(query, 
-            new NpgsqlParameter("@RoomId", roomId),
-            new NpgsqlParameter("@Date", date),
-            new NpgsqlParameter("@StartTime", startTime),
-            new NpgsqlParameter("@EndTime", endTime),
-            new NpgsqlParameter("@PunterId", PunterId)
-        ).ToListAsync();
-}
+        return await Context.Rounds
+            .FromSqlRaw(query,
+                new NpgsqlParameter("@RoomId", roomId),
+                new NpgsqlParameter("@Date", date),
+                new NpgsqlParameter("@StartTime", startTime),
+                new NpgsqlParameter("@EndTime", endTime),
+                new NpgsqlParameter("@PunterId", PunterId)
+            ).ToListAsync();
+    }
     public override Task<Guid> AddAsync(Round objeto)
     {
         if (objeto.Prizes?.Count == 0)
@@ -59,5 +60,41 @@ public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
                              round.Started.TimeOfDay <= timeOfDay2
                             )
                             .ToListAsync();
+    }
+       public async Task<bool> GenerateRounds(RoundBulkRequestDto request)
+    {
+        var roundsToInsert = GenerateRoundsList(request);
+
+        await Context.Rounds.AddRangeAsync(roundsToInsert);
+        await Context.SaveChangesAsync();
+
+        var prizesToInsert = GeneratePrizesList(request, roundsToInsert);
+        await Context.Prizes.AddRangeAsync(prizesToInsert);
+        await Context.SaveChangesAsync();
+        return true;
+    }
+
+    private List<Round> GenerateRoundsList(RoundBulkRequestDto request)
+    {
+        var rounds = new List<Round>();
+
+        for (var date = request.StartedDate; date <= request.FinishedDate; date = date.AddDays(1))
+        {
+            var startTime = DateTime.SpecifyKind(date.ToDateTime(request.StartedTime), DateTimeKind.Utc);
+            var endTime = DateTime.SpecifyKind(date.ToDateTime(request.FinishedTime), DateTimeKind.Utc);
+            var currentTime = startTime;
+            while (currentTime <= endTime)
+            {
+                rounds.Add(new Round(request.CardValue, currentTime, request.TimeBetweenBalls, request.MaxBalls, request.CardRows, request.CardColumns, request.RoomId));
+                currentTime = currentTime.AddMinutes(request.TimeBetweenRounds);
+            }
+        }
+        return rounds;
+    }
+
+    private List<Prize> GeneratePrizesList(RoundBulkRequestDto request, List<Round> rounds)
+    {
+        return rounds.SelectMany(round => request.Prizes.Select(prize => new Prize(prize.Value, prize.Type, round.Id)
+        )).ToList();
     }
 }

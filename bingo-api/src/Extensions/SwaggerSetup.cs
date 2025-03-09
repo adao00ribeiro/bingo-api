@@ -38,6 +38,7 @@ public static class SwaggerSetup
                 Version = "v1",
 
             });
+            options.EnableAnnotations();
             options.SwaggerDoc("v2", new OpenApiInfo
             {
                 Title = "bingo_api",
