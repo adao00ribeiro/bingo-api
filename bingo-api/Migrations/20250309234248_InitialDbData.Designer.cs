@@ -12,7 +12,7 @@ using bingo_api.src.Context;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250216113602_InitialDbData")]
+    [Migration("20250309234248_InitialDbData")]
     partial class InitialDbData
     {
         /// <inheritdoc />
@@ -331,7 +331,7 @@ namespace bingo_api.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("Finished")
+                    b.Property<DateTime?>("Finished")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("MaxBalls")

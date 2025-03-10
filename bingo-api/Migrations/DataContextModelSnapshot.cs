@@ -328,7 +328,7 @@ namespace bingo_api.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("Finished")
+                    b.Property<DateTime?>("Finished")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("MaxBalls")

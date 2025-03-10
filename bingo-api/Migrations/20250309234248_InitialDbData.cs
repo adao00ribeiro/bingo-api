@@ -166,7 +166,7 @@ namespace bingo_api.Migrations
                     CardRows = table.Column<int>(type: "integer", nullable: false),
                     CardColumns = table.Column<int>(type: "integer", nullable: false),
                     Started = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Finished = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Finished = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     RoomId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
