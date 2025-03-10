@@ -15,7 +15,7 @@ public class Round : Entity
     [NotMapped]
     public int CardsPurchased { get; set; }
     public DateTime Started { get; set; }
-    public DateTime Finished { get; set; }
+    public DateTime? Finished { get; set; }
     public Guid RoomId { get; set; }
     public  Room? Room { get; set; }
     public  IEnumerable<Card>? Cards { get; set; }

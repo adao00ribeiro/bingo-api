@@ -15,9 +15,9 @@ public record RoundResponseDto
     public int CardRows { get; set; } // Número de linhas na cartela
     public int CardColumns { get; set; } // Número de colunas na cartela
 
-      public int CardsPurchased { get; set; }
+    public int CardsPurchased { get; set; }
     public DateTime StartedDate { get; set; }
-    public DateTime FinishedDate { get; set; }
+    public DateTime? FinishedDate { get; set; }
     public Guid RoomId { get; set; }
     public RoomResponseDto? Room { get; set; }
 
@@ -37,7 +37,7 @@ public record RoundResponseDto
         int cardColumns,
         int cardsPurchased,
         DateTime startedDate,
-        DateTime finishedDate,
+        DateTime? finishedDate,
         Guid roomId,
         RoomResponseDto? room,
         IEnumerable<CardResponseDto> cards,

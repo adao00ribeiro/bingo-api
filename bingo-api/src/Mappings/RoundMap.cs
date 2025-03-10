@@ -40,7 +40,8 @@ public class RoundMap : IEntityTypeConfiguration<Round>
             .IsRequired();
 
         builder.Property(r => r.Finished)
-            .IsRequired();
+         .IsRequired(false) // Não obrigatório
+    .HasDefaultValue(null); // Garante que o valor padrão será NULL
 
 
         builder.HasOne(r => r.Room)

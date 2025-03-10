@@ -7,6 +7,6 @@ namespace bingo_api.src.Interfaces.Repositories;
 public interface IRoundRepository : IRepositoryBase<Round>
 {
     Task<IEnumerable<Round>> FilterByDateTimeRange(DateTime today, TimeSpan timeOfDay1, TimeSpan timeOfDay2);
-    Task<IEnumerable<Round>> FilterByRoomIdAsync(Guid roomId, DateTime date, TimeSpan startTime, TimeSpan endTime, Guid PunterId);
-      Task<bool> GenerateRounds(RoundBulkRequestDto request);
+    Task<IEnumerable<Round>> FilterByRoomIdAsync(Guid roomId, Guid PunterId);
+    Task<bool> GenerateRounds(RoundBulkRequestDto request);
 }

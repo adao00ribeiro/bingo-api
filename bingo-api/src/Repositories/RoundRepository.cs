@@ -17,21 +17,38 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     }
 
     public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
-        Guid roomId, DateTime date, TimeSpan startTime, TimeSpan endTime, Guid PunterId)
+        Guid roomId, Guid PunterId)
     {
+    DateTime currentDateTime = DateTime.UtcNow;
+    // Calculando startTime (10 minutos antes do tempo atual)
+    TimeSpan startTime = currentDateTime.TimeOfDay.Add(TimeSpan.FromMinutes(-10));
+    // Calculando endTime (24 horas depois do startTime)
+    //TimeSpan endTime = startTime.Add(TimeSpan.FromHours(24));
+    TimeSpan endTime = TimeSpan.FromHours(23) + TimeSpan.FromMinutes(59); 
+    Console.WriteLine("opa" +roomId);
+
+    Console.WriteLine("opa" +PunterId);
+
+    Console.WriteLine("opa" +currentDateTime.Date);
+    Console.WriteLine("opa" +startTime);
+    Console.WriteLine("opa" +endTime);
+
+
+
+
         var query = @"SELECT r.*, COUNT(c.""Id"") AS CardsPurchased
     FROM ""Rounds"" r
     LEFT JOIN ""Cards"" c ON c.""RoundId"" = r.""Id"" AND c.""PunterId"" = @PunterId
     WHERE r.""RoomId"" = @RoomId
     AND DATE(r.""Started"") = @Date
     AND CAST(r.""Started"" AS TIME) BETWEEN @StartTime AND @EndTime
-    AND r.""Finished"" IS NULL
+    AND r.""Finished"" is null
     GROUP BY r.""Id""";
 
         return await Context.Rounds
             .FromSqlRaw(query,
                 new NpgsqlParameter("@RoomId", roomId),
-                new NpgsqlParameter("@Date", date),
+                new NpgsqlParameter("@Date", currentDateTime.Date),
                 new NpgsqlParameter("@StartTime", startTime),
                 new NpgsqlParameter("@EndTime", endTime),
                 new NpgsqlParameter("@PunterId", PunterId)

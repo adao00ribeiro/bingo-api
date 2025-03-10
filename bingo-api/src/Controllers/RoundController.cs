@@ -4,14 +4,16 @@ using bingo_api.src.DTOs.Response;
 using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using System.Security.Claims;
 namespace bingo_api.src.Controllers;
 
 
 
 [ApiVersion("1.0")]
-public class RoundController(IRoundRepository _roundRepository) : ApiControllerBase
+public class RoundController(IRoundRepository _roundRepository , IPunterRepository _punterRepository) : ApiControllerBase
 {
     private readonly IRoundRepository roundRepository = _roundRepository;
+    private readonly IPunterRepository punterRepository = _punterRepository;
 
 
     [HttpGet()]
@@ -21,11 +23,25 @@ public class RoundController(IRoundRepository _roundRepository) : ApiControllerB
         var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
         return Ok(roundsResponse);
     }
-    [HttpPost("filter/rounds")]
-    public async Task<ActionResult<IEnumerable<RoundResponseDto>>> FilterByRoomIdAsync(FilterRoundByRoomIdDateDto dto)
+    [HttpGet("filter/room/{id}")]
+    public async Task<ActionResult<IEnumerable<RoundResponseDto>>> FilterByRoomIdAsync(Guid id)
     {
-        Console.WriteLine(dto);
-        var rounds = await roundRepository.FilterByRoomIdAsync(dto.RoomId,dto.Date,dto.StartTime,dto.EndTime, dto.PunterId);
+        var identity = User.Identity as ClaimsIdentity;
+        var userEmail = identity?.FindFirst(ClaimTypes.Email)?.Value;
+            
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Unauthorized(new { message = "Usuário não autenticado." });
+        }
+
+        var punter = await this.punterRepository.GetByEmailAsync(userEmail);
+      
+        if (punter is null)
+        {
+            return NotFound();
+        }
+        
+        var rounds = await roundRepository.FilterByRoomIdAsync(id, punter.Id);
         var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
         return Ok(roundsResponse);
     }
