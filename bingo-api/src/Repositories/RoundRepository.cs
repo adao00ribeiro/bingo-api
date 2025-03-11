@@ -21,10 +21,10 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     {
     DateTime currentDateTime = DateTime.UtcNow;
     // Calculando startTime (10 minutos antes do tempo atual)
-    TimeSpan startTime = currentDateTime.TimeOfDay.Add(TimeSpan.FromMinutes(-10));
+    var startTime = currentDateTime.AddMinutes(-10);
     // Calculando endTime (24 horas depois do startTime)
-    //TimeSpan endTime = startTime.Add(TimeSpan.FromHours(24));
-    TimeSpan endTime = TimeSpan.FromHours(23) + TimeSpan.FromMinutes(59); 
+    var endTime = startTime.AddHours(24);
+    //TimeSpan endTime = TimeSpan.FromHours(23) + TimeSpan.FromMinutes(59); 
     Console.WriteLine("opa" +roomId);
 
     Console.WriteLine("opa" +PunterId);
@@ -40,9 +40,9 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     FROM ""Rounds"" r
     LEFT JOIN ""Cards"" c ON c.""RoundId"" = r.""Id"" AND c.""PunterId"" = @PunterId
     WHERE r.""RoomId"" = @RoomId
-    AND DATE(r.""Started"") = @Date
-    AND CAST(r.""Started"" AS TIME) BETWEEN @StartTime AND @EndTime
-    AND r.""Finished"" is null
+    AND r.""Started"" >= @StartTime 
+    AND r.""Started"" <= @EndTime
+    AND r.""Finished"" IS NULL
     GROUP BY r.""Id""";
 
         return await Context.Rounds
