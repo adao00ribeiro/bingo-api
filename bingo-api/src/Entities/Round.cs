@@ -20,6 +20,10 @@ public class Round : Entity
     public  Room? Room { get; set; }
     public  IEnumerable<Card>? Cards { get; set; }
     public  ICollection<Prize>? Prizes { get; set; }
+      public Round()
+    {
+
+    }
     public Round(decimal cardValue, DateTime started, int timeBetweenBalls, int maxBalls, int cardRows, int cardColumns, Guid roomId)
     {
         this.CardValue = cardValue;

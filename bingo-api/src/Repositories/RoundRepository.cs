@@ -43,7 +43,9 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     AND r.""Started"" >= @StartTime 
     AND r.""Started"" <= @EndTime
     AND r.""Finished"" IS NULL
-    GROUP BY r.""Id""";
+    GROUP BY r.""Id""
+    ORDER BY r.""Started"" ASC
+    ";
 
         return await Context.Rounds
             .FromSqlRaw(query,

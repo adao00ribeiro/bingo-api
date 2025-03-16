@@ -10,8 +10,8 @@ public class Prize : Entity
     public decimal Value { get; set; }
     public EPrizeType Type { get; set; }
     public Guid RoundId { get; set; }
-    public  Round? Round { get; set; }
-    public  IEnumerable<CardWinner>? CardWinners { get; set; }
+    public Round? Round { get; set; }
+    public IEnumerable<CardWinner>? CardWinners { get; set; }
     public Prize(decimal value)
     {
         this.Value = value;
@@ -81,5 +81,22 @@ public class Prize : Entity
             .ThenBy(obj => obj.MissingNumbers.Count) // Para desempate, prioriza menos números faltantes
             .Take(20)
             .ToList();
+    }
+
+    public void AddAccumulated(decimal accumulatedValue)
+    {
+        if (Type != EPrizeType.FullCard)
+        {
+            return;
+        }
+
+        decimal distributedValue = accumulatedValue / WinningCards.Count;
+
+        foreach (var winner in WinningCards)
+        {
+            winner.ValueOfEachWinner = (decimal)winner.ValueOfEachWinner + distributedValue;
+        }
+
+        this.Value += distributedValue;
     }
 }

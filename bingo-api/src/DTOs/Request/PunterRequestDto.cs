@@ -8,11 +8,12 @@ public record PunterRequestDto : RegisterRequestDto
 {
     [Required(ErrorMessage = "O campo Id do dono da sala é Obrigatorio")]
     public Guid SellerId { get; set; }
-
+    public string Name { get; set; }
     internal static Punter ConvertToEntity(PunterRequestDto dto)
     {
         return new Punter(
              dto.Email,
+             dto.Name,
              dto.Cpf,
              dto.DateBirth,
              dto.SellerId

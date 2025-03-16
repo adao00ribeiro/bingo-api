@@ -10,6 +10,10 @@ public class Room : Entity
     public  IEnumerable<RoomSeller>? RoomsSellers { get; set; }
     public  IEnumerable<Round>? Rounds { get; set; }
     public  Accumulated Accumulated { get; set; }
+
+    public Room(){
+        
+    }
     public Room(string name, Guid ownerId)
     {
         this.Name = name;

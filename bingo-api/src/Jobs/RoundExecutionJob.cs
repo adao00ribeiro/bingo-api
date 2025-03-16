@@ -10,10 +10,10 @@ using Microsoft.EntityFrameworkCore;
 namespace bingo_api.src.Jobs;
 
 public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
- IServiceScopeFactory scopeFactory, 
+ IServiceScopeFactory scopeFactory,
  IWebSocketService _webSocketService,
  ICardWinnerRepository _cardWinnerRepository
- 
+
  ) : IRoundExecutionJob
 {
     IServiceScopeFactory _scopeFactory = scopeFactory;
@@ -33,14 +33,20 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 var context = scope.ServiceProvider.GetRequiredService<DataContext>();
                 Round? tempRound = await context.Rounds
                 .Include(r => r.Cards)
+                .ThenInclude(c => c.Punter)
                 .Include(r => r.Prizes)
                 .Include(r => r.Room)
                 .ThenInclude(room => room.Accumulated)
+                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Id == roundId);
 
-                if (tempRound is null || tempRound?.Finished == null)
+                if (tempRound is null )
                 {
                     Console.WriteLine("round nao existe");
+                    return;
+                }
+                if(tempRound?.Finished != null){
+                      Console.WriteLine("round ja foi finalizado");
                     return;
                 }
                 var message = new RoundMessage(tempRound.Id);
@@ -91,7 +97,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                     foreach (Prize p in prizes)
                     {
                         var prizeService = PrizeServiceFactory.CreateService(p);
-                        prizeService.Execute(cards , tempRound.CardRows, tempRound.CardColumns);
+                        prizeService.Execute(cards, tempRound.CardRows, tempRound.CardColumns);
                     }
                     Console.WriteLine("Checado os premios");
                     var current_prize_result = (PrizeResult)null;
@@ -110,6 +116,19 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                     int secondBall = lastFour.Length > 1 ? lastFour[1] : 0;
                     int thirdBall = lastFour.Length > 2 ? lastFour[2] : 0;
                     int fourthBall = lastFour.Length > 3 ? lastFour[3] : 0;
+
+
+                    var IsAccumulated = bingoAccumulated.Activated && bingoAccumulated.MaximumNumberOfBalls >= tempRound.Numbers.Length;
+
+                    if (IsAccumulated && current_prize_result?.PrizeType == EPrizeType.FullCard
+   )
+                    {
+                        foreach (var prize in prizes)
+                        {
+                            prize.AddAccumulated(bingoAccumulated.CurrentValue);
+                        }
+                    }
+
                     message.MainBall = mainBall;
                     message.SecondBall = secondBall;
                     message.ThirdBall = thirdBall;
@@ -139,16 +158,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 {
                     if (bingoAccumulated.MaximumNumberOfBalls >= tempRound.Numbers.Count())
                     {
-                        foreach (var prize in prizes)
-                        {
-                            if (prize.Type == EPrizeType.FullCard)
-                            {
-                                foreach (var wc in prize.WinningCards)
-                                {
-                                    context.CardWinners.Add(new CardWinner(bingoAccumulated.CurrentValue / prize.WinningCards.Count(), wc.Card.Id, prize.Id));
-                                }
-                            }
-                        }
+                       
                         bingoAccumulated.CurrentValue = bingoAccumulated.MinimumValue;
                         bingoAccumulated.MaximumNumberOfBalls = 40;
                     }
@@ -165,9 +175,9 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
 
                     context.Accumulated.Entry(bingoAccumulated).State = EntityState.Modified;
                     await context.SaveChangesAsync();
-                    Console.WriteLine("Terminado o Job");
+                   
                 }
-                // tempRound.Finished = DateTime.UtcNow;
+                tempRound.Finished = DateTime.UtcNow;
                 context.Rounds.Entry(tempRound).State = EntityState.Modified;
                 await context.SaveChangesAsync();
 
