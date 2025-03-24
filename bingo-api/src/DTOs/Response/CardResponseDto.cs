@@ -12,6 +12,7 @@ public record CardResponseDto
     public RoundResponseDto? Round { get; set; }
     public Guid PunterId { get; set; }
     public PunterResponseDto? Punter { get; set; }
+     [JsonIgnore]
     public IEnumerable<CardWinnerResponseDto> CardWinners { get; set; }
 
     public CardResponseDto(Guid id, int[] numbers, Guid roundId, RoundResponseDto? round, Guid punterId, PunterResponseDto? punter, IEnumerable<CardWinnerResponseDto> cardWinners)
@@ -39,6 +40,19 @@ public record CardResponseDto
         card.PunterId,
         PunterResponse,
         CardsWinnersResponse
+        );
+    }
+     internal static CardResponseDto ConvertToSocketDto(Card card)
+    {
+        var RoundResponse = card.Round != null ? RoundResponseDto.ConvertToSocketDto(card.Round) : null;
+        return new CardResponseDto(
+        card.Id,
+        card.Numbers,
+        card.RoundId,
+        RoundResponse,
+        card.PunterId,
+        null,
+        null
         );
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using bingo_api.src.Context;
@@ -11,9 +12,11 @@ using bingo_api.src.Context;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250317204938_add-is-bot-in-punter")]
+    partial class addisbotinpunter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,9 +227,6 @@ namespace bingo_api.Migrations
                         .IsUnicode(false)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<decimal>("PrizeBalance")
-                        .HasColumnType("numeric");
-
                     b.Property<Guid>("SellerId")
                         .HasColumnType("uuid");
 
@@ -433,9 +433,6 @@ namespace bingo_api.Migrations
                         .IsUnicode(false)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<decimal>("PrizeBalance")
-                        .HasColumnType("numeric");
-
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
@@ -444,44 +441,6 @@ namespace bingo_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Sellers", (string)null);
-                });
-
-            modelBuilder.Entity("bingo_api.src.Entities.TransactionHistory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(15,2)");
-
-                    b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("CurrentBalance")
-                        .HasColumnType("decimal(15,2)");
-
-                    b.Property<Guid>("EntityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("EntityType")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .IsUnicode(false)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<decimal>("PreviousBalance")
-                        .HasColumnType("decimal(15,2)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TransactionHistorys", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Accumulated", b =>

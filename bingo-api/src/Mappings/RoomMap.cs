@@ -35,5 +35,10 @@ public class RoomMap : IEntityTypeConfiguration<Room>
         .WithOne(a => a.Room)
         .HasForeignKey<Accumulated>(a => a.RoomId)
         .IsRequired();
+
+         builder.HasOne(r => r.BotConfig)
+        .WithOne(a => a.Room)
+        .HasForeignKey<BotConfig>(a => a.RoomId)
+        .IsRequired();
     }
 }

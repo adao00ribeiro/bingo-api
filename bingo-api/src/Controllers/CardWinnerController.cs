@@ -17,7 +17,7 @@ public class CardWinnerController(ICardWinnerRepository _cardWinnerRepository) :
     [HttpGet()]
     public async Task<ActionResult<IEnumerable<CardWinnerResponseDto>>> GetAll()
     {
-        var cardWinners = await cardWinnerRepository.GetAllAsync();
+        var cardWinners = await cardWinnerRepository.GetAllAsync(cw => cw.Prize.Round , cd=> cd.Card);
         var cardWinnerResponse = cardWinners.Select(cardWinner => CardWinnerResponseDto.ConvertToDto(cardWinner));
         return Ok(cardWinnerResponse);
     }

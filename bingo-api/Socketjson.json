@@ -1,0 +1,12 @@
+{
+  "id": "df26c78c-2be9-4b6a-a140-afecd5622464",
+  "finished": true,
+  "started": true,
+  "mainBall": 0,
+  "secondBall": 0,
+  "thirdBall": 0,
+  "forthBall": 0,
+  "maxNumbers": 0,
+  "numbers": [],
+  "isAccumulated": false
+}

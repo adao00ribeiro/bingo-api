@@ -22,7 +22,8 @@ builder.Services.AddCors ( options =>
     } );
 } );
 builder.Services.AddApiProblemDetails ( );
-builder.Services.AddControllers ( ).AddJsonOptions ( options =>
+builder.Services.AddControllers ( )
+.AddJsonOptions ( options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     options.JsonSerializerOptions.WriteIndented = true;

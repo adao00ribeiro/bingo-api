@@ -11,7 +11,6 @@ public record CardWinnerResponseDto
     public Guid PrizeId { get; set; }
     public PrizeResponseDto? Prize { get; set; }
 
-
     public CardWinnerResponseDto(Guid id, decimal value, Guid cardId, CardResponseDto? card, Guid prizeId, PrizeResponseDto? prize)
     {
         Id = id;

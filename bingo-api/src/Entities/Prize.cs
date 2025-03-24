@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using bingo_api.src.DTOs.Response;
 using bingo_api.src.Entities.Shared;
 using bingo_api.src.Enums;
 using bingo_api.src.Structs;
@@ -55,8 +56,8 @@ public class Prize : Entity
     {
         var newCardInfo = new TopCardInfo
         {
-            Card = card,
-            Punter = card.Punter,
+            Card =CardResponseDto.ConvertToSocketDto(card),
+            Punter =  PunterResponseDto.ConvertToSocketDto(card.Punter),
             MissingNumbers = missingNumbers,
             Hits = hits
         };

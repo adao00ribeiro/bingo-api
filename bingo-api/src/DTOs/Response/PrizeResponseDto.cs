@@ -11,10 +11,10 @@ public record PrizeResponseDto
     public decimal Value { get; set; }
     public EPrizeType Type { get; set; }
     public Guid RoundId { get; set; }
-
     [JsonIgnore]
     public RoundResponseDto? Round { get; set; }
-    public IEnumerable<CardWinnerResponseDto> CardWinners { get; set; }
+    [JsonIgnore]
+    public IEnumerable<CardWinnerResponseDto>? CardWinners { get; set; }
     public PrizeResponseDto(Guid id, decimal value, EPrizeType prizeType, Guid roundId, RoundResponseDto? round, IEnumerable<CardWinnerResponseDto> cardwinners)
     {
         Id = id;
@@ -36,6 +36,18 @@ public record PrizeResponseDto
                 prize.RoundId,
                 roundResponseDto,
                 cardWinnerResponse
+        );
+    }
+
+    internal static PrizeResponseDto ConvertToSocketDto(Prize prize)
+    {
+        return new PrizeResponseDto(
+                prize.Id,
+                prize.Value,
+                prize.Type,
+                prize.RoundId,
+                null,
+                Enumerable.Empty<CardWinnerResponseDto>()
         );
     }
 }

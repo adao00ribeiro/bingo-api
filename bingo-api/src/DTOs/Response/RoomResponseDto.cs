@@ -32,4 +32,16 @@ public record RoomResponseDto
             roomSellerResponse
         );
     }
+    internal static RoomResponseDto ConvertToSocketDto(Room room)
+    {
+        var roomSellerResponse = room.RoomsSellers?.Select(r => RoomSellerResponseDto.ConvertToDto(r)) ?? Enumerable.Empty<RoomSellerResponseDto>();
+        var ownerResponse = room.Owner != null ? SellerResponseDto.ConvertToDto(room.Owner) : null;
+        return new RoomResponseDto(
+            room.Id,
+            room.Name,
+            room.OwnerId,
+            ownerResponse,
+            roomSellerResponse
+        );
+    }
 }

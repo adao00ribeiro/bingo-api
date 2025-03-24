@@ -14,7 +14,7 @@ public class WebSocketController : ApiControllerBase, IDisposable
 {
     private readonly ILogger<WebSocketController> _logger;
     private readonly IWebSocketService _webSocketService;
-    private const int BufferSize = 4 * 1024;
+    private const int BufferSize = 64 * 1024;
     private Timer _heartbeatTimer;
     public WebSocketController(ILogger<WebSocketController> logger, IWebSocketService webSocketService)
     {
@@ -92,27 +92,31 @@ public class WebSocketController : ApiControllerBase, IDisposable
                         await _webSocketService.SendMessageAsync(webSocket, $"Subscribed to {channel}");
                         break;
 
-                    case "message" when root.TryGetProperty("content", out var contentProperty):
+                    case "message" when root.TryGetProperty("message", out var contentProperty):
                         var channelMessage = contentProperty.GetString();
                         if (channelMessage != null)
                         {
                             await _webSocketService.SendMessageToChannel(channel, channelMessage);
+                            await  _webSocketService.SendMessageAsync(webSocket, "Message sent to channel");
                         }
                         break;
 
                     default:
                         _logger.LogWarning("Invalid command or missing channel in message.");
+                           await  _webSocketService.SendMessageAsync(webSocket, $"Invalid command: {command}");
                         break;
                 }
             }
             else
             {
                 _logger.LogWarning("Invalid JSON message format. Required fields 'command' and 'channel' are missing.");
+                    await  _webSocketService.SendMessageAsync(webSocket, "Error parsing MessagePack data");
             }
         }
         catch (JsonException ex)
         {
             _logger.LogError(ex, "Error parsing JSON message.");
+              await  _webSocketService.SendMessageAsync(webSocket, "Server error");
         }
     }
 
@@ -139,7 +143,7 @@ public class WebSocketController : ApiControllerBase, IDisposable
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         WriteIndented = true // Opcional, para formatar o JSON
                     };
-                    var json = JsonSerializer.Serialize(new SocketMessage("ping", "ping"), options);
+                    var json = JsonSerializer.Serialize(new SocketMessage("ping", "ping","success"), options);
                     var heartbeatMessage = Encoding.UTF8.GetBytes(json);
                     await webSocket.SendAsync(new ArraySegment<byte>(heartbeatMessage), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
@@ -151,6 +155,7 @@ public class WebSocketController : ApiControllerBase, IDisposable
             }
         }
     }
+  
 
     public void Dispose()
     {

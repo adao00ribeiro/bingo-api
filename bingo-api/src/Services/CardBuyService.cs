@@ -11,12 +11,19 @@ public class CardBuyService : ICardBuyService
     private readonly ICardRepository cardRepository;
     private readonly IPunterRepository punterRepository;
     private readonly IRoundRepository roundRepository;
+    private readonly ITransactionHistoryRepository transactionHistoryRepository;
 
-    public CardBuyService(ICardRepository _cardRepository, IPunterRepository _punterRepositoryy, IRoundRepository _roundRepository)
+    public CardBuyService(
+        ICardRepository _cardRepository,
+        IPunterRepository _punterRepositoryy,
+         IRoundRepository _roundRepository,
+         ITransactionHistoryRepository _transactionHistoryRepository
+         )
     {
         this.cardRepository = _cardRepository;
         this.punterRepository = _punterRepositoryy;
         this.roundRepository = _roundRepository;
+        this.transactionHistoryRepository = _transactionHistoryRepository;
     }
     public async Task<bool> Buy(CardBuyRequestDto dto)
     {
@@ -38,7 +45,6 @@ public class CardBuyService : ICardBuyService
         {
             throw new Exception("round Nao encontrado");
         }
-
         if (round.Started < DateTime.UtcNow)
         {
             throw new Exception("The round is already past the scheduled time.");
@@ -69,6 +75,19 @@ public class CardBuyService : ICardBuyService
                 }
 
                 await this.cardRepository.AddRangeAsync(cardsToInsert);
+                // Registra a transação no histórico
+                var transactionHistory = new TransactionHistory
+                {
+                    EntityType = "Punter", // Pode ser Seller se o participante for um Seller
+                    EntityId = punter.Id,
+                    PreviousBalance = punter.Balance, // Antes da alteração
+                    CurrentBalance = punter.Balance - value, // O saldo será alterado após o registro da transação
+                    Amount = value,
+                    Type = TransactionType.CardPurchased, // Assume que Purchase é o tipo de transação para compra de cartela
+                };
+
+                // Registra o histórico da transação antes de alterar o saldo
+                await this.transactionHistoryRepository.AddAsync(transactionHistory);
 
                 round.CardSaleCount += dto.Quantity;
                 punter.Balance -= value;
@@ -84,7 +103,7 @@ public class CardBuyService : ICardBuyService
         }
     }
 
-    private int[] GetRandomNumbers(int maxNumber, int linha, int coluna)
+    public static int[] GetRandomNumbers(int maxNumber, int linha, int coluna)
     {
         List<int> result = new List<int>();
         Random random = new Random();

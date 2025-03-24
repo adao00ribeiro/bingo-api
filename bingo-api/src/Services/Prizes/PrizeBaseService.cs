@@ -1,5 +1,5 @@
+using bingo_api.src.DTOs.Response;
 using bingo_api.src.Entities;
-using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Structs;
 
 namespace bingo_api.src.Services.Prizes;
@@ -21,8 +21,8 @@ public abstract class PrizeBaseService(Prize _prize)
         {
             prize.WinningCards.Add(new WinningCardsInfo
             {
-                Punter = card.Punter,
-                Card = card,
+                Punter =  PunterResponseDto.ConvertToSocketDto(card.Punter),
+                Card = CardResponseDto.ConvertToSocketDto(card),
                 ValueOfEachWinner = prize.Value / resultCards.Count()
             });
         }

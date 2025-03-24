@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
+using bingo_api.src.DTOs.Response;
 using bingo_api.src.Entities;
-using bingo_api.src.Factory;
 
 namespace bingo_api.src.Structs;
 
@@ -21,8 +17,8 @@ public struct RoundMessage
     public List<int> Numbers { get; set; } = new List<int>();
     public Accumulated Accumulated { get; set; } = null;
     public bool IsAccumulated { get; set; } = false;
-    public Round Round { get; set; } = null;
-    public IEnumerable<Prize> Prizes { get; set; }
+    public RoundResponseDto Round { get; set; } = null;
+    public IEnumerable<PrizeResponseDto> Prizes { get; set; }
     public IEnumerable<PrizeResult> Results { get; internal set; }
 
     public PrizeResult? CurrentPrizeResult { get; set; } = null;
@@ -42,7 +38,9 @@ public struct RoundMessage
             DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
             WriteIndented = true
         };
-        return JsonSerializer.Serialize(this, options);
+        var text = JsonSerializer.Serialize(this, options);
+        File.WriteAllText("Socketjson.json", text);
+        return text;
     }
     // Atualiza detalhes de início da rodada
     public void UpdateMessageWithStartDetails(Accumulated bingoAccumulated, int drawnCount)

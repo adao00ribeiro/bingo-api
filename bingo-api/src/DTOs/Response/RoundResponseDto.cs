@@ -1,5 +1,6 @@
 
 using System.Text.Json.Serialization;
+using bingo_api.src.DTOs.Request;
 using bingo_api.src.Entities;
 
 namespace bingo_api.src.DTOs.Response;
@@ -23,8 +24,7 @@ public record RoundResponseDto
 
      [JsonIgnore]
     public IEnumerable<CardResponseDto>? Cards { get; set; }
-    public IEnumerable<PrizeResponseDto> Prizes { get; set; }
-
+    public IEnumerable<PrizeResponseDto>? Prizes { get; set; }
     public RoundResponseDto(
 
         Guid id, decimal cardValue,
@@ -81,6 +81,29 @@ public record RoundResponseDto
                 roomResponse,
                 null,
                 prizesResponse
+
+        );
+    }
+
+    internal static RoundResponseDto ConvertToSocketDto(Round round)
+    {
+        
+        return new RoundResponseDto(
+                round.Id,
+                round.CardValue,
+                round.Numbers,
+                round.CardSaleCount,
+                round.TimeBetweenBalls,
+                round.MaxBalls,
+                round.CardRows,
+                round.CardColumns,
+                round.CardsPurchased,
+                round.Started,
+                round.Finished,
+                round.RoomId,
+                null,
+                null,
+                 Enumerable.Empty<PrizeResponseDto>()
 
         );
     }

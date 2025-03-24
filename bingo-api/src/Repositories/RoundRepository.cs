@@ -19,21 +19,19 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
         Guid roomId, Guid PunterId)
     {
-    DateTime currentDateTime = DateTime.UtcNow;
-    // Calculando startTime (10 minutos antes do tempo atual)
-    var startTime = currentDateTime.AddMinutes(-10);
-    // Calculando endTime (24 horas depois do startTime)
-    var endTime = startTime.AddHours(24);
-    //TimeSpan endTime = TimeSpan.FromHours(23) + TimeSpan.FromMinutes(59); 
-    Console.WriteLine("opa" +roomId);
+        DateTime currentDateTime = DateTime.UtcNow;
+        // Calculando startTime (10 minutos antes do tempo atual)
+        var startTime = currentDateTime.AddMinutes(-10);
+        // Calculando endTime (24 horas depois do startTime)
+        var endTime = startTime.AddHours(24);
+        //TimeSpan endTime = TimeSpan.FromHours(23) + TimeSpan.FromMinutes(59); 
+        Console.WriteLine("opa" + roomId);
 
-    Console.WriteLine("opa" +PunterId);
+        Console.WriteLine("opa" + PunterId);
 
-    Console.WriteLine("opa" +currentDateTime.Date);
-    Console.WriteLine("opa" +startTime);
-    Console.WriteLine("opa" +endTime);
-
-
+        Console.WriteLine("opa" + currentDateTime.Date);
+        Console.WriteLine("opa" + startTime);
+        Console.WriteLine("opa" + endTime);
 
 
         var query = @"SELECT r.*, COUNT(c.""Id"") AS CardsPurchased
@@ -47,14 +45,30 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     ORDER BY r.""Started"" ASC
     ";
 
-        return await Context.Rounds
-            .FromSqlRaw(query,
-                new NpgsqlParameter("@RoomId", roomId),
-                new NpgsqlParameter("@Date", currentDateTime.Date),
-                new NpgsqlParameter("@StartTime", startTime),
-                new NpgsqlParameter("@EndTime", endTime),
-                new NpgsqlParameter("@PunterId", PunterId)
-            ).ToListAsync();
+        var rounds = await Context.Rounds
+                .FromSqlRaw(query,
+                    new NpgsqlParameter("@RoomId", roomId),
+                    new NpgsqlParameter("@Date", currentDateTime.Date),
+                    new NpgsqlParameter("@StartTime", startTime),
+                    new NpgsqlParameter("@EndTime", endTime),
+                    new NpgsqlParameter("@PunterId", PunterId)
+                )
+                  .AsNoTracking()
+                .ToListAsync();
+
+        var roundIds = rounds.Select(r => r.Id).ToList();
+
+        var prizes = await Context.Prizes
+            .Where(p => roundIds.Contains(p.RoundId))
+            .ToListAsync();
+
+        foreach (var round in rounds)
+        {
+            round.Prizes = prizes.Where(p => p.RoundId == round.Id).ToList();
+        }
+
+        return rounds;
+
     }
     public override Task<Guid> AddAsync(Round objeto)
     {
@@ -80,7 +94,7 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
                             )
                             .ToListAsync();
     }
-       public async Task<bool> GenerateRounds(RoundBulkRequestDto request)
+    public async Task<bool> GenerateRounds(RoundBulkRequestDto request)
     {
         var roundsToInsert = GenerateRoundsList(request);
 
@@ -99,10 +113,12 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
 
         for (var date = request.StartedDate; date <= request.FinishedDate; date = date.AddDays(1))
         {
-            var startTime = DateTime.SpecifyKind(date.ToDateTime(request.StartedTime), DateTimeKind.Utc);
-            var endTime = DateTime.SpecifyKind(date.ToDateTime(request.FinishedTime), DateTimeKind.Utc);
-            var currentTime = startTime;
-            while (currentTime <= endTime)
+            var startTimeLocal = date.ToDateTime(request.StartedTime); // Assume que está no fuso local
+            var endTimeLocal = date.ToDateTime(request.FinishedTime);
+            var startTimeUtc = TimeZoneInfo.ConvertTimeToUtc(startTimeLocal, TimeZoneInfo.Local);
+            var endTimeUtc = TimeZoneInfo.ConvertTimeToUtc(endTimeLocal, TimeZoneInfo.Local);
+            var currentTime = startTimeUtc;
+            while (currentTime <= endTimeUtc)
             {
                 rounds.Add(new Round(request.CardValue, currentTime, request.TimeBetweenBalls, request.MaxBalls, request.CardRows, request.CardColumns, request.RoomId));
                 currentTime = currentTime.AddMinutes(request.TimeBetweenRounds);

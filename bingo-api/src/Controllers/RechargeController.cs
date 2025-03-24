@@ -18,7 +18,7 @@ public class RechargeController(IRechargeRepository _rechargeRepository) : ApiCo
     [HttpGet()]
     public async Task<ActionResult<IEnumerable<RechargeResponseDto>>> GetAll()
     {
-        var recharges = await rechargeRepository.GetAllAsync();
+        var recharges = await rechargeRepository.GetAllAsync(r => r.Punter);
         var rechargesResponse = recharges.Select(r => RechargeResponseDto.ConvertToDto(r));
         return Ok(rechargesResponse);
     }

@@ -9,6 +9,10 @@ dotnet ef migrations add InitialDbDataIdentiy --context IdentityDataContext
 
 dotnet ef database update --context DataContext -s .\bingo_api\
 
+dotnet ef migrations remove --context DataContext
 
 dotnet ef database update --context DataContext
 dotnet ef database update --context IdentityDataContext
+
+
+
