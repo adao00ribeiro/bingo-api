@@ -7,13 +7,16 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using bingo_api.src.Services;
+using bingo_api.src.Interfaces.Services;
 namespace bingo_api.src.Controllers;
 
 [Authorize]
 [ApiVersion("1.0")]
-public class PunterController(IPunterRepository _punterRepository) : ApiControllerBase
+public class PunterController(IPunterRepository _punterRepository, IIdentityService _identityService) : ApiControllerBase
 {
     private readonly IPunterRepository punterRepository = _punterRepository;
+    private readonly IIdentityService identityService = _identityService;
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PunterResponseDto>>> GetAll()
@@ -24,21 +27,31 @@ public class PunterController(IPunterRepository _punterRepository) : ApiControll
     [HttpGet("me")]
     public async Task<ActionResult<PunterResponseDto>> GetMe()
     {
-      var identity = User.Identity as ClaimsIdentity;
+        var identity = User.Identity as ClaimsIdentity;
         var userEmail = identity?.FindFirst(ClaimTypes.Email)?.Value;
-            
+
         if (string.IsNullOrEmpty(userEmail))
         {
             return Unauthorized(new { message = "Usuário não autenticado." });
         }
 
         var punter = await this.punterRepository.GetByEmailAsync(userEmail);
-      
+
         if (punter is null)
         {
             return NotFound();
         }
-        return Ok(PunterResponseDto.ConvertToDto(punter));
+
+        var usuario = await this.identityService.GetByEmailAsync(userEmail);
+
+        var punterRequestDto = PunterResponseDto.ConvertToDto(punter);
+
+        if (usuario != null)
+        {
+            punterRequestDto.user = UserResponseDto.ConvertToDto(usuario);
+
+        }
+        return Ok(punterRequestDto);
     }
     [HttpPost]
     public Task<ActionResult<Guid>> Create(PunterRequestDto request)

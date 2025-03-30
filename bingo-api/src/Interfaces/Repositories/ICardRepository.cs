@@ -7,5 +7,5 @@ namespace bingo_api.src.Interfaces.Repositories;
 public interface ICardRepository : IRepositoryBase<Card>
 {
     Task AddRangeAsync(List<Card> cardsToInsert);
-    Task<IEnumerable<Card>> GetAllByRoundId(Guid punterId,Guid roundId,params Expression<Func<Card, object>>[] includeProperties);
+    Task<IEnumerable<Card>> GetAllByRoundId(Guid punterId,Guid roundId,int? page = null , int? size = null,params Expression<Func<Card, object>>[] includeProperties);
 }

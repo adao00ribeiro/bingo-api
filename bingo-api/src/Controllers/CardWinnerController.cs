@@ -15,11 +15,16 @@ public class CardWinnerController(ICardWinnerRepository _cardWinnerRepository) :
 
 
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<CardWinnerResponseDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<CardWinnerResponseDto>>> GetAll(int? page = null, int? size = null)
     {
-        var cardWinners = await cardWinnerRepository.GetAllAsync(cw => cw.Prize.Round , cd=> cd.Card);
+        int totalCount = await cardWinnerRepository.CountAsync();
+        var cardWinners = await cardWinnerRepository.GetAllAsync(page, size, includeProperties: [cw => cw.Prize.Round, cd => cd.Card]);
         var cardWinnerResponse = cardWinners.Select(cardWinner => CardWinnerResponseDto.ConvertToDto(cardWinner));
-        return Ok(cardWinnerResponse);
+        return Ok(new PagedResponseDto<CardWinnerResponseDto>
+        {
+            Items = cardWinnerResponse,
+            TotalCount = totalCount
+        });
     }
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(CardWinnerRequestDto request)

@@ -10,4 +10,6 @@ public class CardWinnerRepository : RepositoryBase<CardWinner>, ICardWinnerRepos
     public CardWinnerRepository(DataContext dataContext) : base(dataContext)
     {
     }
+
+
 }

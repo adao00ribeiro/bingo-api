@@ -19,16 +19,18 @@ public class CardRepository : RepositoryBase<Card>, ICardRepository
         Context.SaveChanges();
     }
 
-    public async Task<IEnumerable<Card>> GetAllByRoundId(Guid punterId, Guid roundId,params Expression<Func<Card, object>>[] includeProperties)
+    public async Task<IEnumerable<Card>> GetAllByRoundId(Guid punterId, Guid roundId, int? page = null, int? size = null, params Expression<Func<Card, object>>[] includeProperties)
     {
-
         // Cria a consulta base com os Includes passados
-    IQueryable<Card> query = base.BuildQueryWithIncludes(includeProperties);
+        IQueryable<Card> query = base.BuildQueryWithIncludes(includeProperties);
+        query = query.Where(card => card.PunterId == punterId && card.RoundId == roundId);
+        if (page.HasValue && size.HasValue)
+        {
+            query = query.Skip((page.Value - 1) * size.Value).Take(size.Value);
+        }
+        // Filtra pela combinação de punterId e roundId
 
-    // Filtra pela combinação de punterId e roundId
-    query = query.Where(card => card.PunterId == punterId && card.RoundId == roundId);
-
-    // Retorna os resultados de forma assíncrona com o AsNoTracking (para melhorar a performance de leitura)
-    return await query.AsNoTracking().ToListAsync();
+        // Retorna os resultados de forma assíncrona com o AsNoTracking (para melhorar a performance de leitura)
+        return await query.AsNoTracking().ToListAsync();
     }
 }

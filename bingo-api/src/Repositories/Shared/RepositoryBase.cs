@@ -11,9 +11,14 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
     protected readonly DataContext Context;
     public RepositoryBase(DataContext dataContext) =>
     Context = dataContext;
-    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includeProperties)
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int? pageNumber = null, int? pageSize = null, params Expression<Func<TEntity, object>>[] includeProperties)
     {
         IQueryable<TEntity> query = BuildQueryWithIncludes(includeProperties);
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
+        }
+
         var entities = await query.ToListAsync();
 
         // Converte as datas de UTC para o horário local
@@ -88,6 +93,10 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
         }
 
         return query;
+    }
+    public async Task<int> CountAsync()
+    {
+        return await Context.Set<TEntity>().CountAsync();
     }
     public void Dispose() =>
         Context.Dispose();

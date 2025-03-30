@@ -70,7 +70,7 @@ public class IdentityController(IIdentityService _identityService, ISellerReposi
         var usuarioId = identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (usuarioId == null)
             return BadRequest();
-
+        
         var resultado = await identityService.LoginSemSenha(usuarioId);
         if (resultado.Sucesso)
             return Ok(resultado);

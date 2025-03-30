@@ -10,16 +10,16 @@ namespace bingo_api.src.Controllers;
 
 
 [ApiVersion("1.0")]
-public class RoundController(IRoundRepository _roundRepository , IPunterRepository _punterRepository) : ApiControllerBase
+public class RoundController(IRoundRepository _roundRepository, IPunterRepository _punterRepository) : ApiControllerBase
 {
     private readonly IRoundRepository roundRepository = _roundRepository;
     private readonly IPunterRepository punterRepository = _punterRepository;
 
 
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<RoundResponseDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<RoundResponseDto>>> GetAll(int? pageNumber = null, int? pageSize = null)
     {
-        var rounds = await roundRepository.GetAllAsync(r => r.Prizes);
+        var rounds = await roundRepository.GetAllAsync(pageNumber, pageSize, includeProperties: [r => r.Prizes]);
         var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
         return Ok(roundsResponse);
     }
@@ -28,20 +28,21 @@ public class RoundController(IRoundRepository _roundRepository , IPunterReposito
     {
         var identity = User.Identity as ClaimsIdentity;
         var userEmail = identity?.FindFirst(ClaimTypes.Email)?.Value;
-            
+
         if (string.IsNullOrEmpty(userEmail))
         {
             return Unauthorized(new { message = "Usuário não autenticado." });
         }
 
         var punter = await this.punterRepository.GetByEmailAsync(userEmail);
-      
+
         if (punter is null)
         {
             return NotFound();
         }
-        
+
         var rounds = await roundRepository.FilterByRoomIdAsync(id, punter.Id);
+      
         var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
         return Ok(roundsResponse);
     }
@@ -49,7 +50,7 @@ public class RoundController(IRoundRepository _roundRepository , IPunterReposito
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(RoundRequestDto request)
     {
-     
+
         var round = RoundRequestDto.ConvertToEntity(request);
         var id = await roundRepository.AddAsync(round);
         return CreatedAtAction(nameof(GetById), new { id = id }, id);

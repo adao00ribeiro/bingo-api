@@ -24,8 +24,6 @@ public class CardController(ICardRepository _cardRepository, IPunterRepository _
         {
             Console.WriteLine($"Type: {claim.Type}, Value: {claim.Value}");
         }
-
-
         if (string.IsNullOrEmpty(UserId))
         {
             return Unauthorized(new { message = "Usuário não autenticado." });
@@ -37,11 +35,11 @@ public class CardController(ICardRepository _cardRepository, IPunterRepository _
         return Ok(cardsResponse);
     }
     [HttpGet("round/{roundId}")]
-    public async Task<ActionResult<IEnumerable<CardResponseDto>>> GetAllByRoundId(Guid roundId)
+    public async Task<ActionResult<PagedResponseDto<CardResponseDto>>> GetAllByRoundId(Guid roundId,int? page = null, int? size = null)
     {
         var identity = User.Identity as ClaimsIdentity;
         var userEmail = identity?.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-
+      
         if (string.IsNullOrEmpty(userEmail))
         {
             return Unauthorized(new { message = "Usuário não autenticado." });
@@ -51,9 +49,14 @@ public class CardController(ICardRepository _cardRepository, IPunterRepository _
         {
             return BadRequest();
         }
-        var cards = await cardRepository.GetAllByRoundId(punter.Id, roundId, c => c.Round);
+        var cards = await cardRepository.GetAllByRoundId(punter.Id, roundId, page,size, includeProperties: c => c.Round);
+        int totalCount = cards.Count();
         var cardsResponse = cards.Select(c => CardResponseDto.ConvertToDto(c));
-        return Ok(cardsResponse);
+        return Ok(new PagedResponseDto<CardResponseDto>
+        {
+            Items = cardsResponse,
+            TotalCount = totalCount
+        });
     }
 
     [HttpGet("id/{id}")]

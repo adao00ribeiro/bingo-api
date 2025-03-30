@@ -55,6 +55,11 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
                 )
                   .AsNoTracking()
                 .ToListAsync();
+        foreach (var round in rounds)
+        {
+            round.CardsPurchased = Context.Cards
+                .Count(c => c.RoundId == round.Id && c.PunterId == PunterId);
+        }
 
         var roundIds = rounds.Select(r => r.Id).ToList();
 
@@ -110,10 +115,10 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     private List<Round> GenerateRoundsList(RoundBulkRequestDto request)
     {
         var rounds = new List<Round>();
-
         for (var date = request.StartedDate; date <= request.FinishedDate; date = date.AddDays(1))
         {
             var startTimeLocal = date.ToDateTime(request.StartedTime); // Assume que está no fuso local
+         
             var endTimeLocal = date.ToDateTime(request.FinishedTime);
             var startTimeUtc = TimeZoneInfo.ConvertTimeToUtc(startTimeLocal, TimeZoneInfo.Local);
             var endTimeUtc = TimeZoneInfo.ConvertTimeToUtc(endTimeLocal, TimeZoneInfo.Local);

@@ -9,4 +9,6 @@ public interface IIdentityService
     Task<RegisterResponseDto> CadastrarUsuario(IdentityUser identityUser);
     Task<LoginResponse> Login(LoginRequest usuarioLogin);
     Task<LoginResponse> LoginSemSenha(string usuarioId);
+    Task<IdentityUser> GetByEmailAsync(string email);
+
 }

@@ -137,5 +137,17 @@ public class IdentityService : IIdentityService
 
         return claims;
     }
+
+    public async Task<IdentityUser> GetByEmailAsync(string email)
+    {
+        var usuario = await _userManager.FindByEmailAsync(email);
+
+        if (usuario == null)
+        {
+            throw new Exception("Usuario nao encontrado.");
+        }
+
+        return usuario;
+    }
 }
 

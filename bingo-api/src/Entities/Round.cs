@@ -12,6 +12,7 @@ public class Round : Entity
     public int MaxBalls { get; set; }//utilizado para jogos de 90 ,80,75, 50 ,30
     public int CardRows { get; set; } // Número de linhas na cartela
     public int CardColumns { get; set; } // Número de colunas na cartela
+
     [NotMapped]
     public int CardsPurchased { get; set; }
     public DateTime Started { get; set; }

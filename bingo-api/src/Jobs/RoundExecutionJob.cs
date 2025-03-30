@@ -189,7 +189,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 await context.SaveChangesAsync();
 
             }
-            //tempRound.Finished = DateTime.UtcNow;
+            tempRound.Finished = DateTime.UtcNow;
             context.Rounds.Entry(tempRound).State = EntityState.Modified;
             await context.SaveChangesAsync();
 
