@@ -11,9 +11,11 @@ public class TransactionHistoryMap : IEntityTypeConfiguration<TransactionHistory
         builder.ToTable("TransactionHistorys");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
-        .ValueGeneratedOnAdd()
+        .ValueGeneratedOnAdd();
 
-        ;
+           builder.Property(a => a.EntityId)
+              .IsRequired();
+
         builder.Property(a => a.EntityType)
               .IsRequired();
 
@@ -31,5 +33,6 @@ public class TransactionHistoryMap : IEntityTypeConfiguration<TransactionHistory
        
         builder.Property(p => p.Type)
         .IsRequired();
+
     }
 }

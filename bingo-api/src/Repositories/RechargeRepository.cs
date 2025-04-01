@@ -4,6 +4,7 @@ using bingo_api.src.Entities;
 using bingo_api.src.Enums;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Repositories.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Repositories;
 
@@ -12,6 +13,8 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
     public RechargeRepository(DataContext dataContext) : base(dataContext)
     {
     }
+
+ 
 
     public async Task<bool> UpdateStatusToCompleted(Guid id)
     {
@@ -63,5 +66,10 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 return false;
             }
         }
+    }
+
+    public Task<int> CountAsync(Guid punterId)
+    {
+        return Context.Recharges.CountAsync(r => r.PunterId == punterId);
     }
 }

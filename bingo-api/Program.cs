@@ -7,6 +7,7 @@ using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Identity;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using bingo_api.src.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,7 +60,7 @@ if (app.Environment.IsDevelopment ( ))
 using (var scope = app.Services.CreateScope ( ))
 {
     var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await DataInitializer.Seed ( context , userManager , roleManager );
 }

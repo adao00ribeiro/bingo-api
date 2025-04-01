@@ -5,32 +5,23 @@ using bingo_api.src.DTOs.Response;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 namespace bingo_api.src.Controllers;
 
 [ApiVersion("1.0")]
-public class IdentityController(IIdentityService _identityService, ISellerRepository _sellerRepository, IPunterRepository _punterRepository) : ApiControllerBase
+public class IdentityController(IIdentityService _identityService) : ApiControllerBase
 {
     private readonly IIdentityService identityService = _identityService;
-    private readonly ISellerRepository sellerRepository = _sellerRepository;
-    private readonly IPunterRepository punterRepository = _punterRepository;
+
 
     [HttpPost("cadastro/seller")]
     public async Task<IActionResult> CadastrarSeller(SellerRequestDto dto)
     {
         if (!ModelState.IsValid)
             return BadRequest();
-
-        var resultado = await identityService.CadastrarUsuario(RegisterRequestDto.ConvertToEntityUser(dto));
-
-        if (!resultado.Sucesso)
-        {
-            throw new Exception("Erro ao Cadastrar");
-        }
-        var id = await sellerRepository.AddAsync(SellerRequestDto.ConvertToEntity(dto));
-        return Ok(id);
+        
+        return Ok( await identityService.CadastrarSeller(RegisterRequestDto.ConvertToEntityUser(dto),SellerRequestDto.ConvertToEntity(dto)));
     }
     [HttpPost("cadastro/punter")]
     public async Task<IActionResult> CadastrarPunter(PunterRequestDto dto)
@@ -38,15 +29,15 @@ public class IdentityController(IIdentityService _identityService, ISellerReposi
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var resultado = await identityService.CadastrarUsuario(RegisterRequestDto.ConvertToEntityUser(dto));
+        var resultado = await identityService.CadastrarPunter(RegisterRequestDto.ConvertToEntityUser(dto),PunterRequestDto.ConvertToEntity(dto));
 
         if (!resultado.Sucesso)
         {
             var erros = string.Join("; ", resultado.Erros); // Combina os erros em uma única string
             return BadRequest(erros);
         }
-        var id = await punterRepository.AddAsync(PunterRequestDto.ConvertToEntity(dto));
-        return Ok(id);
+      
+        return Ok(resultado);
     }
 
     [HttpPost("login")]

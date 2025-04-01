@@ -28,8 +28,7 @@ public record RechargeResponseDto : EntityResponseDto
         PunterResponseDto? punter,
         DateTime createAt,
         DateTime updateAt
-        
-        )
+        ):base(id,createAt,updateAt)
     {
         Id = id;
         Value = value;

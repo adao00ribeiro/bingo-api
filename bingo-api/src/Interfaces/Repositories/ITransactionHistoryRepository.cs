@@ -9,5 +9,5 @@ namespace bingo_api.src.Interfaces.Repositories;
 
 public interface ITransactionHistoryRepository: IRepositoryBase<TransactionHistory>
 {
-    
+  Task<int> CountAsync(Guid ownerId);
 }

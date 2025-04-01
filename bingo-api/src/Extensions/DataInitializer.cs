@@ -8,7 +8,7 @@ namespace bingo_api.src.Extensions;
 
 public static class DataInitializer
 {
-    public static async Task Seed(DataContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+    public static async Task Seed(DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
     {
 
         var roles = new[] { Roles.Admin, Roles.Seller, Roles.Punter };
@@ -29,9 +29,25 @@ public static class DataInitializer
         if (!context.Sellers.Any(s => s.Id == sellerId))
         {
 
-            var identityUser = new IdentityUser
+         
+            // Cria um Seller de desenvolvimento
+            var seller = new Seller
+            {
+                Balance = 0,
+                Email = sellerEmail,
+                Cpf = "11111111111",
+                DateBirth = DateTime.UtcNow,
+                Comission = 0
+            };
+            seller.SetIdGuid(sellerId);
+            // Adiciona o Seller ao contexto
+           var sellerAdded =  context.Sellers.Add(seller);
+
+               var identityUser = new User
             {
                 Id = sellerId.ToString(),
+                EntityId = sellerAdded.Entity.Id,
+                EntityType =  nameof(Seller),
                 UserName = sellerEmail,
                 Email = sellerEmail,
                 EmailConfirmed = true,
@@ -49,18 +65,6 @@ public static class DataInitializer
                 throw new Exception("Falha ao adicionar o Role ao usuário Seller.");
             }
 
-            // Cria um Seller de desenvolvimento
-            var seller = new Seller
-            {
-                Balance = 0,
-                Email = sellerEmail,
-                Cpf = "11111111111",
-                DateBirth = DateTime.UtcNow,
-                Comission = 0
-            };
-            seller.SetIdGuid(sellerId);
-            // Adiciona o Seller ao contexto
-            context.Sellers.Add(seller);
             // Cria uma Room associada ao Seller
             var room = new Room("Sala de Desenvolvimento", sellerId);
 

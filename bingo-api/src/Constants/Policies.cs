@@ -11,6 +11,7 @@ public class Policies
     public const string SellerPolicy = nameof(SellerPolicy);
     public const string PunterPolicy = nameof(PunterPolicy);
     public const string HorarioComercial = nameof(HorarioComercial);
+    public const string RechargeView = nameof(RechargeView);
 
 
 }

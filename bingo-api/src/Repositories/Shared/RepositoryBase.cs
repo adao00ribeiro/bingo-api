@@ -11,9 +11,18 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
     protected readonly DataContext Context;
     public RepositoryBase(DataContext dataContext) =>
     Context = dataContext;
-    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int? pageNumber = null, int? pageSize = null, params Expression<Func<TEntity, object>>[] includeProperties)
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int? pageNumber = null, int? pageSize = null,
+    Expression<Func<TEntity, bool>> filter = null,
+    params Expression<Func<TEntity, object>>[] includeProperties
+    )
     {
         IQueryable<TEntity> query = BuildQueryWithIncludes(includeProperties);
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
         if (pageNumber.HasValue && pageSize.HasValue)
         {
             query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
@@ -98,6 +107,7 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
     {
         return await Context.Set<TEntity>().CountAsync();
     }
+
     public void Dispose() =>
         Context.Dispose();
 

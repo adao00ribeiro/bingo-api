@@ -6,4 +6,6 @@ namespace bingo_api.src.Interfaces.Repositories;
 public interface IRechargeRepository : IRepositoryBase<Recharge>
 {
     Task<bool> UpdateStatusToCompleted(Guid id);
+
+    Task<int> CountAsync(Guid ownerId);
 }

@@ -1,8 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Transactions;
 using bingo_api.src.Configurations;
+using bingo_api.src.Constants;
 using bingo_api.src.DTOs.Request;
 using bingo_api.src.DTOs.Response;
+using bingo_api.src.Entities;
+using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -10,32 +14,111 @@ using Microsoft.Extensions.Options;
 namespace bingo_api.src.Services;
 public class IdentityService : IIdentityService
 {
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<User> _signInManager;
+    private readonly UserManager<User> _userManager;
     private readonly JwtOptions _jwtOptions;
-    public IdentityService(SignInManager<IdentityUser> signInManager,
-                           UserManager<IdentityUser> userManager,
-                           IOptions<JwtOptions> jwtOptions)
+    private readonly ISellerRepository _sellerRepository;
+    private readonly IPunterRepository _punterRepository;
+    public IdentityService(SignInManager<User> signInManager,
+                           UserManager<User> userManager,
+                           IOptions<JwtOptions> jwtOptions,
+                           ISellerRepository sellerRepository,
+                           IPunterRepository punterRepository
+                           )
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _jwtOptions = jwtOptions.Value;
+        _sellerRepository = sellerRepository;
+        _punterRepository = punterRepository;
+
     }
 
-    public async Task<RegisterResponseDto> CadastrarUsuario(IdentityUser identityUser)
+    public async Task<RegisterResponseDto> CadastrarPunter(User identityUser, Punter punter)
     {
-        var result = await _userManager.CreateAsync(identityUser, identityUser.PasswordHash);
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            try
+            {
+                var punterId = await _punterRepository.AddAsync(punter);
+                identityUser.EntityId = punterId;
+                identityUser.EntityType = nameof(Punter);
+                // cadastrar a role no AspNetUserRoles
+                var result = await _userManager.CreateAsync(identityUser, identityUser.PasswordHash);
+                var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Punter);
+                if (!roleResult.Succeeded)
+                {
+                    throw new Exception("Falha ao adicionar o Role ao usuário Punter.");
+                }
 
-        if (result.Succeeded)
-            await _userManager.SetLockoutEnabledAsync(identityUser, false);
+                if (result.Succeeded)
+                    await _userManager.SetLockoutEnabledAsync(identityUser, false);
+                var usuarioCadastroResponse = new RegisterResponseDto(result.Succeeded);
+                if (!result.Succeeded && result.Errors.Count() > 0)
+                {
+                    usuarioCadastroResponse.AdicionarErros(result.Errors.Select(r => r.Description));
+                }
+                transaction.Complete();
+                return usuarioCadastroResponse;
+            }
+            catch (Exception ex)
+            {
+                var usuarioCadastroResponse = new RegisterResponseDto(false);
+                usuarioCadastroResponse.AdicionarErros(new List<string> { ex.Message });
+                return usuarioCadastroResponse;
+            }
+        }
 
-        var usuarioCadastroResponse = new RegisterResponseDto(result.Succeeded);
-        if (!result.Succeeded && result.Errors.Count() > 0)
-            usuarioCadastroResponse.AdicionarErros(result.Errors.Select(r => r.Description));
-
-        return usuarioCadastroResponse;
     }
 
+    public async Task<RegisterResponseDto> CadastrarSeller(User identityUser, Seller seller)
+    {
+        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            try
+            {
+
+                var sellerId = await _sellerRepository.AddAsync(seller);
+                identityUser.EntityId = sellerId;
+                identityUser.EntityType = nameof(Seller);
+
+                var createResult = await _userManager.CreateAsync(identityUser, identityUser.PasswordHash);
+
+                if (createResult.Succeeded)
+                {
+                    await _userManager.SetLockoutEnabledAsync(identityUser, false);
+                }
+
+
+                var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Punter);
+
+
+                var response = new RegisterResponseDto(createResult.Succeeded);
+
+
+                if (!createResult.Succeeded && createResult.Errors.Any())
+                {
+                    response.AdicionarErros(createResult.Errors.Select(r => r.Description));
+                }
+
+
+                if (!roleResult.Succeeded)
+                {
+                    response.AdicionarErros(roleResult.Errors.Select(r => r.Description));
+                }
+
+
+                transaction.Complete();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                var usuarioCadastroResponse = new RegisterResponseDto(false);
+                usuarioCadastroResponse.AdicionarErros(new List<string> { ex.Message });
+                return usuarioCadastroResponse;
+            }
+        }
+    }
     public async Task<LoginResponse> Login(LoginRequest usuarioLogin)
     {
         var usuarioLoginResponse = new LoginResponse();
@@ -113,11 +196,14 @@ public class IdentityService : IIdentityService
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }
 
-    private async Task<IList<Claim>> ObterClaims(IdentityUser user, bool adicionarClaimsUsuario)
+    private async Task<IList<Claim>> ObterClaims(User user, bool adicionarClaimsUsuario)
     {
         var claims = new List<Claim>();
 
         claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+        claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+        claims.Add(new Claim("entityid", user.EntityId.ToString()));
+        claims.Add(new Claim("entitytype", user.EntityType.ToString()));
         claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
         claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
         claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64));
@@ -131,8 +217,10 @@ public class IdentityService : IIdentityService
 
             claims.AddRange(userClaims);
 
-            foreach (var role in roles)
-                claims.Add(new Claim("role", role));
+            foreach (var role in roles){
+                     claims.Add(new Claim("role", role));
+            }
+               
         }
 
         return claims;
@@ -149,5 +237,7 @@ public class IdentityService : IIdentityService
 
         return usuario;
     }
+
+
 }
 

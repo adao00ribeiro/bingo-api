@@ -2,7 +2,6 @@
 using System.Reflection;
 
 using bingo_api.src.Entities;
-using bingo_api.src.Structs;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Context;
@@ -37,6 +36,7 @@ public class DataContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
 
+        
     }
     
 }

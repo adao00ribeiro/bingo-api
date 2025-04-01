@@ -84,7 +84,6 @@ public static class AuthenticationSetup
         {
             //    options.AddPolicy(Policies.HorarioComercial, policy =>
             //  policy.Requirements.Add(new HorarioComercialRequirement()));
-
             options.AddPolicy(Policies.AdminPolicy, policy => policy.RequireRole(Roles.Admin));
             options.AddPolicy(Policies.SellerPolicy, policy => policy.RequireRole(Roles.Seller));
             options.AddPolicy(Policies.PunterPolicy, policy => policy.RequireRole(Roles.Punter));

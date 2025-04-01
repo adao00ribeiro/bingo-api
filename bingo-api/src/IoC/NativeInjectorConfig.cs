@@ -11,7 +11,7 @@ using Hangfire;
 using Hangfire.Redis.StackExchange;
 using StackExchange.Redis;
 using bingo_api.src.Jobs;
-
+using bingo_api.src.Entities;
 
 
 namespace bingo_api.src.IoC;
@@ -28,7 +28,7 @@ public static class NativeInjectorConfig
           options.UseNpgsql(configuration.GetConnectionString("DatabasePostgreSQL"))
       );
 
-        services.AddDefaultIdentity<IdentityUser>()
+        services.AddDefaultIdentity<User>()
                           .AddRoles<IdentityRole>()
                           .AddEntityFrameworkStores<IdentityDataContext>()
                           .AddDefaultTokenProviders();
@@ -72,6 +72,7 @@ public static class NativeInjectorConfig
         services.AddScoped<ICardBuyService, CardBuyService>();
         services.AddScoped<IDepositService, DepositService>();
 
+       
     }
 
 }
