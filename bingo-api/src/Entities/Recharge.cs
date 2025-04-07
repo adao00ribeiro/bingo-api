@@ -3,6 +3,9 @@ using bingo_api.src.Enums;
 
 namespace bingo_api.src.Entities;
 
+
+
+//mudar para BalanceOperation 
 public class Recharge : Entity
 {
     public decimal Value { get; set; }

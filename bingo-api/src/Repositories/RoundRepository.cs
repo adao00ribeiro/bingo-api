@@ -15,7 +15,7 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     public RoundRepository(DataContext dataContext) : base(dataContext)
     {
     }
-
+    
     public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
         Guid roomId, Guid PunterId)
     {
@@ -136,5 +136,14 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     {
         return rounds.SelectMany(round => request.Prizes.Select(prize => new Prize(prize.Value, prize.Type, round.Id)
         )).ToList();
+    }
+
+    public async Task<ICollection<Prize>> GetPrizes(Guid roundId)
+    {
+       
+       var prizes = await Context.Prizes
+            .Where(p=>p.RoundId == roundId)
+                            .ToListAsync();
+       return prizes;
     }
 }

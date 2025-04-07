@@ -40,7 +40,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             {
                 _logger.LogWarning(ex, "Falha ao inserir bots na rodada {RoundId}. Continuando execução.", roundId);
             }
-*/
+    */
             Round? tempRound = await context.Rounds
             .Include(r => r.Cards)
             .ThenInclude(c => c.Punter)

@@ -69,6 +69,7 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         {
             return NotFound();
         }
+        round.Prizes = await roundRepository.GetPrizes(id);
         return Ok(RoundResponseDto.ConvertToDto(round));
     }
 
