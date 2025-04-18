@@ -10,6 +10,10 @@ public class BotConfig : Entity
     public Guid RoomId { get; set; }
     public Room? Room { get; set; }
 
+   public BotConfig()
+    {
+        Enabled = false;
+    }
     public BotConfig(Guid roomId)
     {
         Enabled = false;

@@ -1,7 +1,7 @@
 
 namespace bingo_api.src.Interfaces.Jobs;
 
-public interface IRoundFetcherJob : IJobService
+public interface IRoundFetcherJob 
 {
-
+   Task Execute();
 }

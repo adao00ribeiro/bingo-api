@@ -5,14 +5,14 @@ using Hangfire.Server;
 
 namespace bingo_api.src.Jobs;
 
-public class RoundFetcherJob
+public class RoundFetcherJob : IRoundFetcherJob
 {
     private readonly IRoundRepository _roundRepository;
-    private readonly ILogger<RoundFetcherJob> _logger;
+    private readonly ILogger<IRoundFetcherJob> _logger;
 
     public RoundFetcherJob(
         IRoundRepository roundRepository,
-        ILogger<RoundFetcherJob> logger)
+        ILogger<IRoundFetcherJob> logger)
     {
         _roundRepository = roundRepository;
         _logger = logger;

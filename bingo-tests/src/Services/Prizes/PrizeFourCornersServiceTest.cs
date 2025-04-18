@@ -8,7 +8,7 @@ namespace bingo_tests.src.Services.Prizes;
 public class PrizeFourCornersServiceTest
 {
 
-     private readonly ITestOutputHelper _output;
+    private readonly ITestOutputHelper _output;
     private readonly PrizeFourCornersService _service;
     private readonly Prize _prize;
 
@@ -35,7 +35,8 @@ public class PrizeFourCornersServiceTest
                     1, 2, 3,4,5 ,
                     6, 7, 8,9,10,
                     11, 12, 13,14,15
-            }
+            },
+            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid())
         };
 
         var cards = new List<Card> { card };
@@ -67,7 +68,8 @@ public class PrizeFourCornersServiceTest
                     11, 12, 13, 14, 15,
                     16, 17, 18, 19, 20,
                     21, 22, 23, 24, 25
-            }
+            },
+            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid())
         };
 
         var cards = new List<Card> { card };
@@ -96,7 +98,8 @@ public class PrizeFourCornersServiceTest
                     11, 12, 13, 14,
                     16, 17, 18, 19
 
-            }
+            },
+            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid())
         };
 
         var cards = new List<Card> { card };
@@ -127,7 +130,8 @@ public class PrizeFourCornersServiceTest
                     1, 2, 3,
                     6, 7, 8,
                     11, 12, 13,
-            }
+            },
+            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid())
         };
 
         var cards = new List<Card> { card };

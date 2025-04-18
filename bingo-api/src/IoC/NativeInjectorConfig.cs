@@ -12,6 +12,7 @@ using Hangfire.Redis.StackExchange;
 using StackExchange.Redis;
 using bingo_api.src.Jobs;
 using bingo_api.src.Entities;
+using bingo_api.src.Interfaces.Jobs;
 
 
 namespace bingo_api.src.IoC;
@@ -65,8 +66,8 @@ public static class NativeInjectorConfig
         services.AddScoped< InsertBotRoundService>();
 
         //jobs
-        services.AddScoped< RoundFetcherJob>();
-        services.AddScoped< RoundExecutionJob>();
+        services.AddScoped< IRoundFetcherJob, RoundFetcherJob>();
+        services.AddScoped< IRoundExecutionJob , RoundExecutionJob>();
 
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();

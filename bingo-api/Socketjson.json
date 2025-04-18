@@ -1,60 +1,79 @@
 {
-  "id": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
-  "finished": false,
+  "id": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
+  "finished": true,
   "started": true,
-  "mainBall": 66,
-  "secondBall": 80,
-  "thirdBall": 56,
-  "forthBall": 26,
-  "maxNumbers": 47,
+  "mainBall": 30,
+  "secondBall": 11,
+  "thirdBall": 22,
+  "forthBall": 64,
+  "maxNumbers": 66,
   "numbers": [
-    36,
-    2,
-    87,
-    40,
-    28,
-    33,
-    89,
-    62,
-    64,
-    75,
     35,
-    61,
-    90,
-    53,
-    50,
-    72,
-    27,
-    20,
-    69,
-    78,
-    83,
-    29,
-    22,
-    49,
+    8,
+    47,
     21,
-    37,
-    15,
-    86,
-    44,
-    3,
-    30,
-    65,
-    6,
-    82,
-    17,
-    11,
-    60,
-    31,
-    9,
-    43,
-    77,
-    84,
-    88,
-    26,
-    56,
+    81,
+    63,
     80,
-    66
+    84,
+    89,
+    5,
+    56,
+    9,
+    37,
+    38,
+    2,
+    72,
+    44,
+    24,
+    14,
+    83,
+    65,
+    34,
+    39,
+    33,
+    59,
+    45,
+    69,
+    88,
+    78,
+    76,
+    1,
+    51,
+    17,
+    87,
+    27,
+    28,
+    53,
+    31,
+    58,
+    57,
+    73,
+    23,
+    67,
+    49,
+    85,
+    20,
+    52,
+    12,
+    60,
+    77,
+    26,
+    79,
+    55,
+    7,
+    62,
+    43,
+    68,
+    16,
+    46,
+    74,
+    54,
+    75,
+    64,
+    22,
+    11,
+    30
   ],
   "accumulated": {
     "activated": true,
@@ -71,7 +90,7 @@
   },
   "isAccumulated": false,
   "round": {
-    "id": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
+    "id": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
     "cardValue": 0.20,
     "numbers": [],
     "cardSaleCount": 100,
@@ -80,33 +99,33 @@
     "cardRows": 3,
     "cardColumns": 5,
     "cardsPurchased": 0,
-    "startedDate": "2025-04-07T01:30:00Z",
+    "startedDate": "2025-04-18T19:25:00Z",
     "roomId": "13240740-5d00-44de-a0a0-fee61a7712db",
     "prizes": []
   },
   "prizes": [
     {
-      "id": "fc1ca668-9587-4650-85ed-d786f19af819",
-      "value": 10.00,
-      "type": "FourInLine",
-      "roundId": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff"
-    },
-    {
-      "id": "cff3b048-89c8-4e05-8992-6e50ece94aa3",
-      "value": 30.00,
+      "id": "1fe2e0d0-c0a7-4971-943b-0ab66eb5946e",
+      "value": 80.00,
       "type": "FullCard",
-      "roundId": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff"
+      "roundId": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7"
     },
     {
-      "id": "2c07d2cf-61c5-4cc4-9cac-118b967e597e",
+      "id": "3d94e46d-54a0-448b-ac0d-eae81cef1373",
       "value": 20.00,
       "type": "SingleLine",
-      "roundId": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff"
+      "roundId": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7"
+    },
+    {
+      "id": "3eb68020-142e-4c66-bb03-5fed961d6879",
+      "value": 10.00,
+      "type": "FourInLine",
+      "roundId": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7"
     }
   ],
   "results": [
     {
-      "prizeType": "FourInLine",
+      "prizeType": "FullCard",
       "winningCards": [
         {
           "punter": {
@@ -117,27 +136,27 @@
             "sellerId": "b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06"
           },
           "card": {
-            "id": "b1cd47bb-953c-4b6c-b539-d017e52dc2f9",
+            "id": "c1db0f6e-e497-4415-b1a3-e522f50c9bd2",
             "numbers": [
-              28,
-              42,
-              68,
-              70,
-              77,
-              49,
-              50,
-              86,
-              89,
-              90,
-              6,
-              19,
+              51,
+              58,
+              60,
+              63,
+              69,
+              14,
               20,
-              26,
-              81
+              28,
+              33,
+              53,
+              21,
+              30,
+              44,
+              54,
+              75
             ],
-            "roundId": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
+            "roundId": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
             "round": {
-              "id": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
+              "id": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
               "cardValue": 0.20,
               "numbers": [],
               "cardSaleCount": 100,
@@ -146,39 +165,39 @@
               "cardRows": 3,
               "cardColumns": 5,
               "cardsPurchased": 0,
-              "startedDate": "2025-04-07T01:30:00Z",
+              "startedDate": "2025-04-18T19:25:00Z",
               "roomId": "13240740-5d00-44de-a0a0-fee61a7712db",
               "prizes": []
             },
             "punterId": "80eae65d-00a5-4ca2-a892-2fccff439902"
           },
-          "valueOfEachWinner": 10.00
+          "valueOfEachWinner": 80.00
         }
       ],
       "listTopCards": [
         {
           "card": {
-            "id": "b1cd47bb-953c-4b6c-b539-d017e52dc2f9",
+            "id": "c1db0f6e-e497-4415-b1a3-e522f50c9bd2",
             "numbers": [
-              28,
-              42,
-              68,
-              70,
-              77,
-              49,
-              50,
-              86,
-              89,
-              90,
-              6,
-              19,
+              51,
+              58,
+              60,
+              63,
+              69,
+              14,
               20,
-              26,
-              81
+              28,
+              33,
+              53,
+              21,
+              30,
+              44,
+              54,
+              75
             ],
-            "roundId": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
+            "roundId": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
             "round": {
-              "id": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
+              "id": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
               "cardValue": 0.20,
               "numbers": [],
               "cardSaleCount": 100,
@@ -187,7 +206,7 @@
               "cardRows": 3,
               "cardColumns": 5,
               "cardsPurchased": 0,
-              "startedDate": "2025-04-07T01:30:00Z",
+              "startedDate": "2025-04-18T19:25:00Z",
               "roomId": "13240740-5d00-44de-a0a0-fee61a7712db",
               "prizes": []
             },
@@ -200,20 +219,10 @@
             "balance": 0,
             "sellerId": "b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06"
           },
-          "missingNumbers": [
-            6,
-            19,
-            26,
-            81
-          ],
-          "hits": 4
+          "missingNumbers": [],
+          "hits": 0
         }
       ]
-    },
-    {
-      "prizeType": "FullCard",
-      "winningCards": [],
-      "listTopCards": []
     },
     {
       "prizeType": "SingleLine",
@@ -227,27 +236,27 @@
             "sellerId": "b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06"
           },
           "card": {
-            "id": "b1cd47bb-953c-4b6c-b539-d017e52dc2f9",
+            "id": "ba6ad330-a160-446d-8840-e9b1579fdc97",
             "numbers": [
-              28,
-              42,
-              68,
+              44,
+              61,
+              62,
               70,
-              77,
-              49,
-              50,
-              86,
-              89,
-              90,
-              6,
-              19,
-              20,
-              26,
-              81
+              83,
+              15,
+              21,
+              41,
+              56,
+              58,
+              9,
+              34,
+              39,
+              80,
+              88
             ],
-            "roundId": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
+            "roundId": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
             "round": {
-              "id": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
+              "id": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
               "cardValue": 0.20,
               "numbers": [],
               "cardSaleCount": 100,
@@ -256,7 +265,7 @@
               "cardRows": 3,
               "cardColumns": 5,
               "cardsPurchased": 0,
-              "startedDate": "2025-04-07T01:30:00Z",
+              "startedDate": "2025-04-18T19:25:00Z",
               "roomId": "13240740-5d00-44de-a0a0-fee61a7712db",
               "prizes": []
             },
@@ -268,27 +277,27 @@
       "listTopCards": [
         {
           "card": {
-            "id": "b1cd47bb-953c-4b6c-b539-d017e52dc2f9",
+            "id": "ba6ad330-a160-446d-8840-e9b1579fdc97",
             "numbers": [
-              28,
-              42,
-              68,
+              44,
+              61,
+              62,
               70,
-              77,
-              49,
-              50,
-              86,
-              89,
-              90,
-              6,
-              19,
-              20,
-              26,
-              81
+              83,
+              15,
+              21,
+              41,
+              56,
+              58,
+              9,
+              34,
+              39,
+              80,
+              88
             ],
-            "roundId": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
+            "roundId": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
             "round": {
-              "id": "1b48665e-af2e-4f6f-b7f3-cff3eb55c2ff",
+              "id": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
               "cardValue": 0.20,
               "numbers": [],
               "cardSaleCount": 100,
@@ -297,7 +306,107 @@
               "cardRows": 3,
               "cardColumns": 5,
               "cardsPurchased": 0,
-              "startedDate": "2025-04-07T01:30:00Z",
+              "startedDate": "2025-04-18T19:25:00Z",
+              "roomId": "13240740-5d00-44de-a0a0-fee61a7712db",
+              "prizes": []
+            },
+            "punterId": "80eae65d-00a5-4ca2-a892-2fccff439902"
+          },
+          "punter": {
+            "id": "80eae65d-00a5-4ca2-a892-2fccff439902",
+            "name": "adao correia",
+            "cpf": "",
+            "balance": 0,
+            "sellerId": "b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06"
+          },
+          "missingNumbers": [],
+          "hits": 0
+        }
+      ]
+    },
+    {
+      "prizeType": "FourInLine",
+      "winningCards": [
+        {
+          "punter": {
+            "id": "80eae65d-00a5-4ca2-a892-2fccff439902",
+            "name": "adao correia",
+            "cpf": "",
+            "balance": 0,
+            "sellerId": "b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06"
+          },
+          "card": {
+            "id": "fb9e0434-9e55-48fd-b8de-3378d2529da1",
+            "numbers": [
+              3,
+              34,
+              36,
+              76,
+              88,
+              1,
+              14,
+              17,
+              60,
+              67,
+              9,
+              24,
+              35,
+              47,
+              66
+            ],
+            "roundId": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
+            "round": {
+              "id": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
+              "cardValue": 0.20,
+              "numbers": [],
+              "cardSaleCount": 100,
+              "timeBetweenBalls": 4,
+              "maxBalls": 90,
+              "cardRows": 3,
+              "cardColumns": 5,
+              "cardsPurchased": 0,
+              "startedDate": "2025-04-18T19:25:00Z",
+              "roomId": "13240740-5d00-44de-a0a0-fee61a7712db",
+              "prizes": []
+            },
+            "punterId": "80eae65d-00a5-4ca2-a892-2fccff439902"
+          },
+          "valueOfEachWinner": 10.00
+        }
+      ],
+      "listTopCards": [
+        {
+          "card": {
+            "id": "fb9e0434-9e55-48fd-b8de-3378d2529da1",
+            "numbers": [
+              3,
+              34,
+              36,
+              76,
+              88,
+              1,
+              14,
+              17,
+              60,
+              67,
+              9,
+              24,
+              35,
+              47,
+              66
+            ],
+            "roundId": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
+            "round": {
+              "id": "0d3ab85f-01e2-46c9-ac69-fd35f62008a7",
+              "cardValue": 0.20,
+              "numbers": [],
+              "cardSaleCount": 100,
+              "timeBetweenBalls": 4,
+              "maxBalls": 90,
+              "cardRows": 3,
+              "cardColumns": 5,
+              "cardsPurchased": 0,
+              "startedDate": "2025-04-18T19:25:00Z",
               "roomId": "13240740-5d00-44de-a0a0-fee61a7712db",
               "prizes": []
             },
@@ -311,12 +420,9 @@
             "sellerId": "b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06"
           },
           "missingNumbers": [
-            6,
-            19,
-            26,
-            81
+            66
           ],
-          "hits": 4
+          "hits": 1
         }
       ]
     }

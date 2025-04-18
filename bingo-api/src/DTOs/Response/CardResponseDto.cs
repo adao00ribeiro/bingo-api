@@ -42,7 +42,7 @@ public record CardResponseDto
         CardsWinnersResponse
         );
     }
-     internal static CardResponseDto ConvertToSocketDto(Card card)
+     public static CardResponseDto ConvertToSocketDto(Card card)
     {
         var RoundResponse = card.Round != null ? RoundResponseDto.ConvertToSocketDto(card.Round) : null;
         return new CardResponseDto(

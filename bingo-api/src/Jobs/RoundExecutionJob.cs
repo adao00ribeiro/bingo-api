@@ -18,7 +18,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
  ) : IRoundExecutionJob
 {
     IServiceScopeFactory _scopeFactory = scopeFactory;
-    private readonly ILogger<RoundExecutionJob> _logger = logger;
+    private readonly ILogger<IRoundExecutionJob> _logger = logger;
     private readonly IWebSocketService webSocketService = _webSocketService;
     private readonly InsertBotRoundService InsertBotRoundService = _insertBotRoundServiceWinnerRepository;
     private List<int> remainingNumbers = new List<int>();
@@ -27,20 +27,25 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
     {
         try
         {
-
             using var scope = _scopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<DataContext>();
             _logger.LogInformation("Iniciando Job2 - Processamento do Round {RoundId}", roundId);
-    /*
-            try
+
+            var result = await this.InsertBotRoundService.Execute(roundId);
+
+            if (result.IsSuccess)
             {
-                await this.InsertBotRoundService.Execute(roundId);
+                Console.WriteLine(result.Data); // Exibe a mensagem de sucesso
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogWarning(ex, "Falha ao inserir bots na rodada {RoundId}. Continuando execução.", roundId);
+                Console.WriteLine($"Erro: {result.Error}");
+                if (result.Data != null)
+                {
+                    Console.WriteLine(result.Data); // Pode conter mensagem adicional de erro
+                }
             }
-    */
+           
             Round? tempRound = await context.Rounds
             .Include(r => r.Cards)
             .ThenInclude(c => c.Punter)
@@ -148,7 +153,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 message.Numbers = drawnNumbers.ToList();
                 message.IsAccumulated = bingoAccumulated.Activated && (bingoAccumulated.MaximumNumberOfBalls >= drawnNumbers.Count());
                 message.Round = RoundResponseDto.ConvertToSocketDto(tempRound);
-                message.Prizes = prizes.Select(p=>PrizeResponseDto.ConvertToSocketDto(p));
+                message.Prizes = prizes.Select(p => PrizeResponseDto.ConvertToSocketDto(p));
                 message.Results = prizes.Select(prize => prize.GetObject()).ToList();
                 message.CurrentPrizeResult = null;
 
@@ -164,8 +169,9 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
 
                 allAwardsDrawn = prizes.All(prize => prize.HasWinners());
 
-               await Task.Delay(TimeBetweenBalls* 1000);
+                await Task.Delay(TimeBetweenBalls * 1000);
             }
+
             if (bingoAccumulated.Activated)
             {
                 if (bingoAccumulated.MaximumNumberOfBalls >= tempRound.Numbers.Count())

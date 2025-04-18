@@ -13,26 +13,37 @@ public class InsertBotRoundService
         _context = context;
     }
 
-    public async Task<Round?> Execute(Guid roundId)
+    public async Task<Result> Execute(Guid roundId)
     {
         try
         {
             Round? tempRound = await _context.Rounds
                     .Include(r => r.Room)
+                    .ThenInclude(r => r.BotConfig)
                     .AsNoTracking()
                     .FirstOrDefaultAsync(r => r.Id == roundId);
 
             if (tempRound == null)
             {
-                return null;
+                 return Result.Failure("invalid_round");
             }
+            var config = tempRound.Room?.BotConfig;
+            if (config == null)
+            {
+                return Result.Failure("invalid_config");
+            }
+            if (!config.Enabled)
+            {
+             return Result.Failure("enabled", new { message = "Bot Config desativado" }); 
+           }
+
             var bots = await _context.Punters
                 .Where(p => p.SellerId == tempRound.Room.OwnerId && p.IsBot)
                 .ToListAsync();
 
             if (!bots.Any())
             {
-                return null;
+                  return Result.Failure("no_bots_available");
             }
 
             var cardsToInsert = new List<Card>();
@@ -57,13 +68,21 @@ public class InsertBotRoundService
             await this._context.SaveChangesAsync();
 
 
-
-            return tempRound;
+            return Result.Success(new { message = "Cartelas inseridas com sucesso." });
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erro ao executar a inserção da rodada: {ex.Message}");
-            return null;
+             return Result.Failure("insert_error", new { message = $"Erro ao inserir cartelas: {ex.Message}" });
         }
     }
+
 }
+    public class Result
+    {
+        public bool IsSuccess { get; private set; }
+        public string Error { get; private set; }
+        public object Data { get; private set; }
+
+        public static Result Success(object data) => new Result { IsSuccess = true, Data = data };
+        public static Result Failure(string error, object data = null) => new Result { IsSuccess = false, Error = error, Data = data };
+    }

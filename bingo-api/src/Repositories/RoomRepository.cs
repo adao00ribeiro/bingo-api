@@ -12,8 +12,10 @@ public class RoomRepository : RepositoryBase<Room>, IRoomRepository
 
     public override async Task<Guid> AddAsync(Room objeto)
     {
-        Accumulated acumulated = new Accumulated();
+        Accumulated acumulated = new();
         objeto.Accumulated = acumulated;
+        BotConfig config = new();
+        objeto.BotConfig = config;
         return await base.AddAsync(objeto);
     }
 }
