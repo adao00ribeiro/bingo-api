@@ -5,7 +5,8 @@ WORKDIR /app/api
 
 COPY *.sln ./
 
-COPY bingo_api/*.csproj ./bingo_api/
+COPY bingo-api/*.csproj ./bingo-api/
+COPY bingo-tests/*.csproj ./bingo-tests/
 
 RUN dotnet restore
 
