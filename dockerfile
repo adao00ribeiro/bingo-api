@@ -8,6 +8,7 @@ COPY *.sln ./
 COPY bingo-api/*.csproj ./bingo-api/
 COPY bingo-tests/*.csproj ./bingo-tests/
 
+RUN dotnet clean
 RUN dotnet restore
 
 COPY . ./
@@ -31,4 +32,4 @@ RUN locale-gen en_US.UTF-8 en_GB.UTF-8 de_DE.UTF-8 es_ES.UTF-8 fr_FR.UTF-8 it_IT
 
 ENV LANG=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8
 
-ENTRYPOINT ["dotnet", "bingo_api.dll"]
+ENTRYPOINT ["dotnet", "bingo-api.dll"]
