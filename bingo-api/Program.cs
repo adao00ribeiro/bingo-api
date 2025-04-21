@@ -16,7 +16,7 @@ builder.Services.AddCors ( options =>
 {
     options.AddPolicy ( "AllowAll" , policy =>
     {
-        policy.WithOrigins ( "https://743a771ca0f108ba1df8daef491c66d0.serveo.net" , "http://localhost" , "http://localhost:4200" , "http://localhost:4300" , "https://localhost:4200" , "https://localhost:4300" )
+        policy.WithOrigins ( "http://homologation-bingo-dashboard.captain.localhost" , "http://localhost" , "http://localhost:4200" , "http://localhost:4300" , "https://localhost:4200" , "https://localhost:4300" )
               .AllowAnyMethod ( )
               .AllowAnyHeader ( )
               .AllowCredentials ( );
