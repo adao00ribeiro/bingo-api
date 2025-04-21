@@ -1,9 +1,9 @@
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG DatabasePostgreSQL=${DatabasePostgreSQL}
-ENV DatabasePostgreSQL=${DatabasePostgreSQL}
-ARG RedisConnection=${RedisConnection}
-ENV RedisConnection=${RedisConnection}
+ARG ConnectionStrings__DatabasePostgreSQL=${ConnectionStrings__DatabasePostgreSQL}
+ENV ConnectionStrings__DatabasePostgreSQL=${ConnectionStrings__DatabasePostgreSQL}
+ARG ConnectionStrings__RedisConnection=${ConnectionStrings__RedisConnection}
+ENV ConnectionStrings__RedisConnection=${ConnectionStrings__RedisConnection}
 WORKDIR /app/api
 
 COPY *.sln ./
