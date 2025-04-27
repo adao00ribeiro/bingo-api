@@ -1,5 +1,8 @@
+using System.Text.Json;
 using bingo_api.src.Entities;
+using bingo_api.src.Structs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 
@@ -9,6 +12,7 @@ public class RoundMap : IEntityTypeConfiguration<Round>
 {
     public void Configure(EntityTypeBuilder<Round> builder)
     {
+         var serializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
         builder.ToTable("Rounds");
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedOnAdd();
@@ -26,7 +30,8 @@ public class RoundMap : IEntityTypeConfiguration<Round>
         builder.Property(r => r.TimeBetweenBalls)
             .IsRequired()
             .HasDefaultValue(4);
-
+        builder.Property(r => r.Timeline)
+        .HasColumnType("jsonb"); // Define o tipo da coluna como jsonb
         builder.Property(r => r.MaxBalls)
           .IsRequired()
           .HasDefaultValue(90);

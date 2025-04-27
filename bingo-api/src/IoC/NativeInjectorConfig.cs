@@ -13,6 +13,7 @@ using StackExchange.Redis;
 using bingo_api.src.Jobs;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Jobs;
+using Npgsql;
 
 
 namespace bingo_api.src.IoC;
@@ -21,9 +22,13 @@ public static class NativeInjectorConfig
 {
     public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("DatabasePostgreSQL"));
+        dataSourceBuilder.EnableDynamicJson();
+        var dataSource = dataSourceBuilder.Build();
         services.AddDbContext<DataContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DatabasePostgreSQL"))
-
+          {
+              options.UseNpgsql(dataSource);
+          }
         );
         services.AddDbContext<IdentityDataContext>(options =>
           options.UseNpgsql(configuration.GetConnectionString("DatabasePostgreSQL"))
@@ -47,8 +52,10 @@ public static class NativeInjectorConfig
             logging.SetMinimumLevel(LogLevel.Debug);
         });
 
+        services.AddScoped<DataInitializer>(); // Registrar o DataInitializer
+        
         services.AddSingleton<IWebSocketService, WebSocketService>();
-
+    
         //repository
         services.AddScoped<JwtSecurityExtensionEvents>();
         services.AddScoped<IIdentityService, IdentityService>();
@@ -63,17 +70,18 @@ public static class NativeInjectorConfig
         services.AddScoped<IRoundRepository, RoundRepository>();
         services.AddScoped<IBotConfigRepository, BotConfigRepository>();
         services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
-        services.AddScoped< InsertBotRoundService>();
+        services.AddScoped<InsertBotRoundService>();
 
         //jobs
-        services.AddScoped< IRoundFetcherJob, RoundFetcherJob>();
-        services.AddScoped< IRoundExecutionJob , RoundExecutionJob>();
+        services.AddScoped<IRoundFetcherJob, RoundFetcherJob>();
+        services.AddScoped<IRoundExecutionJob, RoundExecutionJob>();
+        services.AddScoped<IShowTimelineStepJob, ShowTimelineStepJob>();
 
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();
         services.AddScoped<IDepositService, DepositService>();
 
-       
+      
     }
 
 }

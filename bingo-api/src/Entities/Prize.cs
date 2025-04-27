@@ -46,6 +46,9 @@ public class Prize : Entity
     {
         return new PrizeResult
         {
+            PrizeId = Id,
+            Value = Value,
+            RoundId = RoundId,
             PrizeType = Type,
             WinningCards = WinningCards,
             ListTopCards = TopCards

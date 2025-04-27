@@ -4,8 +4,6 @@ namespace bingo_api.src.Entities;
 
 public class BotConfig : Entity
 {
-  
-
     public bool Enabled  { get; set; }
     public Guid RoomId { get; set; }
     public Room? Room { get; set; }

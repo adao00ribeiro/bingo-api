@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using bingo_api.src.Entities.Shared;
+using bingo_api.src.Structs;
 
 namespace bingo_api.src.Entities;
 
@@ -12,7 +13,7 @@ public class Round : Entity
     public int MaxBalls { get; set; }//utilizado para jogos de 90 ,80,75, 50 ,30
     public int CardRows { get; set; } // Número de linhas na cartela
     public int CardColumns { get; set; } // Número de colunas na cartela
-
+    public List<TimelineEvent> Timeline { get; set; } = new List<TimelineEvent>();
     [NotMapped]
     public int CardsPurchased { get; set; }
     public DateTime Started { get; set; }

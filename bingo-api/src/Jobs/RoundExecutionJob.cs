@@ -6,6 +6,7 @@ using bingo_api.src.Factory;
 using bingo_api.src.Interfaces.Jobs;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Structs;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Jobs;
@@ -55,6 +56,8 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
              .AsNoTracking()
             .FirstOrDefaultAsync(r => r.Id == roundId);
 
+            var timeline = new List<TimelineEvent>();
+
             if (tempRound is null)
             {
                 _logger.LogWarning("Rodada {RoundId} não encontrada.", roundId);
@@ -73,7 +76,8 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 context.Rounds.Entry(tempRound).State = EntityState.Modified;
                 await context.SaveChangesAsync();
                 message.Finished = true;
-                await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                //  await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                timeline.Add(new TimelineEvent { eventData = message.Clone() });
                 return;
             }
 
@@ -95,10 +99,12 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             message.MaxNumbers = drawnNumbers.Count();
             message.Numbers = new List<int>();
             message.Accumulated = bingoAccumulated;
+            
+            //   await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
 
-            await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
-
-            await Task.Delay(8000);
+            // await Task.Delay(8000);
+            timeline.Add(new TimelineEvent { eventData = message.Clone() });
+            timeline.Add(new TimelineEvent { Delay = 8 * 1000 });
 
             while (remainingNumbers.Any() && !allAwardsDrawn)
             {
@@ -153,23 +159,27 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 message.Numbers = drawnNumbers.ToList();
                 message.IsAccumulated = bingoAccumulated.Activated && (bingoAccumulated.MaximumNumberOfBalls >= drawnNumbers.Count());
                 message.Round = RoundResponseDto.ConvertToSocketDto(tempRound);
-                message.Prizes = prizes.Select(p => PrizeResponseDto.ConvertToSocketDto(p));
                 message.Results = prizes.Select(prize => prize.GetObject()).ToList();
                 message.CurrentPrizeResult = null;
 
-                await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                //await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
 
-                _logger.LogWarning("Enviado para o websocket");
+                timeline.Add(new TimelineEvent { eventData = message.Clone() });
+
+                // _logger.LogWarning("Enviado para o websocket");
                 if (current_prize_result is not null)
                 {
                     message.CurrentPrizeResult = current_prize_result;
-                    await Task.Delay(3 * 1000);
-                    await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                    //  await Task.Delay(3 * 1000);
+                    //  await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                    timeline.Add(new TimelineEvent { Delay = 3 * 1000 });
+                    timeline.Add(new TimelineEvent { eventData = message.Clone() });
                 }
 
                 allAwardsDrawn = prizes.All(prize => prize.HasWinners());
 
-                await Task.Delay(TimeBetweenBalls * 1000);
+                //await Task.Delay(TimeBetweenBalls * 1000);
+                timeline.Add(new TimelineEvent { Delay = TimeBetweenBalls * 1000 });
             }
 
             if (bingoAccumulated.Activated)
@@ -195,6 +205,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 await context.SaveChangesAsync();
 
             }
+            /*
             tempRound.Finished = DateTime.UtcNow;
             context.Rounds.Entry(tempRound).State = EntityState.Modified;
             await context.SaveChangesAsync();
@@ -207,10 +218,18 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                     await context.SaveChangesAsync();
                 }
             }
-
+            */
             message.Finished = true;
             message.CurrentPrizeResult = null;
-            await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+            timeline.Add(new TimelineEvent { eventData = message.Clone() });
+          
+            tempRound.Timeline = timeline;
+            context.Rounds.Entry(tempRound).State = EntityState.Modified;
+            await context.SaveChangesAsync();
+
+            // BackgroundJob.Enqueue<BingoShowTimelineStepJob>(x => x.PerformAsync(round.Id, 0));
+            BackgroundJob.Enqueue<ShowTimelineStepJob>(job => job.Execute(roundId, 0));
+
         }
         catch (Exception ex)
         {
