@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Transactions;
 using bingo_api.src.Configurations;
@@ -7,8 +8,10 @@ using bingo_api.src.Context;
 using bingo_api.src.DTOs.Request;
 using bingo_api.src.DTOs.Response;
 using bingo_api.src.Entities;
+using bingo_api.src.Exceptions;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
@@ -44,32 +47,42 @@ public class IdentityService : IIdentityService
 
         try
         {
+            var existPunter = await _punterRepository.GetByEmailAsync(punter.Email);
+
+            if (existPunter != null)
+            {
+                throw new Exception("Email ja utilizado");
+            }
+
             var punterId = await _punterRepository.AddAsync(punter);
             identityUser.EntityId = punterId;
             identityUser.EntityType = nameof(Punter);
-            // cadastrar a role no AspNetUserRoles
-            var result = await _userManager.CreateAsync(identityUser, identityUser.PasswordHash);
+
+            var createResult = await _userManager.CreateAsync(identityUser, identityUser.PasswordHash);
+
+            if (!createResult.Succeeded)
+            {
+                // Caso falhe a criação do usuário, adiciona os erros e faz o rollback
+                var errors = createResult.Errors.Select(r => r.Description).ToList();
+                throw new Exception(string.Join(", ", errors));
+            }
+            await _userManager.SetLockoutEnabledAsync(identityUser, false);
+
             var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Punter);
             if (!roleResult.Succeeded)
             {
-                throw new Exception("Falha ao adicionar o Role ao usuário Punter.");
+                var roleErrors = roleResult.Errors.Select(r => r.Description).ToList();
+                throw new Exception(string.Join(", ", roleErrors));
             }
 
-            if (result.Succeeded)
-                await _userManager.SetLockoutEnabledAsync(identityUser, false);
-            var usuarioCadastroResponse = new RegisterResponseDto(result.Succeeded);
-            if (!result.Succeeded && result.Errors.Count() > 0)
-            {
-                usuarioCadastroResponse.AdicionarErros(result.Errors.Select(r => r.Description));
-            }
+
             await transaction.CommitAsync();
-            return usuarioCadastroResponse;
+            return new RegisterResponseDto(true);
         }
         catch (Exception ex)
         {
-            var usuarioCadastroResponse = new RegisterResponseDto(false);
-            usuarioCadastroResponse.AdicionarErros(new List<string> { ex.Message });
-            return usuarioCadastroResponse;
+            await transaction.RollbackAsync();
+            throw new Exception(ex.Message);
         }
 
     }
@@ -77,10 +90,8 @@ public class IdentityService : IIdentityService
     public async Task<RegisterResponseDto> CadastrarSeller(User identityUser, Seller seller)
     {
         await using var transaction = await this._dataContext.Database.BeginTransactionAsync();
-
         try
         {
-
             var sellerId = await _sellerRepository.AddAsync(seller);
             identityUser.EntityId = sellerId;
             identityUser.EntityType = nameof(Seller);
@@ -93,7 +104,7 @@ public class IdentityService : IIdentityService
             }
 
 
-            var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Punter);
+            var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Seller);
 
 
             var response = new RegisterResponseDto(createResult.Succeeded);
@@ -109,7 +120,6 @@ public class IdentityService : IIdentityService
             {
                 response.AdicionarErros(roleResult.Errors.Select(r => r.Description));
             }
-
 
             await transaction.CommitAsync();
             return response;
@@ -242,4 +252,3 @@ public class IdentityService : IIdentityService
         return usuario;
     }
 }
-

@@ -21,7 +21,7 @@ public class PunterRepository : RepositoryBase<Punter>, IPunterRepository
                  .ThenInclude(s => s.OwnerRooms) 
             .FirstOrDefaultAsync(punter => punter.Email == email);
 
-        return punter ?? throw new KeyNotFoundException($"Punter with email {email} not found.");
+        return punter;
     }
 
 }

@@ -2,7 +2,6 @@ using System.Security.Claims;
 using bingo_api.src.Controllers.Shared;
 using bingo_api.src.DTOs.Request;
 using bingo_api.src.DTOs.Response;
-using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,24 +19,14 @@ public class IdentityController(IIdentityService _identityService) : ApiControll
     {
         if (!ModelState.IsValid)
             return BadRequest();
-        
-        return Ok( await identityService.CadastrarSeller(RegisterRequestDto.ConvertToEntityUser(dto),SellerRequestDto.ConvertToEntity(dto)));
+        return Ok(await identityService.CadastrarSeller(RegisterRequestDto.ConvertToEntityUser(dto), SellerRequestDto.ConvertToEntity(dto)));
     }
     [HttpPost("cadastro/punter")]
     public async Task<IActionResult> CadastrarPunter(PunterRequestDto dto)
     {
         if (!ModelState.IsValid)
             return BadRequest();
-
-        var resultado = await identityService.CadastrarPunter(RegisterRequestDto.ConvertToEntityUser(dto),PunterRequestDto.ConvertToEntity(dto));
-
-        if (!resultado.Sucesso)
-        {
-            var erros = string.Join("; ", resultado.Erros); // Combina os erros em uma única string
-            return BadRequest(erros);
-        }
-      
-        return Ok(resultado);
+        return Ok(await identityService.CadastrarPunter(RegisterRequestDto.ConvertToEntityUser(dto), PunterRequestDto.ConvertToEntity(dto)));
     }
 
     [HttpPost("login")]
@@ -61,7 +50,7 @@ public class IdentityController(IIdentityService _identityService) : ApiControll
         var usuarioId = identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (usuarioId == null)
             return BadRequest();
-        
+
         var resultado = await identityService.LoginSemSenha(usuarioId);
         if (resultado.Sucesso)
             return Ok(resultado);
