@@ -35,8 +35,7 @@ public class RoomController(IRoomRepository _roomRepository) : ApiControllerBase
         }
         else if (User.IsInRole("Seller"))
         {
-            // Seller pode ver apenas as salas que ele criou
-            rooms = await roomRepository.GetAllAsync(includeProperties:[r => r.OwnerId == Guid.Parse(userId), r => r.RoomsSellers, r => r.Owner]);
+            rooms = await roomRepository.GetAllAsync(filter:r => r.OwnerId == Guid.Parse(userId),includeProperties:[ r => r.RoomsSellers, r => r.Owner]);
         }
         else if (User.IsInRole("Punter"))
         {

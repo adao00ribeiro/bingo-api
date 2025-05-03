@@ -19,7 +19,7 @@ public class PunterMap : IEntityTypeConfiguration<Punter>
         builder.Property(x => x.Name).HasMaxLength(50).IsRequired();
         builder.Property(x => x.Cpf).HasMaxLength(11).IsRequired();
         builder.Property(x => x.DateBirth).IsRequired();
-
+        builder.HasIndex(x => x.Email).IsUnique(); 
         builder.HasMany(p => p.Cards)
            .WithOne(c => c.Punter)
            .HasForeignKey(c => c.PunterId)

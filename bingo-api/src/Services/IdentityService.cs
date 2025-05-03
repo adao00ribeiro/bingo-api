@@ -1,31 +1,38 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Transactions;
 using bingo_api.src.Configurations;
 using bingo_api.src.Constants;
+using bingo_api.src.Context;
 using bingo_api.src.DTOs.Request;
 using bingo_api.src.DTOs.Response;
 using bingo_api.src.Entities;
+using bingo_api.src.Exceptions;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
 namespace bingo_api.src.Services;
+
 public class IdentityService : IIdentityService
 {
+    public readonly DataContext _dataContext;
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
     private readonly JwtOptions _jwtOptions;
     private readonly ISellerRepository _sellerRepository;
     private readonly IPunterRepository _punterRepository;
-    public IdentityService(SignInManager<User> signInManager,
+    public IdentityService(DataContext dataContext, SignInManager<User> signInManager,
                            UserManager<User> userManager,
                            IOptions<JwtOptions> jwtOptions,
                            ISellerRepository sellerRepository,
                            IPunterRepository punterRepository
                            )
     {
+        _dataContext = dataContext;
         _signInManager = signInManager;
         _userManager = userManager;
         _jwtOptions = jwtOptions.Value;
@@ -36,88 +43,94 @@ public class IdentityService : IIdentityService
 
     public async Task<RegisterResponseDto> CadastrarPunter(User identityUser, Punter punter)
     {
-        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-        {
-            try
-            {
-                var punterId = await _punterRepository.AddAsync(punter);
-                identityUser.EntityId = punterId;
-                identityUser.EntityType = nameof(Punter);
-                // cadastrar a role no AspNetUserRoles
-                var result = await _userManager.CreateAsync(identityUser, identityUser.PasswordHash);
-                var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Punter);
-                if (!roleResult.Succeeded)
-                {
-                    throw new Exception("Falha ao adicionar o Role ao usuário Punter.");
-                }
+        await using var transaction = await this._dataContext.Database.BeginTransactionAsync();
 
-                if (result.Succeeded)
-                    await _userManager.SetLockoutEnabledAsync(identityUser, false);
-                var usuarioCadastroResponse = new RegisterResponseDto(result.Succeeded);
-                if (!result.Succeeded && result.Errors.Count() > 0)
-                {
-                    usuarioCadastroResponse.AdicionarErros(result.Errors.Select(r => r.Description));
-                }
-                transaction.Complete();
-                return usuarioCadastroResponse;
-            }
-            catch (Exception ex)
+        try
+        {
+            var existPunter = await _punterRepository.GetByEmailAsync(punter.Email);
+
+            if (existPunter != null)
             {
-                var usuarioCadastroResponse = new RegisterResponseDto(false);
-                usuarioCadastroResponse.AdicionarErros(new List<string> { ex.Message });
-                return usuarioCadastroResponse;
+                throw new Exception("Email ja utilizado");
             }
+
+            var punterId = await _punterRepository.AddAsync(punter);
+            identityUser.EntityId = punterId;
+            identityUser.EntityType = nameof(Punter);
+
+            var createResult = await _userManager.CreateAsync(identityUser, identityUser.PasswordHash);
+
+            if (!createResult.Succeeded)
+            {
+                // Caso falhe a criação do usuário, adiciona os erros e faz o rollback
+                var errors = createResult.Errors.Select(r => r.Description).ToList();
+                throw new Exception(string.Join(", ", errors));
+            }
+            await _userManager.SetLockoutEnabledAsync(identityUser, false);
+
+            var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Punter);
+            if (!roleResult.Succeeded)
+            {
+                var roleErrors = roleResult.Errors.Select(r => r.Description).ToList();
+                throw new Exception(string.Join(", ", roleErrors));
+            }
+
+
+            await transaction.CommitAsync();
+            return new RegisterResponseDto(true);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw new Exception(ex.Message);
         }
 
     }
 
     public async Task<RegisterResponseDto> CadastrarSeller(User identityUser, Seller seller)
     {
-        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        await using var transaction = await this._dataContext.Database.BeginTransactionAsync();
+        try
         {
-            try
+            var sellerId = await _sellerRepository.AddAsync(seller);
+            identityUser.EntityId = sellerId;
+            identityUser.EntityType = nameof(Seller);
+
+            var createResult = await _userManager.CreateAsync(identityUser, identityUser.PasswordHash);
+
+            if (createResult.Succeeded)
             {
-
-                var sellerId = await _sellerRepository.AddAsync(seller);
-                identityUser.EntityId = sellerId;
-                identityUser.EntityType = nameof(Seller);
-
-                var createResult = await _userManager.CreateAsync(identityUser, identityUser.PasswordHash);
-
-                if (createResult.Succeeded)
-                {
-                    await _userManager.SetLockoutEnabledAsync(identityUser, false);
-                }
-
-
-                var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Punter);
-
-
-                var response = new RegisterResponseDto(createResult.Succeeded);
-
-
-                if (!createResult.Succeeded && createResult.Errors.Any())
-                {
-                    response.AdicionarErros(createResult.Errors.Select(r => r.Description));
-                }
-
-
-                if (!roleResult.Succeeded)
-                {
-                    response.AdicionarErros(roleResult.Errors.Select(r => r.Description));
-                }
-
-
-                transaction.Complete();
-                return response;
+                await _userManager.SetLockoutEnabledAsync(identityUser, false);
             }
-            catch (Exception ex)
+
+
+            var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Seller);
+
+
+            var response = new RegisterResponseDto(createResult.Succeeded);
+
+
+            if (!createResult.Succeeded && createResult.Errors.Any())
             {
-                var usuarioCadastroResponse = new RegisterResponseDto(false);
-                usuarioCadastroResponse.AdicionarErros(new List<string> { ex.Message });
-                return usuarioCadastroResponse;
+                response.AdicionarErros(createResult.Errors.Select(r => r.Description));
             }
+
+
+            if (!roleResult.Succeeded)
+            {
+                response.AdicionarErros(roleResult.Errors.Select(r => r.Description));
+            }
+
+            await transaction.CommitAsync();
+            return response;
         }
+        catch (Exception ex)
+        {
+            var usuarioCadastroResponse = new RegisterResponseDto(false);
+            usuarioCadastroResponse.AdicionarErros(new List<string> { ex.Message });
+            return usuarioCadastroResponse;
+        }
+
     }
     public async Task<LoginResponse> Login(LoginRequest usuarioLogin)
     {
@@ -217,10 +230,11 @@ public class IdentityService : IIdentityService
 
             claims.AddRange(userClaims);
 
-            foreach (var role in roles){
-                     claims.Add(new Claim("role", role));
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim("role", role));
             }
-               
+
         }
 
         return claims;
@@ -237,7 +251,4 @@ public class IdentityService : IIdentityService
 
         return usuario;
     }
-
-
 }
-

@@ -9,5 +9,11 @@ namespace bingo_api.src.Entities;
 public class User : IdentityUser
 {
     public Guid EntityId { get; set; } // ID do Punter ou Seller
-    public string EntityType { get; set; } // Nome da classe (ex: "Punter" ou "Seller")
+    public string EntityType { get; set; } // Nome da classe (ex: "Punter" ou "Seller")+
+
+
+    public override string ToString()
+    {
+        return $"{Id} , {UserName}";
+    }
 }
