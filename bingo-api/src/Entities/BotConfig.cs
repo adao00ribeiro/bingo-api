@@ -12,6 +12,11 @@ public class BotConfig : Entity
     {
         Enabled = false;
     }
+     public BotConfig(bool enabled , Guid roomId)
+    {
+        Enabled = enabled;
+        RoomId = roomId;
+    }
     public BotConfig(Guid roomId)
     {
         Enabled = false;

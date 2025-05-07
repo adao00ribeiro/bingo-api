@@ -9,11 +9,12 @@ namespace bingo_api.src.DTOs.Request;
 
 public record BotConfigRequestDto
 {
-
-    [Required(ErrorMessage = "CardId is required.")]
-    public Guid RoomId { get; set; }
-    internal static BotConfig ConvertToEntity(BotConfigRequestDto dto)
-    {
-      return new BotConfig(dto.RoomId);
-    }
+  [Required(ErrorMessage = "Enabled is required.")]
+  public bool Enabled { get; set; }
+  [Required(ErrorMessage = "RoomId is required.")]
+  public Guid RoomId { get; set; }
+  internal static BotConfig ConvertToEntity(BotConfigRequestDto dto)
+  {
+    return new BotConfig(dto.Enabled,dto.RoomId);
+  }
 }

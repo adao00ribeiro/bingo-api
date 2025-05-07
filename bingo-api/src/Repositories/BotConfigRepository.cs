@@ -13,7 +13,12 @@ public class BotConfigRepository : RepositoryBase<BotConfig>, IBotConfigReposito
     public BotConfigRepository(DataContext dataContext) : base(dataContext)
     {
     }
-
+    public async Task<BotConfig> UpdateAsync(Guid id , BotConfig objeto)
+    {
+        objeto.Id = id;
+        await base.UpdateAsync(objeto);
+        return objeto;
+    }
     public async Task<BotConfig> CreateWithPuntersAsync(BotConfig botConfig)
     {
         using var transaction = await this.Context.Database.BeginTransactionAsync();
@@ -73,5 +78,12 @@ public class BotConfigRepository : RepositoryBase<BotConfig>, IBotConfigReposito
             await transaction.RollbackAsync();
             throw;
         }
+    }
+
+    public async Task<BotConfig> GetByRoomId(Guid roomId)
+    {
+          return await this.Context.BotConfigs
+        .Include(b => b.Room)
+        .FirstOrDefaultAsync(b => b.RoomId == roomId);
     }
 }
