@@ -7,6 +7,8 @@ namespace bingo_api.src.DTOs.Response;
 public record CardResponseDto
 {
     public Guid Id { get; set; }
+    public string Name { get; set; }
+
     public int[] Numbers { get; set; }
     public Guid RoundId { get; set; }
     public RoundResponseDto? Round { get; set; }
@@ -15,9 +17,10 @@ public record CardResponseDto
      [JsonIgnore]
     public IEnumerable<CardWinnerResponseDto> CardWinners { get; set; }
 
-    public CardResponseDto(Guid id, int[] numbers, Guid roundId, RoundResponseDto? round, Guid punterId, PunterResponseDto? punter, IEnumerable<CardWinnerResponseDto> cardWinners)
+    public CardResponseDto(Guid id, string name , int[] numbers, Guid roundId, RoundResponseDto? round, Guid punterId, PunterResponseDto? punter, IEnumerable<CardWinnerResponseDto> cardWinners)
     {
         Id = id;
+        Name = name;
         Numbers = numbers;
         RoundId = roundId;
         Round = round;
@@ -34,6 +37,7 @@ public record CardResponseDto
 
         return new CardResponseDto(
         card.Id,
+        card.Name,
         card.Numbers,
         card.RoundId,
         RoundResponse,
@@ -47,6 +51,7 @@ public record CardResponseDto
         var RoundResponse = card.Round != null ? RoundResponseDto.ConvertToSocketDto(card.Round) : null;
         return new CardResponseDto(
         card.Id,
+        card.Name,
         card.Numbers,
         card.RoundId,
         RoundResponse,

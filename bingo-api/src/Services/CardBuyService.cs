@@ -8,21 +8,24 @@ namespace bingo_api.src.Services;
 
 public class CardBuyService : ICardBuyService
 {
-    private readonly ICardRepository cardRepository;
-    private readonly IPunterRepository punterRepository;
-    private readonly IRoundRepository roundRepository;
+    private readonly ICardRepository _cardRepository;
+    private readonly IPunterRepository _punterRepository;
+    private readonly IRoundRepository _roundRepository;
+    private readonly ICardBuyRepository _cardBuyRepository;
     private readonly ITransactionHistoryRepository transactionHistoryRepository;
 
     public CardBuyService(
-        ICardRepository _cardRepository,
-        IPunterRepository _punterRepositoryy,
-         IRoundRepository _roundRepository,
+        ICardRepository cardRepository,
+        IPunterRepository punterRepositoryy,
+         IRoundRepository roundRepository,
+         ICardBuyRepository cardBuyRepository,
          ITransactionHistoryRepository _transactionHistoryRepository
          )
     {
-        this.cardRepository = _cardRepository;
-        this.punterRepository = _punterRepositoryy;
-        this.roundRepository = _roundRepository;
+        this._cardRepository = cardRepository;
+        this._punterRepository = punterRepositoryy;
+        this._roundRepository = roundRepository;
+        this._cardBuyRepository = cardBuyRepository;
         this.transactionHistoryRepository = _transactionHistoryRepository;
     }
     public async Task<bool> Buy(CardBuyRequestDto dto)
@@ -33,13 +36,13 @@ public class CardBuyService : ICardBuyService
             throw new Exception("Nao encontrado");
         }
 
-        Punter? punter = await this.punterRepository.GetByIdAsync(dto.PunterId);
+        Punter? punter = await this._punterRepository.GetByIdAsync(dto.PunterId);
 
         if (punter is null)
         {
             throw new Exception("pUNTER Nao encontrado");
         }
-        Round? round = await this.roundRepository.GetByIdAsync(dto.RoundId);
+        Round? round = await this._roundRepository.GetByIdAsync(dto.RoundId);
 
         if (round is null)
         {
@@ -60,6 +63,16 @@ public class CardBuyService : ICardBuyService
         {
             try
             {
+              var cardbuy =  CardBuyRequestDto.ConvertToEntity(dto);
+
+              var cardBuyId = await this._cardBuyRepository.AddAsync(cardbuy);
+
+
+                if (cardBuyId == Guid.Empty){
+                     throw new Exception("Compra nao realizada");
+                }
+
+
                 var cardsToInsert = new List<Card>();
 
                 for (int i = 0; i < dto.Quantity; i++)
@@ -67,14 +80,16 @@ public class CardBuyService : ICardBuyService
                     var card = new Card
                     {
                         Numbers = GetRandomNumbers(round.MaxBalls, round.CardRows, round.CardColumns),
+                        Name = punter.Name,
                         Code = new Random().Next(1, 100000),
                         RoundId = round.Id,
                         PunterId = punter.Id,
+                        CardBuyId = cardBuyId
                     };
                     cardsToInsert.Add(card);
                 }
 
-                await this.cardRepository.AddRangeAsync(cardsToInsert);
+                await this._cardRepository.AddRangeAsync(cardsToInsert);
                 // Registra a transação no histórico
                 var transactionHistory = new TransactionHistory
                 {
@@ -91,8 +106,8 @@ public class CardBuyService : ICardBuyService
 
                 round.CardSaleCount += dto.Quantity;
                 punter.Balance -= value;
-                await this.roundRepository.UpdateAsync(round);
-                await this.punterRepository.UpdateAsync(punter);
+                await this._roundRepository.UpdateAsync(round);
+                await this._punterRepository.UpdateAsync(punter);
                 transaction.Complete();
                 return true;
             }

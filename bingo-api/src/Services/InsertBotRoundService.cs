@@ -1,6 +1,7 @@
 using bingo_api.src.Context;
 using bingo_api.src.Entities;
 using bingo_api.src.Services;
+using Bogus;
 using Microsoft.EntityFrameworkCore;
 
 public class InsertBotRoundService
@@ -46,30 +47,37 @@ public class InsertBotRoundService
             {
                 return Result.Failure("no_bots_available");
             }
+             var faker = new Faker("pt_BR");
 
-            var cardsToInsert = new List<Card>();
-            var vendidos = tempRound.CardSaleCount;
-           
-            var valor_cartela = tempRound.CardValue;
-          
             var custo_premios = tempRound.Prizes.Sum(p => p.Value);
-           
-            var porcentagem = 100;
-            var caixa_cartela = vendidos * valor_cartela;
-           
+            decimal porcentagemDecimal = Convert.ToDecimal(config.PresenceRate);
+            var arrecadado = tempRound.CardSaleCount * tempRound.CardValue;
+            var total_cartelas = ((custo_premios / (1 - porcentagemDecimal)) - arrecadado) / tempRound.CardValue;
 
-            var razao = (porcentagem * 10) / caixa_cartela;
-            var total_cartelas = (razao * vendidos) - custo_premios;
-           var quantity = (int)Math.Ceiling(total_cartelas / bots.Count);
-           var random = new Random();
-            foreach (var bot in bots)
+            if (total_cartelas <= 0 ) {
+                 return Result.Failure("no_bots_available");
+            }
+            var cardsToInsert = new List<Card>();
+            var bot = bots.First();
+            var cardBuy = new CardBuy((int)total_cartelas, tempRound.Id, bot.Id);
+
+            var newCardBuy = await _context.CardBuys.AddAsync(cardBuy);
+            await this._context.SaveChangesAsync();
+            var base_quantity = total_cartelas / 1000;
+            var remainder = total_cartelas % 1000;
+
+            var random = new Random();
+            for (int i = 0; i < 1000; i++)
             {
-                for (int i = 0; i < quantity; i++)
+                var quantity = base_quantity + (i < remainder ? 1 : 0);
+                string nomeCompleto = faker.Name.FullName();
+                for (int j = 0; j < quantity; j++)
                 {
                     var card = new Card
                     {
                         Numbers = CardBuyService.GetRandomNumbers(tempRound.MaxBalls, tempRound.CardRows, tempRound.CardColumns),
                         Code = random.Next(1, 100000),
+                        Name = nomeCompleto,
                         RoundId = tempRound.Id,
                         PunterId = bot.Id,
                     };
@@ -82,7 +90,7 @@ public class InsertBotRoundService
             await this._context.Cards.AddRangeAsync(cardsToInsert);
             await this._context.SaveChangesAsync();
 
-            return Result.Success(new { message = $"{quantity} Cartelas Inseridas com sucesso" });
+            return Result.Success(new { message = $"{total_cartelas} Cartelas Inseridas com sucesso" });
         }
         catch (Exception ex)
         {

@@ -15,7 +15,8 @@ public class BotConfigMap : IEntityTypeConfiguration<BotConfig>
         .ValueGeneratedOnAdd();
         builder.Property(a => a.Enabled)
               .IsRequired();
-
+        builder.Property(a => a.PresenceRate)
+              .IsRequired();
         builder.HasOne(a => a.Room)
                .WithOne(r => r.BotConfig)
                .HasForeignKey<BotConfig>(a => a.RoomId)

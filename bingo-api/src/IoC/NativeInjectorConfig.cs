@@ -68,7 +68,9 @@ public static class NativeInjectorConfig
         services.AddScoped<IRoundRepository, RoundRepository>();
         services.AddScoped<ISellerRepository, SellerRepository>();
         services.AddScoped<IRoundRepository, RoundRepository>();
+        services.AddScoped<ICardBuyRepository, CardBuyRepository>();
         services.AddScoped<IBotConfigRepository, BotConfigRepository>();
+        services.AddScoped<IAccumulatedRepository, AccumulatedRepository>();
         services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
         services.AddScoped<InsertBotRoundService>();
 

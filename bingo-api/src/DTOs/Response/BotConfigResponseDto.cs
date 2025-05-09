@@ -7,15 +7,15 @@ public record BotConfigResponseDto
 {
     public Guid Id { get;  set; } 
     public bool Enabled { get; set; }
+    public double PresenceRate{ get; set; }
     public Guid RoomId { get; set; }
-
-    
     [JsonIgnore]
     public RoomResponseDto? Room { get; set; }
-    public BotConfigResponseDto(Guid id ,bool enabled, Guid roomId, RoomResponseDto? room)
+    public BotConfigResponseDto(Guid id ,bool enabled,double presenceRate, Guid roomId, RoomResponseDto? room)
     {
         Id = id;
         Enabled = enabled;
+        PresenceRate = presenceRate;
         RoomId = roomId;
         Room = room;
     }
@@ -25,6 +25,7 @@ public record BotConfigResponseDto
         return new BotConfigResponseDto(
                 config.Id,
                 config.Enabled,
+                config.PresenceRate,
                 config.RoomId,
                 roomResponse
         );

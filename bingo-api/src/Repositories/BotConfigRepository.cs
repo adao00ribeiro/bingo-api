@@ -13,7 +13,7 @@ public class BotConfigRepository : RepositoryBase<BotConfig>, IBotConfigReposito
     public BotConfigRepository(DataContext dataContext) : base(dataContext)
     {
     }
-    public async Task<BotConfig> UpdateAsync(Guid id , BotConfig objeto)
+    public async Task<BotConfig> UpdateAsync(Guid id, BotConfig objeto)
     {
         objeto.Id = id;
         await base.UpdateAsync(objeto);
@@ -40,33 +40,23 @@ public class BotConfigRepository : RepositoryBase<BotConfig>, IBotConfigReposito
 
             // Verifica se o Seller já tem Punters bots
             bool sellerHasPunters = await this.Context.Punters
-                .AnyAsync(p => p.SellerId == sellerId&& p.IsBot == true);
+                .AnyAsync(p => p.SellerId == sellerId && p.IsBot == true);
 
             if (!sellerHasPunters) // Se não tem Punters, cria novos
             {
                 var faker = new Faker("pt_BR");
-                var nomesUsados = new HashSet<string>();
-                var punters = new List<Punter>();
 
-                for (int i = 0; i < 1000; i++)
-                {
-                    string nomeCompleto;
-                    do
-                    {
-                        nomeCompleto = faker.Name.FullName();
-                    } while (nomesUsados.Contains(nomeCompleto));
-                  
-                    nomesUsados.Add(nomeCompleto);
-                    punters.Add(
-                        new Punter(
-                        faker.Internet.Email(nomeCompleto.ToLower().Replace(" ", ".")),
-                    nomeCompleto,
-                    faker.Person.Cpf().Replace(".", "").Replace("-", ""),
-                    faker.Date.Past(60, DateTime.UtcNow.AddYears(-18)), sellerId,
-                    true
-                    ));
-                }
-                await this.Context.Punters.AddRangeAsync(punters);
+                string nomeCompleto = faker.Name.FullName();
+
+                var punter = new Punter(
+                       faker.Internet.Email(nomeCompleto.ToLower().Replace(" ", ".")),
+                   nomeCompleto,
+                   faker.Person.Cpf().Replace(".", "").Replace("-", ""),
+                   faker.Date.Past(60, DateTime.UtcNow.AddYears(-18)), sellerId,
+                   true
+                );
+
+                await this.Context.Punters.AddAsync(punter);
                 await this.Context.SaveChangesAsync();
             }
 
@@ -82,8 +72,8 @@ public class BotConfigRepository : RepositoryBase<BotConfig>, IBotConfigReposito
 
     public async Task<BotConfig> GetByRoomId(Guid roomId)
     {
-          return await this.Context.BotConfigs
-        .Include(b => b.Room)
-        .FirstOrDefaultAsync(b => b.RoomId == roomId);
+        return await this.Context.BotConfigs
+      .Include(b => b.Room)
+      .FirstOrDefaultAsync(b => b.RoomId == roomId);
     }
 }

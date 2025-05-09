@@ -15,6 +15,7 @@ public class DataContext : DbContext
     public DbSet<Round> Rounds { get; set; }
     public DbSet<Prize> Prizes { get; set; }
     public DbSet<Card> Cards { get; set; }
+    public DbSet<CardBuy> CardBuys { get; set; }
     public DbSet<CardWinner> CardWinners { get; set; }
     public DbSet<Recharge> Recharges { get; set; }
     public DbSet<Accumulated> Accumulated { get; set; }

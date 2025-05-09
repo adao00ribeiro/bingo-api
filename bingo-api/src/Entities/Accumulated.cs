@@ -27,4 +27,16 @@ public class Accumulated : Entity
         this.CumulativePercentage = 1;
         this.IncrementBallCumulative = false;
     }
+
+    public Accumulated(bool activated, decimal minimumValue, decimal maximumValue, decimal currentValue, int maximumNumberOfBalls, decimal cumulativePercentage, bool incrementBallCumulative, Guid roomId)
+    {
+        Activated = activated;
+        MinimumValue = minimumValue;
+        MaximumValue = maximumValue;
+        CurrentValue = currentValue;
+        MaximumNumberOfBalls = maximumNumberOfBalls;
+        CumulativePercentage = cumulativePercentage;
+        IncrementBallCumulative = incrementBallCumulative;
+        RoomId = roomId;
+    }
 }

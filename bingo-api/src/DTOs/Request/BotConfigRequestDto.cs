@@ -11,10 +11,13 @@ public record BotConfigRequestDto
 {
   [Required(ErrorMessage = "Enabled is required.")]
   public bool Enabled { get; set; }
+
+  [Required(ErrorMessage = "PresenceRate is required.")]
+  public double PresenceRate{ get; set; }
   [Required(ErrorMessage = "RoomId is required.")]
   public Guid RoomId { get; set; }
   internal static BotConfig ConvertToEntity(BotConfigRequestDto dto)
   {
-    return new BotConfig(dto.Enabled,dto.RoomId);
+    return new BotConfig(dto.Enabled,dto.PresenceRate,dto.RoomId);
   }
 }
