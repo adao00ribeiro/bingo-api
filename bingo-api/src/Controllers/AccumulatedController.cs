@@ -30,4 +30,13 @@ public class AccumulatedController(IAccumulatedRepository _repository) : ApiCont
         var botConfig = await this.accumulatedRepository.GetByRoomId(roomId);
         return Ok(AccumulatedResponseDto.ConvertToDto(botConfig));
     }
+
+    
+    [HttpPut("{id}")]
+    public async Task<ActionResult<AccumulatedResponseDto>> Update(Guid id, [FromBody] AccumulatedRequestDto updateDto)
+    {
+       var objeto =  await this.accumulatedRepository.UpdateAsync( id,AccumulatedRequestDto.ConvertToEntity(updateDto));
+
+        return Ok(AccumulatedResponseDto.ConvertToDto(objeto));
+    }
 }

@@ -15,8 +15,15 @@ public class AccumulatedRepository : RepositoryBase<Accumulated>, IAccumulatedRe
 
     public async Task<Accumulated> GetByRoomId(Guid roomId)
     {
-           return await this.Context.Accumulated
-        .Include(b => b.Room)
-        .FirstOrDefaultAsync(b => b.RoomId == roomId);
+        return await this.Context.Accumulated
+     .Include(b => b.Room)
+     .FirstOrDefaultAsync(b => b.RoomId == roomId);
+    }
+
+    public async Task<Accumulated> UpdateAsync(Guid id, Accumulated accumulated)
+    {
+        accumulated.Id = id;
+        await base.UpdateAsync(accumulated);
+        return accumulated;
     }
 }
