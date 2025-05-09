@@ -19,10 +19,10 @@ public class Round : Entity
     public DateTime Started { get; set; }
     public DateTime? Finished { get; set; }
     public Guid RoomId { get; set; }
-    public  Room? Room { get; set; }
-    public  IEnumerable<Card>? Cards { get; set; }
-    public  ICollection<Prize>? Prizes { get; set; }
-      public Round()
+    public Room? Room { get; set; }
+    public IEnumerable<Card>? Cards { get; set; }
+    public ICollection<Prize>? Prizes { get; set; }
+    public Round()
     {
 
     }

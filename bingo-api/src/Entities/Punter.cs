@@ -16,7 +16,7 @@ public class Punter : Entity , ITransactionParticipant
     public DateTime DateBirth { get; set; }
     public  IEnumerable<Card> Cards { get; set; }
     public Guid SellerId { get; set; }
-    public  Seller? Seller { get; set; }
+    public  Seller Seller { get; set; }
     public  IEnumerable<Recharge>? Recharges { get; set; }
     public Punter()
     {
