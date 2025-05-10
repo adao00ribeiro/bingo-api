@@ -4,10 +4,8 @@ using bingo_api.src.Extensions;
 using bingo_api.src.IoC;
 using Hangfire;
 using Hellang.Middleware.ProblemDetails;
-using Microsoft.AspNetCore.Identity;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using bingo_api.src.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 

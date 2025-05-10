@@ -11,7 +11,7 @@ public class Card : Entity
     public Guid RoundId { get; set; }
     public Round? Round { get; set; }
     public Guid PunterId { get; set; }
-    public Punter? Punter { get; set; }
+    public virtual Punter Punter { get; set; }
     public Guid CardBuyId { get; set; }
     public CardBuy CardBuy { get; set; }
     public IEnumerable<CardWinner>? CardWinners { get; set; }

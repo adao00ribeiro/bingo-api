@@ -6,7 +6,7 @@ public class CardWinner : Entity
 {
     public decimal Value { get; set; }
     public Guid CardId { get; set; }
-    public Card? Card { get; set; }
+    public virtual Card Card { get; set; }
     public Guid PrizeId { get; set; }
     public Prize? Prize { get; set; }
 

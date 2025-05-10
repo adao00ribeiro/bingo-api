@@ -4,13 +4,15 @@ using bingo_api.src.Structs;
 using Hangfire;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Jobs;
+using Microsoft.EntityFrameworkCore;
 
-public class ShowTimelineStepJob(DataContext context, IWebSocketService _webSocketService, ILogger<ShowTimelineStepJob> logger) : IShowTimelineStepJob
+public class ShowTimelineStepJob(DataContext context, IWebSocketService _webSocketService, ITransactionHistoryRepository transactionHistoryRepository, ILogger<ShowTimelineStepJob> logger) : IShowTimelineStepJob
 {
     private readonly DataContext _context = context;
     private readonly IWebSocketService webSocketService = _webSocketService;
+    private readonly ITransactionHistoryRepository _transactionHistoryRepository = transactionHistoryRepository;
     private readonly ILogger<ShowTimelineStepJob> _logger = logger;
-    
+
     [AutomaticRetry(Attempts = 3)]
     public async Task Execute(Guid roundId, int index)
     {
@@ -38,7 +40,7 @@ public class ShowTimelineStepJob(DataContext context, IWebSocketService _webSock
         }
         else
         {
-            await Task.Delay((int)delay);
+           await Task.Delay((int)delay);
         }
 
         if (eventData != null && eventData.Finished && eventData.Results != null)
@@ -53,6 +55,23 @@ public class ShowTimelineStepJob(DataContext context, IWebSocketService _webSock
                     {
                         var cardWinner = new CardWinner(prizeValue, winner.Card.Id, result.PrizeId);
                         _context.CardWinners.Add(cardWinner);
+
+                        var card = _context.Cards.Include(c => c.Punter).FirstOrDefault(c => c.Id == winner.Card.Id);
+                        var punter = card.Punter;
+
+                        var transactionHistory = new TransactionHistory
+                        {
+                            EntityType = "Punter", // Pode ser Seller se o participante for um Seller
+                            EntityId = punter.Id,
+                            PreviousBalance = punter.PrizeBalance, // Antes da alteração
+                            CurrentBalance = punter.PrizeBalance + prizeValue, // O saldo será alterado após o registro da transação
+                            Amount = prizeValue,
+                            Type = TransactionType.PrizeReceived, // Assume que Purchase é o tipo de transação para compra de cartela
+                        };
+                        await this._transactionHistoryRepository.AddAsync(transactionHistory);
+                        punter.PrizeBalance += prizeValue;
+                        _context.Entry(punter).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
                     }
                 }
             }
