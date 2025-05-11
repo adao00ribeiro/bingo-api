@@ -82,6 +82,7 @@ public static class NativeInjectorConfig
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();
         services.AddScoped<IDepositService, DepositService>();
+        services.AddScoped<IReportService, ReportService>();
 
       
     }

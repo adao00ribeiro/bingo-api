@@ -5,6 +5,8 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using System.Security.Claims;
+using bingo_api.src.DTOs.Response.report;
+using bingo_api.src.DTOs.Request.Report;
 namespace bingo_api.src.Controllers;
 
 
@@ -42,7 +44,7 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         }
 
         var rounds = await roundRepository.FilterByRoomIdAsync(id, punter.Id);
-      
+
         var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
         return Ok(roundsResponse);
     }
@@ -87,4 +89,6 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         await roundRepository.RemoveByIdAsync(id);
         return Ok();
     }
+    
+   
 }

@@ -15,7 +15,7 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     public RoundRepository(DataContext dataContext) : base(dataContext)
     {
     }
-    
+
     public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
         Guid roomId, Guid PunterId)
     {
@@ -118,7 +118,7 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
         for (var date = request.StartedDate; date <= request.FinishedDate; date = date.AddDays(1))
         {
             var startTimeLocal = date.ToDateTime(request.StartedTime); // Assume que está no fuso local
-         
+
             var endTimeLocal = date.ToDateTime(request.FinishedTime);
             var startTimeUtc = TimeZoneInfo.ConvertTimeToUtc(startTimeLocal, TimeZoneInfo.Local);
             var endTimeUtc = TimeZoneInfo.ConvertTimeToUtc(endTimeLocal, TimeZoneInfo.Local);
@@ -140,10 +140,12 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
 
     public async Task<ICollection<Prize>> GetPrizes(Guid roundId)
     {
-       
-       var prizes = await Context.Prizes
-            .Where(p=>p.RoundId == roundId)
-                            .ToListAsync();
-       return prizes;
+
+        var prizes = await Context.Prizes
+             .Where(p => p.RoundId == roundId)
+                             .ToListAsync();
+        return prizes;
     }
+
+  
 }
