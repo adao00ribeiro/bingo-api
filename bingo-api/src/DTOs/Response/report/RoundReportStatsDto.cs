@@ -7,12 +7,12 @@ namespace bingo_api.src.DTOs.Response.report;
 
 public record RoundReportStatsDto
 {
-      public int TotalCount { get; set; }
-        public float CollectedSum { get; set; }
-        public float BotCollectedSum { get; set; }
-        public float UserAwardsSum { get; set; }
-        public float BotAwardsSum { get; set; }
-        public float TotalPrizesSum { get; set; }
-        public float ComissionsSum { get; set; }
-        public float NetValueSum { get; set; }
+        public int TotalCount { get; set; }
+        public decimal CollectedSum { get; set; }
+        public decimal BotCollectedSum { get; set; }
+        public decimal UserAwardsSum { get; set; }
+        public decimal BotAwardsSum { get; set; }
+        public decimal TotalPrizesSum { get; set; }
+        public decimal ComissionsSum { get; set; }
+        public decimal NetValueSum { get; set; }
 }

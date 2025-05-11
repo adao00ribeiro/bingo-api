@@ -6,6 +6,7 @@ using bingo_api.src.Context;
 using bingo_api.src.DTOs.Request.Report;
 using bingo_api.src.DTOs.Response.report;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace bingo_api.src.Reports;
 
@@ -48,6 +49,7 @@ public class RoundReport
     }
     private IQueryable<RoundReportItemDto> BuildBaseQuery(RoundReportRequestDto request)
     {
+
         var result = context.Rounds
        .Where(br => br.Started >= request.StartingOn && br.Started <= request.EndingOn)
        .Where(br => br.Room.Owner != null && request.SellerIds.Contains(br.Room.Owner.Id))
@@ -55,22 +57,31 @@ public class RoundReport
                      {
                          RoundTime = g.Started,
                          CardSaleCount = g.CardSaleCount,
-                         BotSaleCount = 0,
-                         Collected = 0,
-                         BotCollected = 0,
+                         Collected = g.CardValue * g.CardSaleCount,
+                         BotSaleCount = g.Cards.Count(c => c.Punter.IsBot),
+                         BotCollected = g.CardValue * g.Cards.Count(c => c.Punter.IsBot),
                          Finished = g.Finished,
-                         UserWinners = 0,
-                         BotWinners = 0,
-                         UserAwards = 0,
-                         BotAwards = 0,
-                         TotalPrizes = 0,
+                         UserWinners = g.Prizes.SelectMany(p => p.CardWinners).Count(w => !w.Card.Punter.IsBot),
+                         BotWinners = g.Prizes
+            .SelectMany(p => p.CardWinners)
+            .Count(w => w.Card.Punter.IsBot),
+                         UserAwards = g.Prizes
+            .SelectMany(p => p.CardWinners)
+            .Where(w => !w.Card.Punter.IsBot)
+            .Sum(w => (decimal?)w.Value) ?? 0,
+                         BotAwards = g.Prizes
+            .SelectMany(p => p.CardWinners)
+            .Where(w => w.Card.Punter.IsBot)
+            .Sum(w => (decimal?)w.Value) ?? 0,
+                         TotalPrizes = g.Prizes.Select(p => (decimal?)p.Value).Distinct().Sum() ?? 0,
                          Comissions = 0,
                          NetValue = 0
 
                      });
         return result;
+
     }
-    private IQueryable<RoundReportItemDto> ApplyFilters(IQueryable<RoundReportItemDto> query, Dictionary<string, object> filters)
+ private IQueryable<RoundReportItemDto> ApplyFilters(IQueryable<RoundReportItemDto> query, Dictionary<string, object> filters)
     {
         if (filters == null || !filters.Any())
             return query;
@@ -87,7 +98,6 @@ public class RoundReport
 */
         return query;
     }
-
     private IQueryable<RoundReportItemDto> ApplyOrders(IQueryable<RoundReportItemDto> query, List<string> orders)
     {
         if (orders == null || !orders.Any())
