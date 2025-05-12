@@ -21,7 +21,7 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PunterResponseDto>>> GetAll()
     {
-        var punters = await this.punterRepository.GetAllAsync(includeProperties: x => x.Seller);
+        var punters = await this.punterRepository.GetAllAsync(filter:x => x.IsBot == false , includeProperties: x => x.Seller);
         return Ok(punters.Select(p => PunterResponseDto.ConvertToDto(p)));
     }
     [HttpGet("me")]
