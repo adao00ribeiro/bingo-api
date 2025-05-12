@@ -2,6 +2,7 @@ namespace bingo_api.src.DTOs.Response.report;
 
 public record RoundReportItemDto
 {
+        public Guid RoundId { get;  set; }
         public DateTime RoundTime { get; set; }
         public int CardSaleCount { get; set; }
         public int BotSaleCount { get; set; }
@@ -15,4 +16,5 @@ public record RoundReportItemDto
         public decimal TotalPrizes { get; set; }
         public decimal Comissions { get; set; }
         public decimal NetValue { get; set; }
+    
 }

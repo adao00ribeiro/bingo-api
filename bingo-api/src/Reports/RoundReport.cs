@@ -49,12 +49,12 @@ public class RoundReport
     }
     private IQueryable<RoundReportItemDto> BuildBaseQuery(RoundReportRequestDto request)
     {
-
         var result = context.Rounds
        .Where(br => br.Started >= request.StartingOn && br.Started <= request.EndingOn)
        .Where(br => br.Room.Owner != null && request.SellerIds.Contains(br.Room.Owner.Id))
                      .Select(g => new RoundReportItemDto
                      {
+                         RoundId = g.Id,
                          RoundTime = g.Started,
                          CardSaleCount = g.CardSaleCount,
                          Collected = g.CardValue * g.CardSaleCount,
@@ -75,8 +75,12 @@ public class RoundReport
             .Sum(w => (decimal?)w.Value) ?? 0,
                          TotalPrizes = g.Prizes.Select(p => (decimal?)p.Value).Distinct().Sum() ?? 0,
                          Comissions = 0,
-                         NetValue = 0
-
+                         NetValue = g.CardSaleCount == 0 ? 0 : 
+            (g.CardValue * g.CardSaleCount) - 
+            (g.Prizes
+                .SelectMany(p => p.CardWinners)
+                .Where(w => !w.Card.Punter.IsBot)
+                .Sum(w => (decimal?)w.Value) ?? 0) - 0 
                      });
         return result;
 
