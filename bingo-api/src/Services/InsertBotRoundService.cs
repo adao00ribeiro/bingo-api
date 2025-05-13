@@ -29,6 +29,10 @@ public class InsertBotRoundService
             {
                 return Result.Failure("invalid_round");
             }
+            if (tempRound.CardSaleCount == 0)
+            {
+                return Result.Failure("invalid_round", new { message = "Rodadas sem cartelas compradas" });
+            }
             var config = tempRound.Room?.BotConfig;
             if (config == null)
             {
@@ -47,15 +51,16 @@ public class InsertBotRoundService
             {
                 return Result.Failure("no_bots_available");
             }
-             var faker = new Faker("pt_BR");
+            var faker = new Faker("pt_BR");
 
             var custo_premios = tempRound.Prizes.Sum(p => p.Value);
             decimal porcentagemDecimal = Convert.ToDecimal(config.PresenceRate);
             var arrecadado = tempRound.CardSaleCount * tempRound.CardValue;
             var total_cartelas = ((custo_premios / (1 - porcentagemDecimal)) - arrecadado) / tempRound.CardValue;
 
-            if (total_cartelas <= 0 ) {
-                 return Result.Failure("no_bots_available");
+            if (total_cartelas <= 0)
+            {
+                return Result.Failure("no_bots_available");
             }
             var cardsToInsert = new List<Card>();
             var bot = bots.First();
