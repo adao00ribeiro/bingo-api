@@ -14,6 +14,7 @@ public class PunterMap : IEntityTypeConfiguration<Punter>
         builder.Property(x => x.CreateAt).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
         builder.Property(x => x.UpdateAt).HasDefaultValueSql("CURRENT_TIMESTAMP"); ;
         builder.Property(x => x.Balance).IsRequired().HasColumnType("numeric(15, 2)");
+        builder.Property(x => x.PrizeBalance).IsRequired().HasColumnType("numeric(15, 2)");
         builder.Property(x => x.IsBot).IsRequired().HasDefaultValue(false);
         builder.Property(x => x.Email).HasMaxLength(100).IsRequired();
         builder.Property(x => x.Name).HasMaxLength(50).IsRequired();
