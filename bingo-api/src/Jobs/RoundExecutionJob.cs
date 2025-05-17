@@ -157,7 +157,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 message.ForthBall = fourthBall;
                 message.MaxNumbers = drawnNumbers.Count();
                 message.Numbers = drawnNumbers.ToList();
-                message.IsAccumulated = bingoAccumulated.Activated && (bingoAccumulated.MaximumNumberOfBalls >= drawnNumbers.Count());
+                message.IsAccumulated = IsAccumulated;
                 message.Round = RoundResponseDto.ConvertToSocketDto(tempRound);
                 message.Results = prizes.Select(prize => prize.GetObject()).ToList();
                 message.CurrentPrizeResult = null;
@@ -184,9 +184,8 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
 
             if (bingoAccumulated.Activated)
             {
-                if (bingoAccumulated.MaximumNumberOfBalls >= tempRound.Numbers.Count())
+                if (bingoAccumulated.MaximumNumberOfBalls >= tempRound.Numbers.Length)
                 {
-
                     bingoAccumulated.CurrentValue = bingoAccumulated.MinimumValue;
                     bingoAccumulated.MaximumNumberOfBalls = 40;
                 }
@@ -205,20 +204,6 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 await context.SaveChangesAsync();
 
             }
-            /*
-            tempRound.Finished = DateTime.UtcNow;
-            context.Rounds.Entry(tempRound).State = EntityState.Modified;
-            await context.SaveChangesAsync();
-
-            foreach (var prize in prizes)
-            {
-                foreach (var wc in prize.WinningCards)
-                {
-                    context.CardWinners.Add(new CardWinner(prize.Value / prize.WinningCards.Count(), wc.Card.Id, prize.Id));
-                    await context.SaveChangesAsync();
-                }
-            }
-            */
             message.Finished = true;
             message.CurrentPrizeResult = null;
             timeline.Add(new TimelineEvent { eventData = message.Clone() });

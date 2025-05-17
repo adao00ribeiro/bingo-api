@@ -14,8 +14,8 @@ public class TransactionHistoryRepository : RepositoryBase<TransactionHistory>, 
     {
     }
     
-    public  Task<int> CountAsync(Guid punterId)
+    public  async Task<int> CountAsync(Guid punterId)
     {
-        return  Context.TransactionHistories.CountAsync(r => r.EntityId == punterId);
+        return await Context.TransactionHistories.CountAsync(r => r.EntityId == punterId);
     }
 }
