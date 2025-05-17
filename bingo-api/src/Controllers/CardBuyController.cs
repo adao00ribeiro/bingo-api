@@ -3,9 +3,14 @@ using Asp.Versioning;
 using bingo_api.src.Controllers.Shared;
 using bingo_api.src.DTOs.Request;
 using bingo_api.src.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.src.Controllers;
+
+
+[Authorize]
+
 [ApiVersion("1.0")]
 public class CardBuyController(ICardBuyService _cardBuyService) : ApiControllerBase
 {

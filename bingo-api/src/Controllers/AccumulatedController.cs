@@ -3,10 +3,11 @@ using bingo_api.src.Controllers.Shared;
 using bingo_api.src.DTOs.Request;
 using bingo_api.src.DTOs.Response;
 using bingo_api.src.Interfaces.Repositories;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.src.Controllers;
+[Authorize]
 
 [ApiVersion("1.0")]
 public class AccumulatedController(IAccumulatedRepository _repository) : ApiControllerBase

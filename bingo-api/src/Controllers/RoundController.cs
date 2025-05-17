@@ -5,12 +5,11 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using System.Security.Claims;
-using bingo_api.src.DTOs.Response.report;
-using bingo_api.src.DTOs.Request.Report;
+using Microsoft.AspNetCore.Authorization;
 namespace bingo_api.src.Controllers;
 
 
-
+[Authorize]
 [ApiVersion("1.0")]
 public class RoundController(IRoundRepository _roundRepository, IPunterRepository _punterRepository) : ApiControllerBase
 {

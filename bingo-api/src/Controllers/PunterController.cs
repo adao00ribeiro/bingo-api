@@ -12,6 +12,7 @@ using bingo_api.src.Interfaces.Services;
 namespace bingo_api.src.Controllers;
 
 [Authorize]
+
 [ApiVersion("1.0")]
 public class PunterController(IPunterRepository _punterRepository, IIdentityService _identityService) : ApiControllerBase
 {

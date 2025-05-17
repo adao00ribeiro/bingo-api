@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 namespace bingo_api.src.Controllers;
 [Authorize]
+
 [ApiVersion("1.0")]
 public class CardController(ICardRepository _cardRepository, IPunterRepository _punterRepository) : ApiControllerBase
 {

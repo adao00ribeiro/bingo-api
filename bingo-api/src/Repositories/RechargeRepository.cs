@@ -68,8 +68,8 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
         }
     }
 
-    public Task<int> CountAsync(Guid punterId)
+    public async Task<int> CountAsync(Guid punterId)
     {
-        return Context.Recharges.CountAsync(r => r.PunterId == punterId);
+        return await Context.Recharges.CountAsync(r => r.PunterId == punterId);
     }
 }

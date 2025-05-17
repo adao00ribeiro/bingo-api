@@ -4,9 +4,13 @@ using bingo_api.src.DTOs.Request;
 using bingo_api.src.DTOs.Response;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.src.Controllers;
+
+
+[Authorize]
 
 [ApiVersion("1.0")]
 public class BotConfigController(IBotConfigRepository _botConfigRepository) : ApiControllerBase

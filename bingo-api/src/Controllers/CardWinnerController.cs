@@ -5,21 +5,45 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using bingo_api.src.Entities;
+using bingo_api.src.Constants;
 namespace bingo_api.src.Controllers;
 
 [Authorize]
+
 [ApiVersion("1.0")]
-public class CardWinnerController(ICardWinnerRepository _cardWinnerRepository) : ApiControllerBase
+public class CardWinnerController(ICardWinnerRepository cardWinnerRepository) : ApiControllerBase
 {
-    private readonly ICardWinnerRepository cardWinnerRepository = _cardWinnerRepository;
+    private readonly ICardWinnerRepository _cardWinnerRepository = cardWinnerRepository;
 
-
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Punter}")]
     [HttpGet()]
     public async Task<ActionResult<IEnumerable<CardWinnerResponseDto>>> GetAll(int? page = null, int? size = null)
     {
-        int totalCount = await cardWinnerRepository.CountAsync();
-        var cardWinners = await cardWinnerRepository.GetAllAsync(page, size, includeProperties: [cw => cw.Prize.Round, cd => cd.Card]);
-        var cardWinnerResponse = cardWinners.Select(cardWinner => CardWinnerResponseDto.ConvertToDto(cardWinner));
+
+        var entityId = User.FindFirst("entityid")?.Value;
+        int totalCount;
+        IEnumerable<CardWinner> cardWinners;
+
+        if (User.IsInRole(Roles.Admin))
+        {
+            // Se for Admin, retorna todas as recargas
+            totalCount = await _cardWinnerRepository.CountAsync();
+            cardWinners = await _cardWinnerRepository.GetAllAsync(page, size);
+        }
+        else if (User.IsInRole(Roles.Punter) && Guid.TryParse(entityId, out _))
+        {
+            totalCount = await _cardWinnerRepository.CountAsync(Guid.Parse(entityId));
+            cardWinners = await _cardWinnerRepository.GetAllAsync(page, size,
+                filter: r => r.Card.PunterId == Guid.Parse(entityId),
+                includeProperties: [cw => cw.Prize.Round, cd => cd.Card]);
+        }
+        else
+        {
+            return Forbid(); // Bloqueia caso o usuário não seja admin nem punter
+        }
+        var cardWinnerResponse = cardWinners.Select(CardWinnerResponseDto.ConvertToDto);
+
         return Ok(new PagedResponseDto<CardWinnerResponseDto>
         {
             Items = cardWinnerResponse,

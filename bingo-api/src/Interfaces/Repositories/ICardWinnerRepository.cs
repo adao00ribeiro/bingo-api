@@ -5,5 +5,5 @@ namespace bingo_api.src.Interfaces.Repositories;
 
 public interface ICardWinnerRepository : IRepositoryBase<CardWinner>
 {
-
+    Task<int> CountAsync(Guid guid);
 }

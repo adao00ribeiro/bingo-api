@@ -2,6 +2,7 @@ using bingo_api.src.Context;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Repositories.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Repositories;
 
@@ -12,4 +13,8 @@ public class CardWinnerRepository : RepositoryBase<CardWinner>, ICardWinnerRepos
     }
 
 
+    public async Task<int> CountAsync(Guid punterId)
+    {
+        return await Context.CardWinners.CountAsync(r => r.Card.PunterId == punterId);
+    }
 }

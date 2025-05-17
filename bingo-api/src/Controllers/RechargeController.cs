@@ -11,6 +11,7 @@ using System.Security.Claims;
 namespace bingo_api.src.Controllers;
 
 
+[Authorize]
 
 [ApiVersion("1.0")]
 public class RechargeController(IRechargeRepository _rechargeRepository) : ApiControllerBase
