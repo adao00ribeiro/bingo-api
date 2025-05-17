@@ -16,53 +16,39 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     {
     }
 
-    public async Task<IEnumerable<Round>> FilterByRoomIdAsync(
-        Guid roomId, Guid PunterId)
+    public async Task<IEnumerable<Round>> FilterByRoomIdAsync(Guid roomId, Guid punterId)
     {
         DateTime currentDateTime = DateTime.UtcNow;
-        // Calculando startTime (10 minutos antes do tempo atual)
         var startTime = currentDateTime.AddMinutes(-10);
-        // Calculando endTime (24 horas depois do startTime)
         var endTime = startTime.AddHours(24);
-        //TimeSpan endTime = TimeSpan.FromHours(23) + TimeSpan.FromMinutes(59); 
-        Console.WriteLine("opa" + roomId);
 
-        Console.WriteLine("opa" + PunterId);
-
-        Console.WriteLine("opa" + currentDateTime.Date);
-        Console.WriteLine("opa" + startTime);
-        Console.WriteLine("opa" + endTime);
-
-
-        var query = @"SELECT r.*, COUNT(c.""Id"") AS CardsPurchased
-    FROM ""Rounds"" r
-    LEFT JOIN ""Cards"" c ON c.""RoundId"" = r.""Id"" AND c.""PunterId"" = @PunterId
-    WHERE r.""RoomId"" = @RoomId
-    AND r.""Started"" >= @StartTime 
-    AND r.""Started"" <= @EndTime
-    AND r.""Finished"" IS NULL
-    GROUP BY r.""Id""
-    ORDER BY r.""Started"" ASC
-    ";
-
+        // Busca os rounds com os filtros
         var rounds = await Context.Rounds
-                .FromSqlRaw(query,
-                    new NpgsqlParameter("@RoomId", roomId),
-                    new NpgsqlParameter("@Date", currentDateTime.Date),
-                    new NpgsqlParameter("@StartTime", startTime),
-                    new NpgsqlParameter("@EndTime", endTime),
-                    new NpgsqlParameter("@PunterId", PunterId)
-                )
-                  .AsNoTracking()
-                .ToListAsync();
-        foreach (var round in rounds)
-        {
-            round.CardsPurchased = Context.Cards
-                .Count(c => c.RoundId == round.Id && c.PunterId == PunterId);
-        }
+            .Where(r => r.RoomId == roomId &&
+                        r.Started >= startTime &&
+                        r.Started <= endTime &&
+                        r.Finished == null)
+            .OrderBy(r => r.Started)
+            .AsNoTracking()
+            .ToListAsync();
 
         var roundIds = rounds.Select(r => r.Id).ToList();
 
+        // Busca os cards comprados pelo punter para esses rounds
+        var cardsByRound = await Context.Cards
+            .Where(c => roundIds.Contains(c.RoundId) && c.PunterId == punterId)
+            .GroupBy(c => c.RoundId)
+            .Select(g => new { RoundId = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        // Mapeia o número de cards para cada round
+        foreach (var round in rounds)
+        {
+            round.CardsPurchased = cardsByRound
+                .FirstOrDefault(c => c.RoundId == round.Id)?.Count ?? 0;
+        }
+
+        // Carrega os prêmios associados aos rounds
         var prizes = await Context.Prizes
             .Where(p => roundIds.Contains(p.RoundId))
             .ToListAsync();
@@ -73,8 +59,8 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
         }
 
         return rounds;
-
     }
+
     public override Task<Guid> AddAsync(Round objeto)
     {
         if (objeto.Prizes?.Count == 0)
@@ -147,5 +133,5 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
         return prizes;
     }
 
-  
+
 }
