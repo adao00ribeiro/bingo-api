@@ -14,8 +14,8 @@ using bingo_api.src.Structs;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250426152817_timeline_in_round")]
-    partial class timeline_in_round
+    [Migration("20250517002616_InitialDbData")]
+    partial class InitialDbData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,126 +31,224 @@ namespace bingo_api.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<bool>("Activated")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("activated");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("CumulativePercentage")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("cumulative_percentage");
 
                     b.Property<decimal>("CurrentValue")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("current_value");
 
                     b.Property<bool>("IncrementBallCumulative")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("increment_ball_cumulative");
 
                     b.Property<int>("MaximumNumberOfBalls")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("maximum_number_of_balls");
 
                     b.Property<decimal>("MaximumValue")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("maximum_value");
 
                     b.Property<decimal>("MinimumValue")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("minimum_value");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("room_id");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoomId")
                         .IsUnique();
 
-                    b.ToTable("Accumulateds", (string)null);
+                    b.ToTable("accumulateds", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.BotConfig", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<bool>("Enabled")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("enabled");
+
+                    b.Property<double>("PresenceRate")
+                        .HasColumnType("double precision")
+                        .HasColumnName("presence_rate");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("room_id");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoomId")
                         .IsUnique();
 
-                    b.ToTable("BotConfigs", (string)null);
+                    b.ToTable("bot_configs", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Card", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CardBuyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("card_buy_id");
 
                     b.Property<int>("Code")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("code");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("name");
 
                     b.Property<int[]>("Numbers")
                         .IsRequired()
-                        .HasColumnType("integer[]");
+                        .HasColumnType("integer[]")
+                        .HasColumnName("numbers");
 
                     b.Property<Guid>("PunterId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("punter_id");
 
                     b.Property<Guid>("RoundId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("round_id");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CardBuyId");
 
                     b.HasIndex("PunterId");
 
                     b.HasIndex("RoundId");
 
-                    b.ToTable("Cards", (string)null);
+                    b.ToTable("cards", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.CardBuy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreateAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("PunterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("punter_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<Guid>("RoundId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("round_id");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("card_buys", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.CardWinner", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid>("CardId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("card_id");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<Guid>("PrizeId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("prize_id");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("value");
 
                     b.HasKey("Id");
 
@@ -158,188 +256,244 @@ namespace bingo_api.Migrations
 
                     b.HasIndex("PrizeId");
 
-                    b.ToTable("CardsWinners", (string)null);
+                    b.ToTable("cards_winners", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Prize", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<Guid>("RoundId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("round_id");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("numeric(15, 2)");
+                        .HasColumnType("numeric(15, 2)")
+                        .HasColumnName("value");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoundId");
 
-                    b.ToTable("Prizes", (string)null);
+                    b.ToTable("prizes", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Punter", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("numeric(15, 2)");
+                        .HasColumnType("numeric(15, 2)")
+                        .HasColumnName("balance");
 
                     b.Property<string>("Cpf")
                         .IsRequired()
                         .HasMaxLength(11)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(11)");
+                        .HasColumnType("character varying(11)")
+                        .HasColumnName("cpf");
 
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime>("DateBirth")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_birth");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("email");
 
                     b.Property<bool>("IsBot")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_bot");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("name");
 
                     b.Property<decimal>("PrizeBalance")
-                        .HasColumnType("numeric");
+                        .HasColumnType("numeric(15, 2)")
+                        .HasColumnName("prize_balance");
 
                     b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
 
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasDatabaseName("ux_punters_email");
+
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Punters", (string)null);
+                    b.ToTable("punters", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Recharge", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("ImagemQrcode")
                         .IsRequired()
                         .HasMaxLength(500)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("imagem_qrcode");
 
                     b.Property<Guid>("PunterId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("punter_id");
 
                     b.Property<string>("Qrcode")
                         .IsRequired()
                         .HasMaxLength(200)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("qrcode");
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(0);
+                        .HasDefaultValue(0)
+                        .HasColumnName("status");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("numeric(15, 2)");
+                        .HasColumnType("numeric(15, 2)")
+                        .HasColumnName("value");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PunterId");
 
-                    b.ToTable("Recharges", (string)null);
+                    b.ToTable("recharges", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Room", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
 
                     b.Property<Guid>("OwnerId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("owner_id");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Rooms", (string)null);
+                    b.ToTable("rooms", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.RoomSeller", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("AssignedBy")
                         .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("assigned_by");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("room_id");
 
                     b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
@@ -347,100 +501,125 @@ namespace bingo_api.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("RoomsSellers", (string)null);
+                    b.ToTable("rooms_sellers", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Round", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<int>("CardColumns")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("card_columns");
 
                     b.Property<int>("CardRows")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("card_rows");
 
                     b.Property<int>("CardSaleCount")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(0);
+                        .HasDefaultValue(0)
+                        .HasColumnName("card_sale_count");
 
                     b.Property<decimal>("CardValue")
-                        .HasColumnType("numeric(15, 2)");
+                        .HasColumnType("numeric(15, 2)")
+                        .HasColumnName("card_value");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("Finished")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("finished");
 
                     b.Property<int>("MaxBalls")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(90);
+                        .HasDefaultValue(90)
+                        .HasColumnName("max_balls");
 
                     b.Property<int[]>("Numbers")
                         .IsRequired()
-                        .HasColumnType("integer[]");
+                        .HasColumnType("integer[]")
+                        .HasColumnName("numbers");
 
                     b.Property<Guid>("RoomId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("room_id");
 
                     b.Property<DateTime>("Started")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("started");
 
                     b.Property<int>("TimeBetweenBalls")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(4);
+                        .HasDefaultValue(4)
+                        .HasColumnName("time_between_balls");
 
                     b.Property<List<TimelineEvent>>("Timeline")
                         .IsRequired()
-                        .HasColumnType("jsonb");
+                        .HasColumnType("jsonb")
+                        .HasColumnName("timeline");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("Rounds", (string)null);
+                    b.ToTable("rounds", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Seller", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("numeric(15, 2)");
+                        .HasColumnType("numeric(15, 2)")
+                        .HasColumnName("balance");
 
                     b.Property<decimal>("Comission")
-                        .HasColumnType("numeric(15, 2)");
+                        .HasColumnType("numeric(15, 2)")
+                        .HasColumnName("comission");
 
                     b.Property<string>("Cpf")
                         .IsRequired()
                         .HasMaxLength(11)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(11)");
+                        .HasColumnType("character varying(11)")
+                        .HasColumnName("cpf");
 
                     b.Property<DateTime>("CreateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime>("DateBirth")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_birth");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("email");
 
                     b.Property<decimal>("PrizeBalance")
                         .HasColumnType("numeric");
@@ -448,49 +627,63 @@ namespace bingo_api.Migrations
                     b.Property<DateTime>("UpdateAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sellers", (string)null);
+                    b.ToTable("sellers", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.TransactionHistory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(15,2)");
+                        .HasColumnType("decimal(15,2)")
+                        .HasColumnName("amount");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("create_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("CurrentBalance")
-                        .HasColumnType("decimal(15,2)");
+                        .HasColumnType("decimal(15,2)")
+                        .HasColumnName("current_balance");
 
                     b.Property<Guid>("EntityId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("entity_id");
 
                     b.Property<string>("EntityType")
                         .IsRequired()
                         .HasMaxLength(500)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("entity_type");
 
                     b.Property<decimal>("PreviousBalance")
-                        .HasColumnType("decimal(15,2)");
+                        .HasColumnType("decimal(15,2)")
+                        .HasColumnName("previous_balance");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
 
                     b.Property<DateTime>("UpdateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("update_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
-                    b.ToTable("TransactionHistorys", (string)null);
+                    b.ToTable("transaction_histories", (string)null);
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Accumulated", b =>
@@ -499,7 +692,8 @@ namespace bingo_api.Migrations
                         .WithOne("Accumulated")
                         .HasForeignKey("bingo_api.src.Entities.Accumulated", "RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_accumulated_room_id");
 
                     b.Navigation("Room");
                 });
@@ -510,24 +704,36 @@ namespace bingo_api.Migrations
                         .WithOne("BotConfig")
                         .HasForeignKey("bingo_api.src.Entities.BotConfig", "RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_bot_config_room_id");
 
                     b.Navigation("Room");
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Card", b =>
                 {
+                    b.HasOne("bingo_api.src.Entities.CardBuy", "CardBuy")
+                        .WithMany("Cards")
+                        .HasForeignKey("CardBuyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_card_card_buy_id");
+
                     b.HasOne("bingo_api.src.Entities.Punter", "Punter")
                         .WithMany("Cards")
                         .HasForeignKey("PunterId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_card_punter_id");
 
                     b.HasOne("bingo_api.src.Entities.Round", "Round")
                         .WithMany("Cards")
                         .HasForeignKey("RoundId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_card_round_id");
+
+                    b.Navigation("CardBuy");
 
                     b.Navigation("Punter");
 
@@ -540,13 +746,15 @@ namespace bingo_api.Migrations
                         .WithMany("CardWinners")
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_card_winner_card_id");
 
                     b.HasOne("bingo_api.src.Entities.Prize", "Prize")
                         .WithMany("CardWinners")
                         .HasForeignKey("PrizeId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_card_winner_prize_id");
 
                     b.Navigation("Card");
 
@@ -559,7 +767,8 @@ namespace bingo_api.Migrations
                         .WithMany("Prizes")
                         .HasForeignKey("RoundId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_prize_round_id");
 
                     b.Navigation("Round");
                 });
@@ -630,6 +839,11 @@ namespace bingo_api.Migrations
             modelBuilder.Entity("bingo_api.src.Entities.Card", b =>
                 {
                     b.Navigation("CardWinners");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.CardBuy", b =>
+                {
+                    b.Navigation("Cards");
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Prize", b =>

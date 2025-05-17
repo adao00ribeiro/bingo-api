@@ -31,6 +31,9 @@ namespace bingo_api.Migrations.IdentityData
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    Discriminator = table.Column<string>(type: "character varying(13)", maxLength: 13, nullable: false),
+                    EntityId = table.Column<Guid>(type: "uuid", nullable: true),
+                    EntityType = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -187,6 +190,12 @@ namespace bingo_api.Migrations.IdentityData
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_EntityId",
+                table: "AspNetUsers",
+                column: "EntityId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",

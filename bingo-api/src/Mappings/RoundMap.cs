@@ -5,66 +5,91 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-
 namespace bingo_api.src.Mappings;
 
 public class RoundMap : IEntityTypeConfiguration<Round>
 {
     public void Configure(EntityTypeBuilder<Round> builder)
     {
-         var serializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-        builder.ToTable("Rounds");
+        var serializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+        builder.ToTable("rounds");
+
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).ValueGeneratedOnAdd();
-        // Propriedades
+        builder.Property(x => x.Id)
+               .HasColumnName("id")
+               .ValueGeneratedOnAdd();
+
         builder.Property(r => r.CardValue)
-            .IsRequired().HasColumnType("numeric(15, 2)");
+               .HasColumnName("card_value")
+               .IsRequired()
+               .HasColumnType("numeric(15, 2)");
 
         builder.Property(r => r.Numbers)
-            .IsRequired();
+               .HasColumnName("numbers")
+               .IsRequired();
 
         builder.Property(r => r.CardSaleCount)
-            .IsRequired()
-            .HasDefaultValue(0);
+               .HasColumnName("card_sale_count")
+               .IsRequired()
+               .HasDefaultValue(0);
 
         builder.Property(r => r.TimeBetweenBalls)
-            .IsRequired()
-            .HasDefaultValue(4);
+               .HasColumnName("time_between_balls")
+               .IsRequired()
+               .HasDefaultValue(4);
+
         builder.Property(r => r.Timeline)
-        .HasColumnType("jsonb"); // Define o tipo da coluna como jsonb
+               .HasColumnName("timeline")
+               .HasColumnType("jsonb");
+
         builder.Property(r => r.MaxBalls)
-          .IsRequired()
-          .HasDefaultValue(90);
+               .HasColumnName("max_balls")
+               .IsRequired()
+               .HasDefaultValue(90);
 
         builder.Property(r => r.CardRows)
-      .IsRequired();
+               .HasColumnName("card_rows")
+               .IsRequired();
+
         builder.Property(r => r.CardColumns)
-      .IsRequired();
+               .HasColumnName("card_columns")
+               .IsRequired();
 
         builder.Property(r => r.Started)
-            .IsRequired();
+               .HasColumnName("started")
+               .IsRequired();
 
         builder.Property(r => r.Finished)
-         .IsRequired(false) // Não obrigatório
-    .HasDefaultValue(null); // Garante que o valor padrão será NULL
+               .HasColumnName("finished")
+               .IsRequired(false)
+               .HasDefaultValue(null);
 
+        builder.Property(r => r.RoomId)
+               .HasColumnName("room_id")
+               .IsRequired();
+   builder.Property(x => x.CreateAt)
+               .HasColumnName("create_at")
+               .IsRequired()
+               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(x => x.UpdateAt)
+               .HasColumnName("update_at")
+               .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.HasOne(r => r.Room)
-            .WithMany(d => d.Rounds)
-            .HasForeignKey(r => r.RoomId)
-            .OnDelete(DeleteBehavior.Cascade);
-
+               .WithMany(d => d.Rounds)
+               .HasForeignKey(r => r.RoomId)
+               .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(r => r.Cards)
-            .WithOne(c => c.Round)
-            .HasForeignKey(c => c.RoundId)
-            .OnDelete(DeleteBehavior.Cascade);
+               .WithOne(c => c.Round)
+               .HasForeignKey(c => c.RoundId)
+               .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(r => r.Prizes)
-                .WithOne(p => p.Round) // Se não houver uma propriedade de navegação na classe Prize que se refira a Round, pode deixar vazio
-                  .HasForeignKey(c => c.RoundId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-
+               .WithOne(p => p.Round)
+               .HasForeignKey(c => c.RoundId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }

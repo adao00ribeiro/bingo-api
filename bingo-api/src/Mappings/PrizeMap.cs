@@ -3,32 +3,51 @@ using bingo_api.src.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-
 namespace bingo_api.src.Mappings;
 
 public class PrizeMap : IEntityTypeConfiguration<Prize>
 {
     public void Configure(EntityTypeBuilder<Prize> builder)
     {
-        builder.ToTable("Prizes");
+        builder.ToTable("prizes");
+
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).ValueGeneratedOnAdd();
+
+        builder.Property(x => x.Id)
+               .HasColumnName("id")
+               .ValueGeneratedOnAdd();
 
         builder.Property(p => p.Value)
-            .IsRequired().HasColumnType("numeric(15, 2)"); // Ajuste a precisão e a escala conforme necessário
-        // Mapeamento de propriedades específicas
-        builder.Property(p => p.Type)
-            .IsRequired();
-        // Relacionamento com round
-        builder.HasOne(p => p.Round)
-            .WithMany(d => d.Prizes)
-            .HasForeignKey(p => p.RoundId)
-            .OnDelete(DeleteBehavior.Cascade);
+               .HasColumnName("value")
+               .IsRequired()
+               .HasColumnType("numeric(15, 2)");
 
-        // Relacionamento com Winner (um-para-muitos)
+        builder.Property(p => p.Type)
+               .HasColumnName("type")
+               .IsRequired();
+
+        builder.Property(p => p.RoundId)
+               .HasColumnName("round_id")
+               .IsRequired();
+   builder.Property(x => x.CreateAt)
+               .HasColumnName("create_at")
+               .IsRequired()
+               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(x => x.UpdateAt)
+               .HasColumnName("update_at")
+               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.HasOne(p => p.Round)
+               .WithMany(d => d.Prizes)
+               .HasForeignKey(p => p.RoundId)
+               .HasConstraintName("fk_prize_round_id")
+               .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasMany(p => p.CardWinners)
-            .WithOne(cw => cw.Prize)
-            .HasForeignKey(cw => cw.PrizeId)
-            .OnDelete(DeleteBehavior.Cascade);
+               .WithOne(cw => cw.Prize)
+               .HasForeignKey(cw => cw.PrizeId)
+               .HasConstraintName("fk_card_winner_prize_id")
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }

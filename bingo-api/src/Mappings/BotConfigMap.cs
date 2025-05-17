@@ -6,21 +6,40 @@ namespace bingo_api.src.Mappings;
 
 public class BotConfigMap : IEntityTypeConfiguration<BotConfig>
 {
-     public void Configure(EntityTypeBuilder<BotConfig> builder)
+    public void Configure(EntityTypeBuilder<BotConfig> builder)
     {
+        builder.ToTable("bot_configs");
 
-        builder.ToTable("BotConfigs");
         builder.HasKey(x => x.Id);
+
         builder.Property(x => x.Id)
-        .ValueGeneratedOnAdd();
+               .HasColumnName("id")
+               .ValueGeneratedOnAdd();
+
         builder.Property(a => a.Enabled)
-              .IsRequired();
+               .HasColumnName("enabled")
+               .IsRequired();
+
         builder.Property(a => a.PresenceRate)
-              .IsRequired();
+               .HasColumnName("presence_rate")
+               .IsRequired();
+
+        builder.Property(a => a.RoomId)
+               .HasColumnName("room_id");
+       builder.Property(x => x.CreateAt)
+               .HasColumnName("create_at")
+               .IsRequired()
+               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.Property(x => x.UpdateAt)
+               .HasColumnName("update_at")
+               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
         builder.HasOne(a => a.Room)
                .WithOne(r => r.BotConfig)
                .HasForeignKey<BotConfig>(a => a.RoomId)
+               .HasConstraintName("fk_bot_config_room_id")
                .OnDelete(DeleteBehavior.Cascade)
-                .IsRequired();
+               .IsRequired();
     }
 }
