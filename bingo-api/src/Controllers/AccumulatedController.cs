@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.src.Controllers;
-[Authorize]
 
+[Authorize]
 [ApiVersion("1.0")]
 public class AccumulatedController(IAccumulatedRepository _repository) : ApiControllerBase
 {

@@ -97,7 +97,7 @@ public class CardBuyService : ICardBuyService
                     EntityId = punter.Id,
                     PreviousBalance = punter.Balance, // Antes da alteração
                     CurrentBalance = punter.Balance - value, // O saldo será alterado após o registro da transação
-                    Amount = value,
+                    Amount = -value,
                     Type = TransactionType.CardPurchased, // Assume que Purchase é o tipo de transação para compra de cartela
                 };
 

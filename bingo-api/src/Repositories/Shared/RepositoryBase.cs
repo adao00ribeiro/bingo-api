@@ -13,6 +13,7 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
     Context = dataContext;
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int? pageNumber = null, int? pageSize = null,
     Expression<Func<TEntity, bool>> filter = null,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
     params Expression<Func<TEntity, object>>[] includeProperties
     )
     {
@@ -22,14 +23,15 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
         {
             query = query.Where(filter);
         }
-
+         if (orderBy != null)
+        {
+            query = orderBy(query);
+        }
         if (pageNumber.HasValue && pageSize.HasValue)
         {
             query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
         }
-
         var entities = await query.ToListAsync();
-
         // Converte as datas de UTC para o horário local
         foreach (var entity in entities)
         {
