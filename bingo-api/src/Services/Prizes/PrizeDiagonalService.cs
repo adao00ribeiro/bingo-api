@@ -9,12 +9,8 @@ namespace bingo_api.src.Services.Prizes
 
         protected override bool CheckWinner(Card card, int row, int col)
         {
-            var isWinner = CheckDiagonal(card, col);
-            if (isWinner)
-            {
-                ExecuteTopFiveList(card, row, col);
-            }
-            return isWinner;
+              ExecuteTopFiveList(card, row, col);
+            return CheckDiagonal(card, col);
         }
 
         private bool CheckDiagonal(Card card, int col)

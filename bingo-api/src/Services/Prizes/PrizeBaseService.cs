@@ -11,17 +11,20 @@ public abstract class PrizeBaseService(Prize _prize)
     public void Execute(IEnumerable<Card> cards, int row, int col)
     {
         if (prize.HasWinners()) return;
-
+        this.prize.TopCards.Clear();
         var topCards = cards.OrderByDescending(card => card.Score).Take(20).ToList();
         var resultCards = topCards.Where(card => CheckWinner(card, row, col)).ToList();
 
-        prize.SetRefresWinner(resultCards.Any());
+
+        if (resultCards.Count > 0)
+        {
+            prize.SetRefresWinner(true);
+        }
 
         foreach (var card in resultCards)
         {
             prize.WinningCards.Add(new WinningCardsInfo
             {
-                Punter =  PunterResponseDto.ConvertToSocketDto(card.Punter),
                 Card = CardResponseDto.ConvertToSocketDto(card),
                 ValueOfEachWinner = prize.Value / resultCards.Count()
             });

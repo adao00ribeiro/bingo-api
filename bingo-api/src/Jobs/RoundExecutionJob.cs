@@ -46,7 +46,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                     Console.WriteLine(result.Data); // Pode conter mensagem adicional de erro
                 }
             }
-           
+
             Round? tempRound = await context.Rounds
             .Include(r => r.Cards)
             .ThenInclude(c => c.Punter)
@@ -83,6 +83,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
 
             var drawnNumbers = new HashSet<int>();
             remainingNumbers = [.. Enumerable.Range(1, tempRound.MaxBalls)];
+
             var prizes = tempRound.Prizes;
             var allAwardsDrawn = false;
             var bingoAccumulated = tempRound.Room?.Accumulated;
@@ -99,7 +100,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             message.MaxNumbers = drawnNumbers.Count();
             message.Numbers = new List<int>();
             message.Accumulated = bingoAccumulated;
-            
+
             //   await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
 
             // await Task.Delay(8000);
@@ -110,6 +111,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             {
                 var number = GenerateRandomNumber();
                 drawnNumbers.Add(number);
+                tempRound.Numbers = drawnNumbers.ToArray();
                 var sleep_round = tempRound.TimeBetweenBalls;
                 var TimeBetweenBalls = tempRound.TimeBetweenBalls;
                 foreach (var card in cards)
@@ -191,28 +193,27 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 }
                 else
                 {
-                    var cumulativeValueIncrease = (tempRound.CardValue * tempRound.CardSaleCount) * (bingoAccumulated.CumulativePercentage / 100);
-                    bingoAccumulated.CurrentValue += cumulativeValueIncrease;
+                    bingoAccumulated.CurrentValue +=
+                        (tempRound.CardValue * tempRound.CardSaleCount) * (bingoAccumulated.CumulativePercentage / 100m);
+
+                    bingoAccumulated.CurrentValue = Math.Min(bingoAccumulated.CurrentValue, bingoAccumulated.MaximumValue);
 
                     if (bingoAccumulated.IncrementBallCumulative)
                     {
                         bingoAccumulated.MaximumNumberOfBalls += 1;
                     }
                 }
-
                 context.Accumulated.Entry(bingoAccumulated).State = EntityState.Modified;
                 await context.SaveChangesAsync();
-
             }
             message.Finished = true;
             message.CurrentPrizeResult = null;
             timeline.Add(new TimelineEvent { eventData = message.Clone() });
-          
+
             tempRound.Timeline = timeline;
             context.Rounds.Entry(tempRound).State = EntityState.Modified;
             await context.SaveChangesAsync();
 
-            // BackgroundJob.Enqueue<BingoShowTimelineStepJob>(x => x.PerformAsync(round.Id, 0));
             BackgroundJob.Enqueue<ShowTimelineStepJob>(job => job.Execute(roundId, 0));
 
         }

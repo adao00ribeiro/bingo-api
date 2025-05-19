@@ -51,40 +51,33 @@ public class Prize : Entity
             RoundId = RoundId,
             PrizeType = Type,
             WinningCards = WinningCards,
-            ListTopCards = TopCards
+            ListTopCards = TopCards.OrderBy(obj => obj.Hits)
+           .Take(20)
+           .ToList()
+          
         };
     }
 
     public void SetTopFive(Card card, int hits, List<int> missingNumbers)
     {
-        var newCardInfo = new TopCardInfo
-        {
-            Card =CardResponseDto.ConvertToSocketDto(card),
-            Punter =  PunterResponseDto.ConvertToSocketDto(card.Punter),
-            MissingNumbers = missingNumbers,
-            Hits = hits
-        };
+       
+        var existingCardIndex = TopCards.FindIndex(obj => obj.Card.Id == card.Id);
 
-        // Verifica se já existe um cartão com o mesmo ID
-        var existingCard = TopCards.FirstOrDefault(obj => obj.Card.Id == card.Id);
-
-        if (existingCard != null)
+        if (existingCardIndex >= 0)
         {
             // Atualiza o `hits` e `missingNumbers` do cartão existente
-            existingCard.Hits = hits;
-            existingCard.MissingNumbers = missingNumbers;
+            TopCards[existingCardIndex].Hits = hits;
+            TopCards[existingCardIndex].MissingNumbers = missingNumbers;
         }
         else
         {
-            // Adiciona o novo cartão
-            TopCards.Add(newCardInfo);
+            TopCards.Add(new TopCardInfo
+            {
+                Card = CardResponseDto.ConvertToSocketDto(card),
+                MissingNumbers = missingNumbers,
+                Hits = hits
+            });
         }
-        // Ordena `ListTopCards` pelos maiores hits em ordem decrescente e limita aos top 20
-        TopCards = TopCards
-            .OrderByDescending(obj => obj.Hits)
-            .ThenBy(obj => obj.MissingNumbers.Count) // Para desempate, prioriza menos números faltantes
-            .Take(20)
-            .ToList();
     }
 
     public void AddAccumulated(decimal accumulatedValue)

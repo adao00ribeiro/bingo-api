@@ -1,8 +1,5 @@
 using bingo_api.src.Entities;
-using bingo_api.src.Interfaces.Repositories;
-using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Services.Prizes;
-using bingo_api.src.Structs;
 
 namespace bingo_api.src.Services
 {
@@ -13,12 +10,8 @@ namespace bingo_api.src.Services
 
         protected override bool CheckWinner(Card card, int row, int col)
         {
-            var isWinner = CheckFullCard(card);
-            if (isWinner)
-            {
-                ExecuteTopFiveList(card, row, col);
-            }
-            return isWinner;
+            ExecuteTopFiveList(card, row, col);
+            return CheckFullCard(card);
         }
 
         private bool CheckFullCard(Card card)
@@ -28,20 +21,20 @@ namespace bingo_api.src.Services
 
         protected override void ExecuteTopFiveList(Card card, int row, int col)
         {
-            var subNumbers = card.Numbers.Chunk(col).ToList();
-            var markedSubarrays = card.CardMarkedNumbers.Chunk(col).ToList();
+            var subnumbers = card.Numbers;
+            var markedNumbersArray = card.CardMarkedNumbers;
 
-            for (int i = 0; i < subNumbers.Count; i++)
-            {
-                var subNumberArray = subNumbers[i];
-                var markedArray = markedSubarrays[i];
+            var markedNumbers = subnumbers
+                .Where((_, i) => markedNumbersArray[i] == 1)
+                .ToList();
 
-                var markedNumbers = subNumberArray.Where((_, index) => markedArray[index] == 1).ToList();
-                var missingNumbers = subNumberArray.Except(markedNumbers).ToList();
-                var lackOfHits = missingNumbers.Count;
+            var missing = subnumbers
+                .Where((_, i) => markedNumbersArray[i] == 0)
+                .ToList(); // <-- Aqui pegamos os que não foram marcados
 
-                prize.SetTopFive(card, lackOfHits, missingNumbers);
-            }
+            int lackOfHits = missing.Count;
+
+            prize.SetTopFive(card, lackOfHits, missing);
         }
     }
 }

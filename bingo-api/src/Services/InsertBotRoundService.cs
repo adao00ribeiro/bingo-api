@@ -84,6 +84,7 @@ public class InsertBotRoundService
                         Code = random.Next(1, 100000),
                         Name = nomeCompleto,
                         RoundId = tempRound.Id,
+                        CardBuyId = cardBuy.Id,
                         PunterId = bot.Id,
                     };
 
