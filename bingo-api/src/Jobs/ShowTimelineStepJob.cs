@@ -6,11 +6,17 @@ using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Jobs;
 using Microsoft.EntityFrameworkCore;
 
-public class ShowTimelineStepJob(DataContext context, IWebSocketService _webSocketService, ITransactionHistoryRepository transactionHistoryRepository, ILogger<ShowTimelineStepJob> logger) : IShowTimelineStepJob
+public class ShowTimelineStepJob(
+    DataContext context,
+    IWebSocketService _webSocketService,
+     ITransactionHistoryRepository transactionHistoryRepository,
+     IRoundRepository roundRepository,
+      ILogger<ShowTimelineStepJob> logger) : IShowTimelineStepJob
 {
     private readonly DataContext _context = context;
     private readonly IWebSocketService webSocketService = _webSocketService;
     private readonly ITransactionHistoryRepository _transactionHistoryRepository = transactionHistoryRepository;
+    private readonly IRoundRepository _roundRepository = roundRepository;
     private readonly ILogger<ShowTimelineStepJob> _logger = logger;
 
     [AutomaticRetry(Attempts = 3)]
@@ -78,8 +84,8 @@ public class ShowTimelineStepJob(DataContext context, IWebSocketService _webSock
 
             round.Timeline = [];
             round.Finished = DateTime.UtcNow;
-
-            await _context.SaveChangesAsync();
+            await this._roundRepository.UpdateAsync(round);
+            await this._roundRepository.RemoveCards(round.Id);
         }
         else
         {

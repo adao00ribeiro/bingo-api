@@ -133,5 +133,12 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
         return prizes;
     }
 
-
+    public async Task RemoveCards(Guid RoundId)
+    {
+        var cardsToRemove = Context.Cards
+            .Where(card => card.RoundId == RoundId &&
+                           !Context.CardWinners.Any(winner => winner.CardId == card.Id));
+       Context.Cards.RemoveRange(cardsToRemove);
+       await Context.SaveChangesAsync();
+    }
 }

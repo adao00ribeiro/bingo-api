@@ -14,7 +14,7 @@ using bingo_api.src.Structs;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250517002616_InitialDbData")]
+    [Migration("20250523112246_InitialDbData")]
     partial class InitialDbData
     {
         /// <inheritdoc />
@@ -715,7 +715,7 @@ namespace bingo_api.Migrations
                     b.HasOne("bingo_api.src.Entities.CardBuy", "CardBuy")
                         .WithMany("Cards")
                         .HasForeignKey("CardBuyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_card_card_buy_id");
 

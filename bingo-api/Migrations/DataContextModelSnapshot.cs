@@ -712,7 +712,7 @@ namespace bingo_api.Migrations
                     b.HasOne("bingo_api.src.Entities.CardBuy", "CardBuy")
                         .WithMany("Cards")
                         .HasForeignKey("CardBuyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_card_card_buy_id");
 

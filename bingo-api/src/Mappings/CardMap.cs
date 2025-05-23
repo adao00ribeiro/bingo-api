@@ -64,12 +64,12 @@ public class CardMap : IEntityTypeConfiguration<Card>
                .WithMany(c => c.Cards)
                .HasForeignKey(cb => cb.CardBuyId)
                .HasConstraintName("fk_card_card_buy_id")
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(c => c.CardWinners)
                .WithOne(cw => cw.Card)
                .HasForeignKey(cw => cw.CardId)
                .HasConstraintName("fk_card_winner_card_id")
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

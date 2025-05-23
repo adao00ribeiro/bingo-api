@@ -106,7 +106,9 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             // await Task.Delay(8000);
             timeline.Add(new TimelineEvent { eventData = message.Clone() });
             timeline.Add(new TimelineEvent { Delay = 8 * 1000 });
-
+            var prizeServices = prizes
+    .Select(p => PrizeServiceFactory.CreateService(p))
+    .ToList();
             while (remainingNumbers.Any() && !allAwardsDrawn)
             {
                 var number = GenerateRandomNumber();
@@ -119,9 +121,8 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                     card.CheckNumberOnTheCard(number);
                 }
 
-                foreach (Prize p in prizes)
+                foreach (var prizeService in prizeServices)
                 {
-                    var prizeService = PrizeServiceFactory.CreateService(p);
                     prizeService.Execute(cards, tempRound.CardRows, tempRound.CardColumns);
                 }
 

@@ -228,10 +228,10 @@ namespace bingo_api.Migrations
                     max_balls = table.Column<int>(type: "integer", nullable: false, defaultValue: 90),
                     card_rows = table.Column<int>(type: "integer", nullable: false),
                     card_columns = table.Column<int>(type: "integer", nullable: false),
-                    timeline = table.Column<List<TimelineEvent>>(type: "jsonb", nullable: false),
                     started = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     finished = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     room_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    timeline = table.Column<List<TimelineEvent>>(type: "jsonb", nullable: false),
                     create_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     update_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
@@ -268,7 +268,7 @@ namespace bingo_api.Migrations
                         column: x => x.card_buy_id,
                         principalTable: "card_buys",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "fk_card_punter_id",
                         column: x => x.punter_id,
