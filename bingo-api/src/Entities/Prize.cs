@@ -44,17 +44,18 @@ public class Prize : Entity
     public bool HasWinners() => WinningCards.Any();
     internal PrizeResult GetObject()
     {
+        var snapshot = WinningCards.ToList(); // isso copia os dados do momento
         return new PrizeResult
         {
             PrizeId = Id,
             Value = Value,
             RoundId = RoundId,
             PrizeType = Type,
-            WinningCards = WinningCards,
+            WinningCards = snapshot,
             ListTopCards = TopCards.OrderBy(obj => obj.Hits)
            .Take(20)
            .ToList()
-          
+
         };
     }
 
