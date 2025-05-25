@@ -5,7 +5,7 @@ using bingo_api.src.Enums;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Repositories.Shared;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
+
 
 namespace bingo_api.src.Repositories;
 

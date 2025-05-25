@@ -1,9 +1,7 @@
 using bingo_api.src.Context;
-using bingo_api.src.DTOs.Response;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Repositories.Shared;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Repositories;

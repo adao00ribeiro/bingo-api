@@ -16,6 +16,4 @@ public class SellerRepository : RepositoryBase<Seller>, ISellerRepository
          return await Context.Sellers
             .FirstOrDefaultAsync(punter => punter.Email == email);
     }
-
-   
 }

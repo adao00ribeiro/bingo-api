@@ -6,6 +6,4 @@ public class WinningCardsInfo
 {
     public CardResponseDto Card { get; set; }
     public decimal ValueOfEachWinner { get; set; }
-
-
 }

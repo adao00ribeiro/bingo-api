@@ -6,6 +6,10 @@ using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Jobs;
 using Microsoft.EntityFrameworkCore;
 
+
+
+
+
 public class ShowTimelineStepJob(
     DataContext context,
     IWebSocketService _webSocketService,
@@ -19,7 +23,7 @@ public class ShowTimelineStepJob(
     private readonly IRoundRepository _roundRepository = roundRepository;
     private readonly ILogger<ShowTimelineStepJob> _logger = logger;
 
-    [AutomaticRetry(Attempts = 3)]
+    [AutomaticRetry(Attempts = 3, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
     public async Task Execute(Guid roundId, int index)
     {
         _logger.LogInformation($"Executando passo {index} da timeline do round {roundId}");
@@ -46,7 +50,7 @@ public class ShowTimelineStepJob(
         }
         else
         {
-           await Task.Delay((int)delay);
+            await Task.Delay((int)delay);
         }
 
         if (eventData != null && eventData.Finished && eventData.Results != null)
