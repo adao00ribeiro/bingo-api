@@ -24,7 +24,7 @@ namespace bingo_api.src.Services.Prizes
             for (int col = 0; col < cols; col++)
             {
                 bool isColumnComplete = true;
-                
+
                 // Verificar se todos os números da coluna estão marcados
                 for (int row = 0; row < rows; row++)
                 {
@@ -35,25 +35,25 @@ namespace bingo_api.src.Services.Prizes
                         break;
                     }
                 }
-                
+
                 if (isColumnComplete)
                 {
                     return true; // Encontrou uma coluna completa
                 }
             }
-            
+
             return false; // Nenhuma coluna completa encontrada
         }
 
         protected override void ExecuteTopFiveList(Card card, int rows, int cols)
         {
             var columnsWithMissingNumbers = new List<(int columnIndex, List<int> missingNumbers, int missingCount)>();
-            
+
             // Para cada coluna, identificar os números não marcados
             for (int col = 0; col < cols; col++)
             {
                 var missingNumbers = new List<int>();
-                
+
                 for (int row = 0; row < rows; row++)
                 {
                     int index = row * cols + col;
@@ -62,22 +62,22 @@ namespace bingo_api.src.Services.Prizes
                         missingNumbers.Add(card.Numbers[index]);
                     }
                 }
-                
+
                 if (missingNumbers.Count > 0)
                 {
                     columnsWithMissingNumbers.Add((col, missingNumbers, missingNumbers.Count));
                 }
             }
-            
+
             // Ordenar colunas pelo número de itens faltantes (menor para maior)
             var sortedColumns = columnsWithMissingNumbers.OrderBy(col => col.missingCount).ToList();
-            
+
             if (sortedColumns.Count > 0)
             {
                 // Pegar a coluna que está mais próxima de ser completa
                 var closestColumn = sortedColumns.First();
                 int lackOfHits = closestColumn.missingCount;
-                
+
                 // Atualizar o top five com os números faltantes desta coluna
                 prize.SetTopFive(card, lackOfHits, closestColumn.missingNumbers);
             }

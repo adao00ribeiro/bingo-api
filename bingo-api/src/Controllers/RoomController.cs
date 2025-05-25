@@ -31,16 +31,16 @@ public class RoomController(IRoomRepository _roomRepository) : ApiControllerBase
         if (User.IsInRole("Admin"))
         {
             // Admin pode ver todas as salas
-            rooms = await roomRepository.GetAllAsync(includeProperties :[r => r.RoomsSellers, r => r.Owner]);
+            rooms = await roomRepository.GetAllAsync(includeProperties: [r => r.RoomsSellers, r => r.Owner]);
         }
         else if (User.IsInRole("Seller"))
         {
-            rooms = await roomRepository.GetAllAsync(filter:r => r.OwnerId == Guid.Parse(userId),includeProperties:[ r => r.RoomsSellers, r => r.Owner]);
+            rooms = await roomRepository.GetAllAsync(filter: r => r.OwnerId == Guid.Parse(userId), includeProperties: [r => r.RoomsSellers, r => r.Owner]);
         }
         else if (User.IsInRole("Punter"))
         {
             // Punter pode ver apenas as salas dos Sellers associados a ele
-            rooms = await roomRepository.GetAllAsync(includeProperties:[
+            rooms = await roomRepository.GetAllAsync(includeProperties: [
                 r => r.RoomsSellers.Any(rs => rs.Seller.Punters.Any(p => p.Id == Guid.Parse(userId))),
                 r => r.RoomsSellers,
                 r => r.Owner]

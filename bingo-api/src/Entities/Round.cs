@@ -13,14 +13,14 @@ public class Round : Entity
     public int MaxBalls { get; set; }//utilizado para jogos de 90 ,80,75, 50 ,30
     public int CardRows { get; set; } // Número de linhas na cartela
     public int CardColumns { get; set; } // Número de colunas na cartela
-   
+
     [NotMapped]
     public int CardsPurchased { get; set; }
     public DateTime Started { get; set; }
     public DateTime? Finished { get; set; }
     public Guid RoomId { get; set; }
     public Room? Room { get; set; }
-     public List<TimelineEvent> Timeline { get; set; } = new List<TimelineEvent>();
+    public List<TimelineEvent> Timeline { get; set; } = new List<TimelineEvent>();
     public IEnumerable<Card>? Cards { get; set; }
     public ICollection<Prize>? Prizes { get; set; }
     public Round()

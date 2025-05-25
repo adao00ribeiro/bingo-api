@@ -32,7 +32,7 @@ public class Card : Entity
         if (index >= 0) // Se o índice for válido (ou seja, o número foi encontrado)
         {
             CardMarkedNumbers[index] = 1;
-            Score += 1 ;
+            Score += 1;
         }
     }
 

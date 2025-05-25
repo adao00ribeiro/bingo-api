@@ -64,7 +64,7 @@ public class WebSocketService : IWebSocketService, IDisposable
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true // Opcional, para formatar o JSON
         };
-        var json = JsonSerializer.Serialize(new SocketMessage("message", channel, message,"sucess"), options);
+        var json = JsonSerializer.Serialize(new SocketMessage("message", channel, message, "sucess"), options);
         var serverMsg = Encoding.UTF8.GetBytes(json);
         foreach (var subscriber in subscribers)
         {
@@ -85,7 +85,7 @@ public class WebSocketService : IWebSocketService, IDisposable
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true // Opcional, para formatar o JSON
         };
-        var json = JsonSerializer.Serialize(new SocketMessage("message", message,"sucess"), options);
+        var json = JsonSerializer.Serialize(new SocketMessage("message", message, "sucess"), options);
         var serverMsg = Encoding.UTF8.GetBytes(json);
         await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), WebSocketMessageType.Text, true, CancellationToken.None);
         _logger.LogInformation("Message sent to Client: {Message}", message);

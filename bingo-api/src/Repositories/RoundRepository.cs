@@ -138,7 +138,7 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
         var cardsToRemove = Context.Cards
             .Where(card => card.RoundId == RoundId &&
                            !Context.CardWinners.Any(winner => winner.CardId == card.Id));
-       Context.Cards.RemoveRange(cardsToRemove);
-       await Context.SaveChangesAsync();
+        Context.Cards.RemoveRange(cardsToRemove);
+        await Context.SaveChangesAsync();
     }
 }

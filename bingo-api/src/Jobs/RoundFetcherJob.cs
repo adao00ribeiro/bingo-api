@@ -26,7 +26,7 @@ public class RoundFetcherJob : IRoundFetcherJob
             var futureTime = now.AddMinutes(9);
             int totalMinutes = (int)(now.TimeOfDay.TotalMinutes / 10) * 10;
             Console.WriteLine(TimeSpan.FromMinutes(totalMinutes));
-            var rounds = await _roundRepository.FilterByDateTimeRange(now.Date,TimeSpan.FromMinutes(totalMinutes), futureTime.TimeOfDay);
+            var rounds = await _roundRepository.FilterByDateTimeRange(now.Date, TimeSpan.FromMinutes(totalMinutes), futureTime.TimeOfDay);
             _logger.LogInformation("total encontrado:" + rounds.Count());
             foreach (var round in rounds)
             {

@@ -20,7 +20,7 @@ public class DepositController(IDepositService _deposityService) : ApiController
     {
         var identity = User.Identity as ClaimsIdentity;
         var userEmail = identity?.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-            
+
         if (string.IsNullOrEmpty(userEmail))
         {
             return Unauthorized(new { message = "Usuário não autenticado." });

@@ -10,5 +10,5 @@ public class CardBuyRepository : RepositoryBase<CardBuy>, ICardBuyRepository
     public CardBuyRepository(DataContext dataContext) : base(dataContext)
     {
     }
-    
+
 }

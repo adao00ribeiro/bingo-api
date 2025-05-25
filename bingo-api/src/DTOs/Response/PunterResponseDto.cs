@@ -53,7 +53,7 @@ public record PunterResponseDto : EntityResponseDto
             punter.Name,
             punter.Cpf,
             punter.Balance,
-            punter.PrizeBalance ,
+            punter.PrizeBalance,
             punter.CreateAt,
             punter.UpdateAt,
             null,

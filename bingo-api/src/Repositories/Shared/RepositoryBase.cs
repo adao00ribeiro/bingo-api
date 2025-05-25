@@ -12,18 +12,17 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
     public RepositoryBase(DataContext dataContext) =>
     Context = dataContext;
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int? pageNumber = null, int? pageSize = null,
-    Expression<Func<TEntity, bool>> filter = null,
-    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+    Expression<Func<TEntity, bool>>? filter = null,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
     params Expression<Func<TEntity, object>>[] includeProperties
     )
     {
         IQueryable<TEntity> query = BuildQueryWithIncludes(includeProperties);
-
         if (filter != null)
         {
             query = query.Where(filter);
         }
-         if (orderBy != null)
+        if (orderBy != null)
         {
             query = orderBy(query);
         }
@@ -51,9 +50,8 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
 
     public virtual async Task UpdateAsync(TEntity objeto)
     {
-        var objetUpdate = await GetByIdAsync(objeto.Id);
-        if (objetUpdate == null)
-            throw new Exception("O registro não existe na base de dados.");
+        var objetUpdate = await GetByIdAsync(objeto.Id) ?? throw new Exception("O registro não existe na base de dados.");
+
         foreach (var prop in objeto.GetType().GetProperties())
         {
             var entityProp = typeof(TEntity).GetProperty(prop.Name);
@@ -74,9 +72,8 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
 
     public virtual async Task RemoveByIdAsync(Guid id)
     {
-        var objeto = await GetByIdAsync(id);
-        if (objeto == null)
-            throw new Exception("O registro não existe na base de dados.");
+        var objeto = await GetByIdAsync(id) ?? throw new Exception("O registro não existe na base de dados.");
+
         await RemoveAsync(objeto);
     }
     private void ConvertDatesToLocal<TEntity>(TEntity entity) where TEntity : class

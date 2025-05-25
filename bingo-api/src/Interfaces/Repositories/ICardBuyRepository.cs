@@ -7,7 +7,7 @@ using bingo_api.src.Interfaces.Repositories.Shared;
 
 namespace bingo_api.src.Interfaces.Repositories;
 
-public interface ICardBuyRepository: IRepositoryBase<CardBuy>
+public interface ICardBuyRepository : IRepositoryBase<CardBuy>
 {
-    
+
 }

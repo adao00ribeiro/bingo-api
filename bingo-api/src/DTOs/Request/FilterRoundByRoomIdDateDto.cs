@@ -21,8 +21,8 @@ public record FilterRoundByRoomIdDateDto
     [Required(ErrorMessage = "O horário de término é obrigatório.")]
     [DefaultValue("23:59:00")]
     public TimeSpan EndTime { get; set; }
-    
+
     [Required(ErrorMessage = "O ID do dono é obrigatório.")]
-     [DefaultValue("b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06")]
+    [DefaultValue("b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06")]
     public Guid PunterId { get; set; }
 }

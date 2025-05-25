@@ -2,7 +2,7 @@ using bingo_api.src.Entities;
 
 namespace bingo_api.src.Services.Prizes;
 
-public class PrizeSingleLineService: PrizeBaseService
+public class PrizeSingleLineService : PrizeBaseService
 {
     public PrizeSingleLineService(Prize prize)
        : base(prize) { }

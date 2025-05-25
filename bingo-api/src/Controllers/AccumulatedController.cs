@@ -32,11 +32,11 @@ public class AccumulatedController(IAccumulatedRepository _repository) : ApiCont
         return Ok(AccumulatedResponseDto.ConvertToDto(botConfig));
     }
 
-    
+
     [HttpPut("{id}")]
     public async Task<ActionResult<AccumulatedResponseDto>> Update(Guid id, [FromBody] AccumulatedRequestDto updateDto)
     {
-       var objeto =  await this.accumulatedRepository.UpdateAsync( id,AccumulatedRequestDto.ConvertToEntity(updateDto));
+        var objeto = await this.accumulatedRepository.UpdateAsync(id, AccumulatedRequestDto.ConvertToEntity(updateDto));
 
         return Ok(AccumulatedResponseDto.ConvertToDto(objeto));
     }

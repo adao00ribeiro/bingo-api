@@ -8,7 +8,7 @@ public class RoomSeller : Entity
     public Guid RoomId { get; set; }
     public Room Room { get; set; }
     public Guid SellerId { get; set; }
-    public  Seller Seller { get; set; }
+    public Seller Seller { get; set; }
     public string AssignedBy { get; set; }
 
 

@@ -11,7 +11,7 @@ public static class ApiVersioningSetup
             options.DefaultApiVersion = new ApiVersion(1, 0);
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ReportApiVersions = true;
-           
+
         }).AddApiExplorer(options =>
         {
             options.GroupNameFormat = "'v'VVV";

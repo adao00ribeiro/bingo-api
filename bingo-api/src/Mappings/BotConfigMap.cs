@@ -26,10 +26,10 @@ public class BotConfigMap : IEntityTypeConfiguration<BotConfig>
 
         builder.Property(a => a.RoomId)
                .HasColumnName("room_id");
-       builder.Property(x => x.CreateAt)
-               .HasColumnName("create_at")
-               .IsRequired()
-               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        builder.Property(x => x.CreateAt)
+                .HasColumnName("create_at")
+                .IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.Property(x => x.UpdateAt)
                .HasColumnName("update_at")

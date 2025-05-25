@@ -13,7 +13,7 @@ public class TransactionHistory : Entity
     public decimal Amount { get; set; }
     public TransactionType Type { get; set; }
 
-    public TransactionHistory() {}
+    public TransactionHistory() { }
 
     public TransactionHistory(Guid entityId, string entityType, decimal previousBalance, decimal amount, TransactionType type)
     {

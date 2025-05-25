@@ -23,10 +23,10 @@ public class RoomMap : IEntityTypeConfiguration<Room>
 
         builder.Property(r => r.OwnerId)
                .HasColumnName("owner_id");
-   builder.Property(x => x.CreateAt)
-               .HasColumnName("create_at")
-               .IsRequired()
-               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        builder.Property(x => x.CreateAt)
+                    .HasColumnName("create_at")
+                    .IsRequired()
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.Property(x => x.UpdateAt)
                .HasColumnName("update_at")

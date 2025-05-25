@@ -6,7 +6,7 @@ namespace bingo_api.src.Entities;
 public class Seller : Entity, ITransactionParticipant
 {
     public decimal Balance { get; set; }
-    public decimal PrizeBalance { get ; set; }
+    public decimal PrizeBalance { get; set; }
     public string Email { get; set; }
     public string Cpf { get; set; }
     public DateTime DateBirth { get; set; }
@@ -14,7 +14,7 @@ public class Seller : Entity, ITransactionParticipant
     public IEnumerable<Punter> Punters { get; set; }
     public IEnumerable<RoomSeller> Rooms { get; set; }
     public IEnumerable<Room> OwnerRooms { get; set; }
-   
+
 
     public Seller()
     {

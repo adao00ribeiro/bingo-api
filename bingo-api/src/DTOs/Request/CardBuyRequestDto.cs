@@ -15,9 +15,9 @@ public class CardBuyRequestDto
     public Guid PunterId { get; set; }
 
 
-      internal static CardBuy ConvertToEntity(CardBuyRequestDto dto)
+    internal static CardBuy ConvertToEntity(CardBuyRequestDto dto)
     {
-        return new CardBuy(dto.Quantity ,dto.RoundId, dto.PunterId);
+        return new CardBuy(dto.Quantity, dto.RoundId, dto.PunterId);
     }
 
 }

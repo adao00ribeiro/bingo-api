@@ -14,7 +14,7 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
     {
     }
 
- 
+
 
     public async Task<bool> UpdateStatusToCompleted(Guid id)
     {
@@ -26,7 +26,7 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
 
                 if (recharge is null)
                 {
-                     throw new Exception("Recharge nao encontrado.");
+                    throw new Exception("Recharge nao encontrado.");
                 }
 
                 // Atualiza o status para COMPLETED
@@ -38,20 +38,20 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 {
                     throw new Exception("Punter nao encontrado.");
                 }
-               
+
                 var transactionHistory = new TransactionHistory
                 {
                     EntityType = "Punter",
                     EntityId = punter.Id,
-                    PreviousBalance = punter.Balance, 
-                    CurrentBalance = punter.Balance + recharge.Value, 
+                    PreviousBalance = punter.Balance,
+                    CurrentBalance = punter.Balance + recharge.Value,
                     Amount = recharge.Value,
-                    Type = TransactionType.Deposit, 
+                    Type = TransactionType.Deposit,
                 };
-               
+
                 await this.Context.TransactionHistories.AddAsync(transactionHistory);
 
-              
+
                 punter.Balance += recharge.Value;
                 await Context.SaveChangesAsync();
                 transaction.Complete();

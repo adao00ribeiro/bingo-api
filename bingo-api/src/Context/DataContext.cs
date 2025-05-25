@@ -37,7 +37,7 @@ public class DataContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
 
-        
+
     }
-    
+
 }

@@ -18,7 +18,7 @@ public class RoundMessage
     public Accumulated Accumulated { get; set; } = null;
     public bool IsAccumulated { get; set; } = false;
     public RoundResponseDto Round { get; set; } = null;
-    public IEnumerable<PrizeResult> Results { get;  set; }
+    public IEnumerable<PrizeResult> Results { get; set; }
     public PrizeResult? CurrentPrizeResult { get; set; } = null;
     public RoundMessage()
     {
@@ -44,24 +44,24 @@ public class RoundMessage
         return text;
     }
     public RoundMessage Clone()
-{
-    return new RoundMessage
     {
-        Id = this.Id,
-        Finished = this.Finished,
-        Started = this.Started,
-        MainBall = this.MainBall,
-        SecondBall = this.SecondBall,
-        ThirdBall = this.ThirdBall,
-        ForthBall = this.ForthBall,
-        MaxNumbers = this.MaxNumbers,
-        Numbers = new List<int>(this.Numbers),
-        Accumulated = this.Accumulated,
-        IsAccumulated = this.IsAccumulated,
-        Round = this.Round ,
-        Results = this.Results,
-        CurrentPrizeResult = this.CurrentPrizeResult
-    };
-}
+        return new RoundMessage
+        {
+            Id = this.Id,
+            Finished = this.Finished,
+            Started = this.Started,
+            MainBall = this.MainBall,
+            SecondBall = this.SecondBall,
+            ThirdBall = this.ThirdBall,
+            ForthBall = this.ForthBall,
+            MaxNumbers = this.MaxNumbers,
+            Numbers = new List<int>(this.Numbers),
+            Accumulated = this.Accumulated,
+            IsAccumulated = this.IsAccumulated,
+            Round = this.Round,
+            Results = this.Results,
+            CurrentPrizeResult = this.CurrentPrizeResult
+        };
+    }
 
 }

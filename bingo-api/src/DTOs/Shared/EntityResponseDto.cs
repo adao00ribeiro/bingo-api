@@ -2,9 +2,9 @@ namespace bingo_api.src.DTOs.Shared;
 
 public record EntityResponseDto
 {
-    public Guid Id { get;  set; } 
+    public Guid Id { get; set; }
     public DateTime CreateAt { get; set; }
-    public DateTime UpdateAt { get; set; } 
+    public DateTime UpdateAt { get; set; }
 
     public EntityResponseDto(Guid id, DateTime createAt, DateTime updateAt)
     {
@@ -12,5 +12,5 @@ public record EntityResponseDto
         CreateAt = createAt;
         UpdateAt = updateAt;
     }
-    
+
 }

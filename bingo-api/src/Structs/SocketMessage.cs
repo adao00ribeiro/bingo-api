@@ -10,14 +10,14 @@ public class SocketMessage
     public object? Message { get; set; }
     public string Status { get; set; }
 
-    public SocketMessage(string command, object message , string status)
+    public SocketMessage(string command, object message, string status)
     {
         Command = command;
         Channel = null; // Define como null
         Message = message;
         Status = status;
     }
-    public SocketMessage(string command, string channel, object message,string status)
+    public SocketMessage(string command, string channel, object message, string status)
     {
         Command = command;
         Channel = channel;

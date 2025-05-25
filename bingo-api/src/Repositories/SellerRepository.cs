@@ -13,7 +13,7 @@ public class SellerRepository : RepositoryBase<Seller>, ISellerRepository
     }
     public async Task<Seller> GetByEmailAsync(string email)
     {
-         return await Context.Sellers
-            .FirstOrDefaultAsync(punter => punter.Email == email);
+        return await Context.Sellers
+           .FirstOrDefaultAsync(punter => punter.Email == email);
     }
 }

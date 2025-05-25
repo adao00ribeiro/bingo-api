@@ -12,7 +12,7 @@ public class UserIdMiddleware
 
     public async Task Invoke(HttpContext context)
     {
-       
+
 
         await _next(context);
     }

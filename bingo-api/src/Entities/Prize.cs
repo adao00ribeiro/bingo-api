@@ -61,7 +61,7 @@ public class Prize : Entity
 
     public void SetTopFive(Card card, int hits, List<int> missingNumbers)
     {
-       
+
         var existingCardIndex = TopCards.FindIndex(obj => obj.Card.Id == card.Id);
 
         if (existingCardIndex >= 0)

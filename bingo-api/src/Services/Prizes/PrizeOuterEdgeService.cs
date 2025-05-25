@@ -92,7 +92,7 @@ namespace bingo_api.src.Services.Prizes
             }
 
             var lackOfHits = missingNumbers.Count;
-            
+
             prize.SetTopFive(card, lackOfHits, missingNumbers);
         }
     }

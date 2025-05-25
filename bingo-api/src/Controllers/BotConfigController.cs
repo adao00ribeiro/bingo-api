@@ -33,7 +33,7 @@ public class BotConfigController(IBotConfigRepository _botConfigRepository) : Ap
     [HttpPut("{id}")]
     public async Task<ActionResult<BotConfigResponseDto>> Update(Guid id, [FromBody] BotConfigRequestDto updateDto)
     {
-       var objeto =  await botConfigRepository.UpdateAsync( id,BotConfigRequestDto.ConvertToEntity(updateDto));
+        var objeto = await botConfigRepository.UpdateAsync(id, BotConfigRequestDto.ConvertToEntity(updateDto));
 
         return Ok(BotConfigResponseDto.ConvertToDto(objeto));
     }

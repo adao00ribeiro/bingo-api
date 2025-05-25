@@ -7,8 +7,8 @@ namespace bingo_api.src.Interfaces.Services;
 
 public interface IIdentityService
 {
-    Task<RegisterResponseDto> CadastrarPunter(User identityUser , Punter punter);
-    Task<RegisterResponseDto> CadastrarSeller(User identityUser , Seller seller);
+    Task<RegisterResponseDto> CadastrarPunter(User identityUser, Punter punter);
+    Task<RegisterResponseDto> CadastrarSeller(User identityUser, Seller seller);
     Task<LoginResponse> Login(LoginRequest usuarioLogin);
     Task<LoginResponse> LoginSemSenha(string usuarioId);
     Task<IdentityUser> GetByEmailAsync(string email);

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace bingo_api.src.Enums
 {
-      [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum EPrizeType
     {
         [EnumMember(Value = "FourInLine")]

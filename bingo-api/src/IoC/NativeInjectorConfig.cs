@@ -53,9 +53,9 @@ public static class NativeInjectorConfig
         });
 
         services.AddScoped<DataInitializer>(); // Registrar o DataInitializer
-        
+
         services.AddSingleton<IWebSocketService, WebSocketService>();
-    
+
         //repository
         services.AddScoped<JwtSecurityExtensionEvents>();
         services.AddScoped<IIdentityService, IdentityService>();
@@ -84,7 +84,7 @@ public static class NativeInjectorConfig
         services.AddScoped<IDepositService, DepositService>();
         services.AddScoped<IReportService, ReportService>();
 
-      
+
     }
 
 }

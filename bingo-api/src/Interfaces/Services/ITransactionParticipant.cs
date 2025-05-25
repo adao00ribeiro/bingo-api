@@ -7,6 +7,6 @@ namespace bingo_api.src.Interfaces.Services;
 
 public interface ITransactionParticipant
 {
-        decimal Balance { get; set; }
-        decimal PrizeBalance  { get; set; }
+    decimal Balance { get; set; }
+    decimal PrizeBalance { get; set; }
 }

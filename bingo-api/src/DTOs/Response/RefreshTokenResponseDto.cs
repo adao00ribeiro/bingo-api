@@ -7,5 +7,5 @@ namespace bingo_api.src.DTOs.Response;
 
 public class RefreshTokenResponseDto
 {
-    
+
 }

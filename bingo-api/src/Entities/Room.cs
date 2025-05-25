@@ -6,14 +6,15 @@ public class Room : Entity
 {
     public string Name { get; set; }
     public Guid OwnerId { get; set; }
-    public  Seller Owner { get; set; }
-    public  IEnumerable<RoomSeller>? RoomsSellers { get; set; }
-    public  IEnumerable<Round>? Rounds { get; set; }
-    public  Accumulated Accumulated { get; set; }
-    public  BotConfig BotConfig { get; set; }
+    public Seller Owner { get; set; }
+    public IEnumerable<RoomSeller>? RoomsSellers { get; set; }
+    public IEnumerable<Round>? Rounds { get; set; }
+    public Accumulated Accumulated { get; set; }
+    public BotConfig BotConfig { get; set; }
 
-    public Room(){
-        
+    public Room()
+    {
+
     }
     public Room(string name, Guid ownerId)
     {

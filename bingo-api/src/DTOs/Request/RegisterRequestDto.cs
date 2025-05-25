@@ -19,7 +19,7 @@ public record RegisterRequestDto
     [EmailAddress(ErrorMessage = "O campo {0} é inválido")]
     [DefaultValue("jogo@gmail.com")]
     public string Email { get; set; }
-    
+
     [Required(ErrorMessage = "O campo Telefone é obrigatório.")]
     [Phone(ErrorMessage = "O Telefone informado não é válido.")]
     [DefaultValue("44999999999")]

@@ -9,5 +9,5 @@ namespace bingo_api.src.Interfaces.Services;
 
 public interface IReportService
 {
-    Task<ReportResponseDto<RoundReportItemDto,RoundReportStatsDto>> GenerateRoundReportAsync(RoundReportRequestDto dto);
+    Task<ReportResponseDto<RoundReportItemDto, RoundReportStatsDto>> GenerateRoundReportAsync(RoundReportRequestDto dto);
 }

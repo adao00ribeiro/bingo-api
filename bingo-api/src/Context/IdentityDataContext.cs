@@ -13,11 +13,11 @@ public class IdentityDataContext : IdentityDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
 
-    modelBuilder.Entity<User>()
-            .HasIndex(u => u.EntityId)
-            .IsUnique();  // 👈 Isso garante que `EntityId` seja único
+        modelBuilder.Entity<User>()
+                .HasIndex(u => u.EntityId)
+                .IsUnique();  // 👈 Isso garante que `EntityId` seja único
         base.OnModelCreating(modelBuilder);
 
-        
+
     }
 }

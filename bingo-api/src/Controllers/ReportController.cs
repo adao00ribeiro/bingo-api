@@ -14,9 +14,9 @@ namespace bingo_api.src.Controllers;
 public class ReportController(IReportService service) : ApiControllerBase
 {
     private readonly IReportService _reportService = service;
-    
+
     [HttpPost("rounds")]
-    public async Task<ActionResult<ReportResponseDto<RoundReportItemDto,RoundReportStatsDto>>> Report(RoundReportRequestDto dto)
+    public async Task<ActionResult<ReportResponseDto<RoundReportItemDto, RoundReportStatsDto>>> Report(RoundReportRequestDto dto)
     {
         return Ok(await _reportService.GenerateRoundReportAsync(dto));
     }

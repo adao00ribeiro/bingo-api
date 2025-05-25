@@ -19,16 +19,16 @@ public record RechargeResponseDto : EntityResponseDto
     public PunterResponseDto? Punter { get; set; }
 
     public RechargeResponseDto(
-        Guid id, 
-        decimal value, 
-        ERechargeStatus status, 
-        string qrcode, 
-        string imagemQrcode, 
-        Guid punterId, 
+        Guid id,
+        decimal value,
+        ERechargeStatus status,
+        string qrcode,
+        string imagemQrcode,
+        Guid punterId,
         PunterResponseDto? punter,
         DateTime createAt,
         DateTime updateAt
-        ):base(id,createAt,updateAt)
+        ) : base(id, createAt, updateAt)
     {
         Id = id;
         Value = value;

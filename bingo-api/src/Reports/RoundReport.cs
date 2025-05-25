@@ -75,17 +75,17 @@ public class RoundReport
             .Sum(w => (decimal?)w.Value) ?? 0,
                          TotalPrizes = g.Prizes.Select(p => (decimal?)p.Value).Distinct().Sum() ?? 0,
                          Comissions = 0,
-                         NetValue = g.CardSaleCount == 0 ? 0 : 
-            (g.CardValue * g.CardSaleCount) - 
+                         NetValue = g.CardSaleCount == 0 ? 0 :
+            (g.CardValue * g.CardSaleCount) -
             (g.Prizes
                 .SelectMany(p => p.CardWinners)
                 .Where(w => !w.Card.Punter.IsBot)
-                .Sum(w => (decimal?)w.Value) ?? 0) - 0 
+                .Sum(w => (decimal?)w.Value) ?? 0) - 0
                      });
         return result;
 
     }
- private IQueryable<RoundReportItemDto> ApplyFilters(IQueryable<RoundReportItemDto> query, Dictionary<string, object> filters)
+    private IQueryable<RoundReportItemDto> ApplyFilters(IQueryable<RoundReportItemDto> query, Dictionary<string, object> filters)
     {
         if (filters == null || !filters.Any())
             return query;

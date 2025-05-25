@@ -63,13 +63,14 @@ public class CardBuyService : ICardBuyService
         {
             try
             {
-              var cardbuy =  CardBuyRequestDto.ConvertToEntity(dto);
+                var cardbuy = CardBuyRequestDto.ConvertToEntity(dto);
 
-              var cardBuyId = await this._cardBuyRepository.AddAsync(cardbuy);
+                var cardBuyId = await this._cardBuyRepository.AddAsync(cardbuy);
 
 
-                if (cardBuyId == Guid.Empty){
-                     throw new Exception("Compra nao realizada");
+                if (cardBuyId == Guid.Empty)
+                {
+                    throw new Exception("Compra nao realizada");
                 }
 
 

@@ -12,13 +12,13 @@ public static class MigrationManager
             try
             {
                 var context = services.GetRequiredService<TContext>();
-                context.Database.Migrate(); // Aplica as migrations pendentes
+                context.Database.Migrate();
             }
             catch (Exception ex)
             {
                 var logger = services.GetRequiredService<ILogger<TContext>>();
                 logger.LogError(ex, "An error occurred while migrating the database.");
-                throw; // Rethrow para garantir que erros críticos sejam tratados
+                throw;
             }
         }
         return host;

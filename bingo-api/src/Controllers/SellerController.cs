@@ -41,10 +41,10 @@ public class SellerController(ISellerRepository _sellerRepository) : ApiControll
     [HttpGet("me")]
     public async Task<ActionResult<SellerResponseDto>> GetMe()
     {
-       
+
         var identity = User.Identity as ClaimsIdentity;
         var userEmail = identity?.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-            
+
         if (string.IsNullOrEmpty(userEmail))
         {
             return Unauthorized(new { message = "Usuário não autenticado." });

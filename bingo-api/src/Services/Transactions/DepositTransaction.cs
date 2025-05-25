@@ -10,6 +10,6 @@ public class DepositTransaction : ITransactionStrategy
 {
     public void Execute(ITransactionParticipant participant, decimal amount)
     {
-         participant.Balance += amount;
+        participant.Balance += amount;
     }
 }

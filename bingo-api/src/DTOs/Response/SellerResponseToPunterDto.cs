@@ -10,7 +10,7 @@ public record SellerResponseToPunterDto
     public IEnumerable<RoomResponseDto> Rooms { get; set; }
     public SellerResponseToPunterDto(Guid id, string email, IEnumerable<RoomResponseDto> rooms)
     {
-        Id = id;    
+        Id = id;
         Email = email;
         Rooms = rooms;
     }

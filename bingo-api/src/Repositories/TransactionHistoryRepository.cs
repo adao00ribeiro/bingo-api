@@ -13,8 +13,8 @@ public class TransactionHistoryRepository : RepositoryBase<TransactionHistory>, 
     public TransactionHistoryRepository(DataContext dataContext) : base(dataContext)
     {
     }
-    
-    public  async Task<int> CountAsync(Guid punterId)
+
+    public async Task<int> CountAsync(Guid punterId)
     {
         return await Context.TransactionHistories.CountAsync(r => r.EntityId == punterId);
     }

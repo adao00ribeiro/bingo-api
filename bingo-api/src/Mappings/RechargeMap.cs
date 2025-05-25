@@ -39,10 +39,10 @@ public class RechargeMap : IEntityTypeConfiguration<Recharge>
 
         builder.Property(r => r.PunterId)
                .HasColumnName("punter_id");
-   builder.Property(x => x.CreateAt)
-               .HasColumnName("create_at")
-               .IsRequired()
-               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        builder.Property(x => x.CreateAt)
+                    .HasColumnName("create_at")
+                    .IsRequired()
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.Property(x => x.UpdateAt)
                .HasColumnName("update_at")

@@ -6,5 +6,5 @@ namespace bingo_api.src.Interfaces.Repositories;
 public interface ISellerRepository : IRepositoryBase<Seller>
 {
     Task<Seller> GetByEmailAsync(string userEmail);
-   
+
 }

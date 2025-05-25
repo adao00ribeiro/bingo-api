@@ -22,7 +22,7 @@ public record RoundResponseDto
     public Guid RoomId { get; set; }
     public RoomResponseDto? Room { get; set; }
 
-     [JsonIgnore]
+    [JsonIgnore]
     public IEnumerable<CardResponseDto>? Cards { get; set; }
     public IEnumerable<PrizeResponseDto>? Prizes { get; set; }
     public RoundResponseDto(
@@ -63,7 +63,7 @@ public record RoundResponseDto
     internal static RoundResponseDto ConvertToDto(Round round)
     {
         var roomResponse = round.Room != null ? RoomResponseDto.ConvertToDto(round.Room) : null;
-       
+
         var prizesResponse = round.Prizes?.Select(x => PrizeResponseDto.ConvertToDto(x)) ?? Enumerable.Empty<PrizeResponseDto>();
         return new RoundResponseDto(
                 round.Id,
@@ -87,7 +87,7 @@ public record RoundResponseDto
 
     internal static RoundResponseDto ConvertToSocketDto(Round round)
     {
-        
+
         return new RoundResponseDto(
                 round.Id,
                 round.CardValue,

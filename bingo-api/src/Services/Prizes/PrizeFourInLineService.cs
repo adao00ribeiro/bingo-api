@@ -9,8 +9,8 @@ public class PrizeFourInLineService : PrizeBaseService
 
     protected override bool CheckWinner(Card card, int row, int col)
     {
-            ExecuteTopFiveList(card, row, col);
-        return card.CardMarkedNumbers.Chunk(col).Any(row => row.Count(mark => mark == 1) == (col-1));
+        ExecuteTopFiveList(card, row, col);
+        return card.CardMarkedNumbers.Chunk(col).Any(row => row.Count(mark => mark == 1) == (col - 1));
     }
 
     protected override void ExecuteTopFiveList(Card card, int row, int col)

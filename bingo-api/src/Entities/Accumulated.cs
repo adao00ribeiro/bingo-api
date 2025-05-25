@@ -15,7 +15,7 @@ public class Accumulated : Entity
     public Guid RoomId { get; set; }
 
     [JsonIgnore]
-    public  Room Room { get; set; }
+    public Room Room { get; set; }
 
     public Accumulated()
     {

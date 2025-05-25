@@ -9,7 +9,7 @@ namespace bingo_api.src.Services.Prizes
 
         protected override bool CheckWinner(Card card, int row, int col)
         {
-              ExecuteTopFiveList(card, row, col);
+            ExecuteTopFiveList(card, row, col);
             return CheckDiagonal(card, col);
         }
 
