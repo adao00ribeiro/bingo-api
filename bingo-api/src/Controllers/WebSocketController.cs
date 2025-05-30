@@ -143,7 +143,9 @@ public class WebSocketController : ApiControllerBase, IDisposable
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         WriteIndented = true // Opcional, para formatar o JSON
                     };
-                    var json = JsonSerializer.Serialize(new SocketMessage("ping", "ping", "success"), options);
+                         
+                    var text = JsonSerializer.Serialize(new TimerEvent());
+                    var json = JsonSerializer.Serialize(new SocketMessage("ping",text , "success"), options);
                     var heartbeatMessage = Encoding.UTF8.GetBytes(json);
                     await webSocket.SendAsync(new ArraySegment<byte>(heartbeatMessage), WebSocketMessageType.Text, true, CancellationToken.None);
                 }
