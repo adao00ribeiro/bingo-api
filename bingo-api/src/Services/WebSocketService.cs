@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Structs;
+using StackExchange.Redis;
 
 namespace bingo_api.src.Services;
 
@@ -10,23 +11,29 @@ public class WebSocketService : IWebSocketService, IDisposable
 {
     private readonly ILogger<IWebSocketService> _logger;
     private readonly Dictionary<string, List<WebSocket>> _channelSubscriptions = new();
+    private readonly ISubscriber _subscriber;
+    private readonly IConnectionMultiplexer _redis;
 
-    public WebSocketService(ILogger<IWebSocketService> logger)
+    public WebSocketService(ILogger<IWebSocketService> logger, IConnectionMultiplexer redis)
     {
         _logger = logger;
+        _redis = redis;
+        _subscriber = _redis.GetSubscriber();
     }
 
     public void SubscribeToChannel(string channel, WebSocket webSocket)
     {
-
         lock (_channelSubscriptions)
         {
             if (!_channelSubscriptions.ContainsKey(channel))
             {
                 _channelSubscriptions[channel] = new List<WebSocket>();
+                _subscriber.Subscribe(channel, async (redisChannel, value) =>
+                {
+                    await BroadcastToLocalClients(channel, value!);
+                });
             }
             _channelSubscriptions[channel].Add(webSocket);
-
         }
         _logger.LogInformation("Client subscribed to channel {Channel}", channel);
     }
@@ -44,38 +51,35 @@ public class WebSocketService : IWebSocketService, IDisposable
             }
         }
     }
-    public async Task SendMessageToChannel(string channel, string message)
+    private async Task BroadcastToLocalClients(string channel, string message)
     {
-        lock (_channelSubscriptions)
-        {
-            if (!_channelSubscriptions.ContainsKey(channel))
-            {
-                _channelSubscriptions[channel] = new List<WebSocket>();
-                _logger.LogInformation("Channel {Channel} created automatically by server.", channel);
-            }
-        }
         List<WebSocket> subscribers;
         lock (_channelSubscriptions)
         {
+            if (!_channelSubscriptions.ContainsKey(channel)) return;
             subscribers = _channelSubscriptions[channel].ToList();
         }
+
         var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true // Opcional, para formatar o JSON
+            WriteIndented = true
         };
-        var json = JsonSerializer.Serialize(new SocketMessage("message", channel, message, "sucess"), options);
+        var json = JsonSerializer.Serialize(new SocketMessage("message", channel, message, "success"), options);
         var serverMsg = Encoding.UTF8.GetBytes(json);
+
         foreach (var subscriber in subscribers)
         {
-
             if (subscriber.State == WebSocketState.Open)
             {
-                Console.WriteLine(channel);
-                await subscriber.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-                //_logger.LogInformation("Message sent to channel {Channel}: {Message}", channel, message);
+                await subscriber.SendAsync(new ArraySegment<byte>(serverMsg), WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
+    }
+    public async Task SendMessageToChannel(string channel, string message)
+    {
+        // Publica para o Redis, que será distribuído para todas as instâncias
+        await _subscriber.PublishAsync(channel, message);
     }
 
     public async Task SendMessageAsync(WebSocket webSocket, string message)
