@@ -56,6 +56,7 @@ public static class NativeInjectorConfig
 
         services.AddSingleton<IWebSocketService, WebSocketService>();
 
+        services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")));
         //repository
         services.AddScoped<JwtSecurityExtensionEvents>();
         services.AddScoped<IIdentityService, IdentityService>();
