@@ -55,7 +55,7 @@ public static class NativeInjectorConfig
         services.AddScoped<DataInitializer>(); // Registrar o DataInitializer
 
         services.AddSingleton<IWebSocketService, WebSocketService>();
-
+        
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")));
         //repository
         services.AddScoped<JwtSecurityExtensionEvents>();

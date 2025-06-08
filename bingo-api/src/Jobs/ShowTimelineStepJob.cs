@@ -6,10 +6,6 @@ using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Jobs;
 using Microsoft.EntityFrameworkCore;
 
-
-
-
-
 public class ShowTimelineStepJob(
     DataContext context,
     IWebSocketService _webSocketService,
@@ -97,4 +93,3 @@ public class ShowTimelineStepJob(
         }
     }
 }
-

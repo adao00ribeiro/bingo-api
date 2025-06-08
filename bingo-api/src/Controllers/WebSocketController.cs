@@ -91,16 +91,14 @@ public class WebSocketController : ApiControllerBase, IDisposable
                         _webSocketService.SubscribeToChannel(channel, webSocket);
                         await _webSocketService.SendMessageAsync(webSocket, $"Subscribed to {channel}");
                         break;
-
                     case "message" when root.TryGetProperty("message", out var contentProperty):
                         var channelMessage = contentProperty.GetString();
                         if (channelMessage != null)
                         {
                             await _webSocketService.SendMessageToChannel(channel, channelMessage);
-                            await _webSocketService.SendMessageAsync(webSocket, "Message sent to channel");
+                          //  await _webSocketService.SendMessageAsync(webSocket, "Message sent to channel");
                         }
                         break;
-
                     default:
                         _logger.LogWarning("Invalid command or missing channel in message.");
                         await _webSocketService.SendMessageAsync(webSocket, $"Invalid command: {command}");
