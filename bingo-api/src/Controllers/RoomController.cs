@@ -21,9 +21,10 @@ public class RoomController(IRoomRepository _roomRepository) : ApiControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RoomResponseDto>>> GetAll()
     {
-        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+         var entityId = User.FindFirst("entityid")?.Value;
+  
         var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userRole))
+        if (string.IsNullOrEmpty(entityId) || string.IsNullOrEmpty(userRole))
         {
             return Unauthorized("Usuário não autenticado.");
         }
@@ -35,13 +36,13 @@ public class RoomController(IRoomRepository _roomRepository) : ApiControllerBase
         }
         else if (User.IsInRole("Seller"))
         {
-            rooms = await roomRepository.GetAllAsync(filter: r => r.OwnerId == Guid.Parse(userId), includeProperties: [r => r.RoomsSellers, r => r.Owner]);
+            rooms = await roomRepository.GetAllAsync(filter: r => r.OwnerId == Guid.Parse(entityId), includeProperties: [r => r.RoomsSellers, r => r.Owner]);
         }
         else if (User.IsInRole("Punter"))
         {
             // Punter pode ver apenas as salas dos Sellers associados a ele
             rooms = await roomRepository.GetAllAsync(includeProperties: [
-                r => r.RoomsSellers.Any(rs => rs.Seller.Punters.Any(p => p.Id == Guid.Parse(userId))),
+                r => r.RoomsSellers.Any(rs => rs.Seller.Punters.Any(p => p.Id == Guid.Parse(entityId))),
                 r => r.RoomsSellers,
                 r => r.Owner]
             );
