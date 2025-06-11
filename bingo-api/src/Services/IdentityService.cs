@@ -54,6 +54,21 @@ public class IdentityService : IIdentityService
                 throw new Exception("Email ja utilizado");
             }
 
+            if (!String.IsNullOrEmpty(punter.IndicateTag))
+            {
+                var validTag = await _punterRepository.GetPunterByTag(punter.IndicateTag);
+
+                if (validTag == null)
+                {
+                    punter.IndicateTag = "";
+                }
+            }
+
+            if (existPunter != null)
+            {
+                throw new Exception("Email ja utilizado");
+            }
+
             var punterId = await _punterRepository.AddAsync(punter);
             identityUser.EntityId = punterId;
             identityUser.EntityType = nameof(Punter);

@@ -76,4 +76,26 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
     {
         throw new NotImplementedException();
     }
+
+    [HttpGet("indicatetag")]
+    public async Task<ActionResult> IndicateTag()
+    {
+        var entityId = User.FindFirst("entityid")?.Value;
+
+        var punter = await this.punterRepository.GetByIdAsync(Guid.Parse(entityId));
+
+        if (punter is null)
+        {
+            return NotFound();
+        }
+
+        if (String.IsNullOrEmpty(punter.IndicateTag))
+        {
+            Guid myuuid = Guid.NewGuid();
+            punter.IndicateTag = myuuid.ToString().Substring(7).ToUpper();
+            await this.punterRepository.UpdateAsync(punter);
+        }
+
+        return Ok(new { indicateTag = "http://localhost:4200/cadastro&tag=" + punter.IndicateTag });
+    }
 }
