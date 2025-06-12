@@ -50,6 +50,10 @@ public class PunterMap : IEntityTypeConfiguration<Punter>
                .HasMaxLength(50)
                .IsRequired();
 
+       builder.Property(x => x.IndicateTag)
+               .HasColumnName("indicate_tag")
+               .HasMaxLength(50);
+               
         builder.Property(x => x.Cpf)
                .HasColumnName("cpf")
                .HasMaxLength(11)
