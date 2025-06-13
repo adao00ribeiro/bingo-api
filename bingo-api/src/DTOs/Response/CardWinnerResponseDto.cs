@@ -1,8 +1,9 @@
+using bingo_api.src.DTOs.Shared;
 using bingo_api.src.Entities;
 
 namespace bingo_api.src.DTOs.Response;
 
-public record CardWinnerResponseDto
+public record CardWinnerResponseDto : EntityResponseDto
 {
     public Guid Id { get; set; }
     public decimal Value { get; set; }
@@ -11,13 +12,16 @@ public record CardWinnerResponseDto
     public Guid PrizeId { get; set; }
     public PrizeResponseDto? Prize { get; set; }
 
-    public CardWinnerResponseDto(Guid id, decimal value, Guid cardId, CardResponseDto? card, Guid prizeId, PrizeResponseDto? prize)
+    public CardWinnerResponseDto(Guid id, decimal value, Guid cardId, CardResponseDto? card, Guid prizeId, DateTime createAt,
+        DateTime updateAt, PrizeResponseDto? prize) : base(id, createAt, updateAt)
     {
         Id = id;
         Value = value;
         CardId = cardId;
         Card = card;
         PrizeId = prizeId;
+        CreateAt = createAt;
+        UpdateAt = updateAt;
         Prize = prize;
     }
     internal static CardWinnerResponseDto ConvertToDto(CardWinner cardWinner)
@@ -30,6 +34,8 @@ public record CardWinnerResponseDto
         cardWinner.CardId,
         cardResponse,
         cardWinner.PrizeId,
+          cardWinner.CreateAt,
+            cardWinner.UpdateAt,
         prizeResponse
      );
     }
