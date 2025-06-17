@@ -11,7 +11,6 @@ namespace bingo_api.src.Controllers;
 
 
 [Authorize]
-
 [ApiVersion("1.0")]
 public class RechargeController(IRechargeRepository _rechargeRepository, ISellerRepository _sellerRepository) : ApiControllerBase
 {

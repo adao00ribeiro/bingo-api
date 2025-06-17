@@ -6,6 +6,7 @@ using Hangfire;
 using Hellang.Middleware.ProblemDetails;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,35 @@ builder.Services.AddControllers()
     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     options.JsonSerializerOptions.Converters.Add(new JsonTimeOnlyConverter());
 });
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 100,
+                Window = TimeSpan.FromMinutes(3),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }
+        )
+    );
+
+    
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        // Custom rejection handling logic
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.Headers["Retry-After"] = "60";
+
+        await context.HttpContext.Response.WriteAsync("Rate limit exceeded. Please try again later.", cancellationToken);
+       
+    };
+    
+
+
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddLogging();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
@@ -46,6 +76,14 @@ var app = builder.Build();
 app.MigrateDatabase<DataContext>();
 app.MigrateDatabase<IdentityDataContext>();
 app.UseCors("AllowAll");
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("Referrer-Policy", "no-referrer");
+    context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'");
+    await next();
+});
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -62,8 +100,10 @@ using (var scope = app.Services.CreateScope())
 }
 app.UseProblemDetails();
 app.UseWebSockets();
+app.UseHsts();
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHangfireJobs();
