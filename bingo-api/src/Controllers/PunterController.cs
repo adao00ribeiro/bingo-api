@@ -14,10 +14,11 @@ namespace bingo_api.src.Controllers;
 [Authorize]
 
 [ApiVersion("1.0")]
-public class PunterController(IPunterRepository _punterRepository, IIdentityService _identityService) : ApiControllerBase
+public class PunterController(IPunterRepository _punterRepository, IIdentityService _identityService, IConfiguration _configuration) : ApiControllerBase
 {
     private readonly IPunterRepository punterRepository = _punterRepository;
     private readonly IIdentityService identityService = _identityService;
+    private readonly IConfiguration configuration = _configuration;
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PunterResponseDto>>> GetAll()
@@ -75,5 +76,26 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
     public Task<ActionResult> Delete(Guid id)
     {
         throw new NotImplementedException();
+    }
+
+    [HttpGet("indicatetag")]
+    public async Task<ActionResult> IndicateTag()
+    {
+        var entityId = User.FindFirst("entityid")?.Value;
+
+        var punter = await this.punterRepository.GetByIdAsync(Guid.Parse(entityId));
+
+        if (punter is null)
+        {
+            return NotFound();
+        }
+
+        if (String.IsNullOrEmpty(punter.IndicateTag))
+        {
+            punter.IndicateTag = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+            await this.punterRepository.UpdateAsync(punter);
+        }
+
+        return Ok(new { indicateTag = $"{configuration["ConnectionStrings:HostUrl"]}cadastro?tag=" + punter.IndicateTag });
     }
 }

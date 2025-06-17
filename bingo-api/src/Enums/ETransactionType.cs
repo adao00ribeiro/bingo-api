@@ -3,5 +3,6 @@ public enum TransactionType
     PrizeReceived,
     Deposit,
     Withdrawal,
-    CardPurchased
+    CardPurchased,
+    Reward
 }

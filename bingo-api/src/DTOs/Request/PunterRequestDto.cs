@@ -16,7 +16,8 @@ public record PunterRequestDto : RegisterRequestDto
              dto.Name,
              dto.Cpf,
              dto.DateBirth,
-             dto.SellerId
+             dto.SellerId,
+             dto.IndicateTag
         );
     }
 }

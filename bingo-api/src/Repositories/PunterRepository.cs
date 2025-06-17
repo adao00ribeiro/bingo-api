@@ -22,4 +22,14 @@ public class PunterRepository : RepositoryBase<Punter>, IPunterRepository
         return punter;
     }
 
+    public async Task<Punter> GetByIdAsync(Guid id)
+    {
+        return await Context.Punters.FirstOrDefaultAsync(punter => punter.Id == id);
+    }
+
+    public async Task<Punter> GetPunterByTag(String indicateTag)
+    {
+        return await Context.Punters.FirstOrDefaultAsync(punter => punter.IndicateTag == indicateTag); ;
+    }
+
 }
