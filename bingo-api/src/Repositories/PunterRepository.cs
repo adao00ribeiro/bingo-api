@@ -24,7 +24,7 @@ public class PunterRepository : RepositoryBase<Punter>, IPunterRepository
 
     public async Task<Punter> GetByIdAsync(Guid id)
     {
-        return await Context.Punters.FirstOrDefaultAsync(punter => punter.Id == id); ;
+        return await Context.Punters.FirstOrDefaultAsync(punter => punter.Id == id);
     }
 
     public async Task<Punter> GetPunterByTag(String indicateTag)

@@ -14,10 +14,11 @@ namespace bingo_api.src.Controllers;
 [Authorize]
 
 [ApiVersion("1.0")]
-public class PunterController(IPunterRepository _punterRepository, IIdentityService _identityService) : ApiControllerBase
+public class PunterController(IPunterRepository _punterRepository, IIdentityService _identityService, IConfiguration _configuration) : ApiControllerBase
 {
     private readonly IPunterRepository punterRepository = _punterRepository;
     private readonly IIdentityService identityService = _identityService;
+    private readonly IConfiguration configuration = _configuration;
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PunterResponseDto>>> GetAll()
@@ -91,11 +92,10 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
 
         if (String.IsNullOrEmpty(punter.IndicateTag))
         {
-            Guid myuuid = Guid.NewGuid();
-            punter.IndicateTag = myuuid.ToString().Substring(7).ToUpper();
+            punter.IndicateTag = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
             await this.punterRepository.UpdateAsync(punter);
         }
 
-        return Ok(new { indicateTag = "http://localhost:4200/cadastro&tag=" + punter.IndicateTag });
+        return Ok(new { indicateTag = $"{configuration["ConnectionStrings:HostUrl"]}cadastro?tag=" + punter.IndicateTag });
     }
 }

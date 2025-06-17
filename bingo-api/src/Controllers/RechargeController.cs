@@ -13,9 +13,10 @@ namespace bingo_api.src.Controllers;
 [Authorize]
 
 [ApiVersion("1.0")]
-public class RechargeController(IRechargeRepository _rechargeRepository) : ApiControllerBase
+public class RechargeController(IRechargeRepository _rechargeRepository, ISellerRepository _sellerRepository) : ApiControllerBase
 {
     private readonly IRechargeRepository rechargeRepository = _rechargeRepository;
+    private readonly ISellerRepository sellerRepository = _sellerRepository;
 
     [Authorize(Roles = $"{Roles.Admin},{Roles.Punter}")]
     [HttpGet()]
@@ -74,8 +75,9 @@ public class RechargeController(IRechargeRepository _rechargeRepository) : ApiCo
     [HttpPatch("complete")]
     public async Task<ActionResult> UpdateStatusToCompleted(RechargeRequestDto dto)
     {
-        Console.WriteLine("opa", dto.Id);
-        return Ok(await rechargeRepository.UpdateStatusToCompleted(dto.Id));
+        var entityId = User.FindFirst("entityid")?.Value;
+        var seller = await this.sellerRepository.GetByIdAsync(Guid.Parse(entityId));
+        return Ok(await rechargeRepository.UpdateStatusToCompleted(dto.Id, seller));
     }
     [HttpPut]
     public async Task<ActionResult> Update(RechargeRequestDto request)
