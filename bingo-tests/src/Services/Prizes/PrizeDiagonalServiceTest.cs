@@ -36,7 +36,7 @@ public class PrizeDiagonalServiceTest
                     11, 12, 13,14,15
             },
 
-            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid())
+            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid(),"")
         };
 
         var cards = new List<Card> { card };
@@ -71,7 +71,7 @@ public class PrizeDiagonalServiceTest
             }
             ,
 
-            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid())
+            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid(),"")
 
         };
 
@@ -110,7 +110,7 @@ public class PrizeDiagonalServiceTest
             }
             ,
 
-            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid())
+            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid(),"")
 
         };
 
@@ -145,7 +145,7 @@ public class PrizeDiagonalServiceTest
             }
             ,
 
-            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid())
+            Punter = new Punter("faker@user", "Jodo joelso", "11111111111", DateTime.Now, Guid.NewGuid(),"")
 
         };
 
