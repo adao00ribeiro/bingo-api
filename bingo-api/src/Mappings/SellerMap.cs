@@ -31,7 +31,7 @@ public class SellerMap : IEntityTypeConfiguration<Seller>
 
 
         builder.Property(x => x.IndicateRewardValue)
-               .HasColumnName("IndicateRewardValue")
+               .HasColumnName("indicate_reward_value")
                .HasDefaultValue(20.0)
                .HasColumnType("numeric(15, 2)");
 

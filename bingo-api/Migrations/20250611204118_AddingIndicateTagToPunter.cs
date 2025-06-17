@@ -11,7 +11,7 @@ namespace bingo_api.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "IndicateTag",
+                name: "indicate_tag",
                 table: "punters",
                 type: "character varying(500)",
                 unicode: false,
@@ -24,7 +24,7 @@ namespace bingo_api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "IndicateTag",
+                name: "indicate_tag",
                 table: "punters");
         }
     }
