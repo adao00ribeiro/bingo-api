@@ -4,6 +4,8 @@ ARG ConnectionStrings__DatabasePostgreSQL=${ConnectionStrings__DatabasePostgreSQ
 ENV ConnectionStrings__DatabasePostgreSQL=${ConnectionStrings__DatabasePostgreSQL}
 ARG ConnectionStrings__RedisConnection=${ConnectionStrings__RedisConnection}
 ENV ConnectionStrings__RedisConnection=${ConnectionStrings__RedisConnection}
+ARG ConnectionStrings__HostUrl=${ConnectionStrings__HostUrl}
+ENV ConnectionStrings__HostUrl=${ConnectionStrings__HostUrl}
 WORKDIR /app/api
 
 COPY *.sln ./
