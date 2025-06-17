@@ -92,7 +92,17 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
 
         if (String.IsNullOrEmpty(punter.IndicateTag))
         {
-            punter.IndicateTag = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+
+            var generateTag = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+            var punterTag = await this.punterRepository.GetPunterByTag(generateTag);
+
+            while (punterTag is not null)
+            {
+                generateTag = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+                punterTag = await this.punterRepository.GetPunterByTag(generateTag);
+            }
+
+            punter.IndicateTag = generateTag;
             await this.punterRepository.UpdateAsync(punter);
         }
 
