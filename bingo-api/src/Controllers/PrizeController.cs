@@ -5,7 +5,11 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace bingo_api.src.Controllers;
+
 using Asp.Versioning;
+
+
+[Authorize]
 [ApiVersion("1.0")]
 public class PrizeController(IPrizeRepository _prizeRepository) : ApiControllerBase
 {

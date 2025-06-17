@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace bingo_api.src.Controllers;
 
 [Authorize]
-
 [ApiVersion("1.0")]
 public class ReportController(IReportService service) : ApiControllerBase
 {

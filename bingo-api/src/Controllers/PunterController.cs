@@ -7,7 +7,6 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
-using bingo_api.src.Services;
 using bingo_api.src.Interfaces.Services;
 namespace bingo_api.src.Controllers;
 
