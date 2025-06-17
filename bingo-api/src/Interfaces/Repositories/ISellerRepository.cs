@@ -7,4 +7,6 @@ public interface ISellerRepository : IRepositoryBase<Seller>
 {
     Task<Seller> GetByEmailAsync(string userEmail);
 
+    Task<Seller> GetByIdAsync(Guid id);
+
 }

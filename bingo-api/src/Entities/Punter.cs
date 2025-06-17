@@ -18,17 +18,19 @@ public class Punter : Entity, ITransactionParticipant
     public Guid SellerId { get; set; }
     public Seller Seller { get; set; }
     public IEnumerable<Recharge>? Recharges { get; set; }
+    public string IndicateTag { get; set; }
     public Punter()
     {
 
     }
-    public Punter(string email, string name, string cpf, DateTime datebirth, Guid sellerId)
+    public Punter(string email, string name, string cpf, DateTime datebirth, Guid sellerId, string indicateTag)
     {
         this.Email = email;
         this.Name = name;
         this.Cpf = cpf;
         this.DateBirth = datebirth;
         this.SellerId = sellerId;
+        this.IndicateTag = indicateTag;
     }
     public Punter(string email, string name, string cpf, DateTime datebirth, Guid sellerId, bool isBot)
     {

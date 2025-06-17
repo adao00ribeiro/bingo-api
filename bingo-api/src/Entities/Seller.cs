@@ -14,7 +14,7 @@ public class Seller : Entity, ITransactionParticipant
     public IEnumerable<Punter> Punters { get; set; }
     public IEnumerable<RoomSeller> Rooms { get; set; }
     public IEnumerable<Room> OwnerRooms { get; set; }
-
+    public decimal IndicateRewardValue { get; set; }
 
     public Seller()
     {

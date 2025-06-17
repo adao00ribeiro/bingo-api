@@ -14,9 +14,7 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
     {
     }
 
-
-
-    public async Task<bool> UpdateStatusToCompleted(Guid id)
+    public async Task<bool> UpdateStatusToCompleted(Guid id, Seller seller)
     {
         using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
@@ -37,6 +35,28 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 if (punter == null)
                 {
                     throw new Exception("Punter nao encontrado.");
+                }
+
+                if (punter.Balance == 0 && punter.IndicateTag is not null)
+                {
+                    var indicatePunter = await Context.Punters.FirstAsync(x => x.IndicateTag == punter.IndicateTag);
+
+                    if (indicatePunter != null)
+                    {
+                        var bonusIndicate = seller.IndicateRewardValue;
+                        var transactionIndicateHistory = new TransactionHistory
+                        {
+                            EntityType = "Punter",
+                            EntityId = indicatePunter.Id,
+                            PreviousBalance = indicatePunter.Balance,
+                            CurrentBalance = indicatePunter.Balance + bonusIndicate,
+                            Amount = bonusIndicate,
+                            Type = TransactionType.Reward,
+                        };
+
+                        await this.Context.TransactionHistories.AddAsync(transactionIndicateHistory);
+                        indicatePunter.Balance += bonusIndicate;
+                    }
                 }
 
                 var transactionHistory = new TransactionHistory

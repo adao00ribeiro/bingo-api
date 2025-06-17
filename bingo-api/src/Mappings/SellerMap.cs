@@ -29,9 +29,15 @@ public class SellerMap : IEntityTypeConfiguration<Seller>
                .IsRequired()
                .HasColumnType("numeric(15, 2)");
 
-        builder.Property(x => x.Comission)
-               .HasColumnName("comission")
-               .IsRequired()
+
+        builder.Property(x => x.IndicateRewardValue)
+               .HasColumnName("IndicateRewardValue")
+               .HasDefaultValue(20.0)
+               .HasColumnType("numeric(15, 2)");
+
+              builder.Property(x => x.Comission)
+                     .HasColumnName("comission")
+                     .IsRequired()
                .HasColumnType("numeric(15, 2)");
 
         builder.Property(x => x.Email)

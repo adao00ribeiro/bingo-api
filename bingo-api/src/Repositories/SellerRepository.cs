@@ -16,4 +16,9 @@ public class SellerRepository : RepositoryBase<Seller>, ISellerRepository
         return await Context.Sellers
            .FirstOrDefaultAsync(punter => punter.Email == email);
     }
+
+    public async Task<Seller> GetByIdAsync(Guid id)
+    {
+        return await Context.Sellers.FirstOrDefaultAsync(seller => seller.Id == id);
+    }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using bingo_api.src.Context;
@@ -13,9 +14,11 @@ using bingo_api.src.Structs;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250611204118_AddingIndicateTagToPunter")]
+    partial class AddingIndicateTagToPunter
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -623,12 +626,6 @@ namespace bingo_api.Migrations
                         .IsUnicode(false)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("email");
-
-                    b.Property<decimal>("IndicateRewardValue")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("numeric(15, 2)")
-                        .HasDefaultValue(20m)
-                        .HasColumnName("IndicateRewardValue");
 
                     b.Property<decimal>("PrizeBalance")
                         .HasColumnType("numeric");
