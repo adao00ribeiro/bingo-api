@@ -3,10 +3,10 @@ using bingo_api.src.Context;
 using bingo_api.src.Extensions;
 using bingo_api.src.IoC;
 using Hangfire;
-using Hellang.Middleware.ProblemDetails;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Threading.RateLimiting;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,10 +98,10 @@ using (var scope = app.Services.CreateScope())
     var dataInitializer = scope.ServiceProvider.GetRequiredService<DataInitializer>();
     await dataInitializer.Seed();
 }
-app.UseProblemDetails();
 app.UseWebSockets();
 app.UseHsts();
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
 app.UseRouting();
 app.UseRateLimiter();
 app.UseAuthentication();
