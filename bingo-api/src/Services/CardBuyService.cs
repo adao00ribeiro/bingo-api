@@ -93,6 +93,8 @@ public class CardBuyService : ICardBuyService
                 }
 
                 await this._cardRepository.AddRangeAsync(cardsToInsert);
+
+                
                 // Registra a transação no histórico
                 var transactionHistory = new TransactionHistory
                 {
