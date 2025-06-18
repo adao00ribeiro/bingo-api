@@ -1,17 +1,13 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
-using System.Transactions;
 using bingo_api.src.Configurations;
 using bingo_api.src.Constants;
 using bingo_api.src.Context;
 using bingo_api.src.DTOs.Request;
 using bingo_api.src.DTOs.Response;
 using bingo_api.src.Entities;
-using bingo_api.src.Exceptions;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
