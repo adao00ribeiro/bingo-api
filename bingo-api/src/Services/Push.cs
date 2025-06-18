@@ -13,7 +13,7 @@ public class Push
     {
         var client = new HttpClient();
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://api-sandbox.pushinpay.com.br/api/pix/cashIn");
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.pushinpay.com.br/api/pix/cashIn");
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "34432|1vsemHuaQShQjzdy4bWKMTLLeCFvnVAJMu5PLGCd8d9040bf");
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -37,7 +37,7 @@ public class Push
     public async Task ConsultarPix()
     {
         var client = new HttpClient();
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://api-sandbox.pushinpay.com.br/api/transactions/{ID}");
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://api.pushinpay.com.br/api/transactions/{ID}");
         request.Headers.Add("Authorization", "Bearer");
         request.Headers.Add("Accept", "application/json");
         var content = new StringContent(string.Empty);
