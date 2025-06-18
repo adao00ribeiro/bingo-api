@@ -38,9 +38,10 @@ public class IdentityController(IIdentityService _identityService) : ApiControll
         var resultado = await identityService.Login(usuarioLogin);
 
         if (resultado.Sucesso)
+        {
             return Ok(resultado);
-
-        return Unauthorized();
+        }
+        return Unauthorized(resultado);
     }
     [Authorize]
     [HttpPost("refresh-login")]

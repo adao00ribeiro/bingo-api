@@ -22,6 +22,10 @@ public class DepositService(
             {
                 return false;
             }
+
+            var push = new Push();
+            await push.CriarPix();
+
             var recharge = new Recharge(dto.Value, Enums.ERechargeStatus.PENDING, punter.Id);
             await this.rechargeRepository.AddAsync(recharge);
             return true;
