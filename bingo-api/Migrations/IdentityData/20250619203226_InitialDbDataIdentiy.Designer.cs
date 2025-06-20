@@ -12,7 +12,7 @@ using bingo_api.src.Context;
 namespace bingo_api.Migrations.IdentityData
 {
     [DbContext(typeof(IdentityDataContext))]
-    [Migration("20250523112336_InitialDbDataIdentiy")]
+    [Migration("20250619203226_InitialDbDataIdentiy")]
     partial class InitialDbDataIdentiy
     {
         /// <inheritdoc />

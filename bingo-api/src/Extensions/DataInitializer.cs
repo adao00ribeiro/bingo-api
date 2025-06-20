@@ -54,7 +54,8 @@ public class DataInitializer
                 Email = sellerEmail,
                 Cpf = "11111111111",
                 DateBirth = DateTime.UtcNow,
-                Comission = 0
+                Comission = 0,
+                IndicateRewardValue=20
             };
             seller.SetIdGuid(sellerId);
             // Adiciona o Seller ao contexto
