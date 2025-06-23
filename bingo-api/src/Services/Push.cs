@@ -1,38 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 namespace bingo_api.src.Services;
 
 public class Push
 {
-    public async Task CriarPix()
+    public async Task<QrCodeResponse> CriarPix(decimal value)
     {
         var client = new HttpClient();
 
         var request = new HttpRequestMessage(HttpMethod.Post, "https://api.pushinpay.com.br/api/pix/cashIn");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "34432|1vsemHuaQShQjzdy4bWKMTLLeCFvnVAJMu5PLGCd8d9040bf");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "34572|yzqObrfNiQqHMfW9B2VN2BVLLcinz37Uf9Hf2bnV69dd34ad");
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var json = @"
-        {
-            ""value"": 10,
-            ""webhook_url"": ""http://homologation-bingo-api.srv813210.hstgr.cloud/api/webhook"",
-            ""split_rules"": []
-        }";
 
-        request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+        string jsonPayload = $@"{{ ""value"": {(int)(value * 100)}, ""webhook_url"": ""https://webhook.site/08a2f9a4-4070-419c-af84-d53ac6eff3cb"", ""split_rules"": [] }}";
+     
+        var content = new StringContent(jsonPayload, null, "application/json");
 
+        request.Content = content;
         var response = await client.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
 
         string result = await response.Content.ReadAsStringAsync();
-        Console.WriteLine(result);
-
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var data = JsonSerializer.Deserialize<QrCodeResponse>(result, options);
+        Console.WriteLine(data.ToString());
+        return data;
     }
     public async Task ConsultarPix()
     {
@@ -47,5 +47,28 @@ public class Push
         response.EnsureSuccessStatusCode();
         Console.WriteLine(await response.Content.ReadAsStringAsync());
     }
+
+}
+
+public class QrCodeResponse
+{
+    public Guid Id { get; set; }
+
+    [JsonPropertyName("qr_code")]
+    public string QrCode { get; set; }
+    public string Status { get; set; }
+
+    [JsonPropertyName("value")]
+    public decimal Value { get; set; }
+
+    [JsonPropertyName("webhook_url")]
+    public string WebhookUrl { get; set; }
+
+    [JsonPropertyName("qr_code_base64")]
+    public string QrCodeBase64 { get; set; }
+    public object[] SplitRules { get; set; }
+    public string EndToEndId { get; set; }
+    public string PayerName { get; set; }
+    public string PayerNationalRegistration { get; set; }
 
 }

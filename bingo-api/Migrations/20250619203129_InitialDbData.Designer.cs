@@ -14,8 +14,8 @@ using bingo_api.src.Structs;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250611204118_AddingIndicateTagToPunter")]
-    partial class AddingIndicateTagToPunter
+    [Migration("20250619203129_InitialDbData")]
+    partial class InitialDbData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -334,9 +334,10 @@ namespace bingo_api.Migrations
 
                     b.Property<string>("IndicateTag")
                         .IsRequired()
-                        .HasMaxLength(500)
+                        .HasMaxLength(50)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("indicate_tag");
 
                     b.Property<bool>("IsBot")
                         .ValueGeneratedOnAdd()
@@ -393,7 +394,7 @@ namespace bingo_api.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("imagem_qrcode");
 
                     b.Property<Guid>("PunterId")
@@ -626,6 +627,12 @@ namespace bingo_api.Migrations
                         .IsUnicode(false)
                         .HasColumnType("character varying(100)")
                         .HasColumnName("email");
+
+                    b.Property<decimal>("IndicateRewardValue")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("numeric(15, 2)")
+                        .HasDefaultValue(20m)
+                        .HasColumnName("indicate_reward_value");
 
                     b.Property<decimal>("PrizeBalance")
                         .HasColumnType("numeric");

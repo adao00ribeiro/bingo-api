@@ -6,6 +6,20 @@ ARG ConnectionStrings__RedisConnection=${ConnectionStrings__RedisConnection}
 ENV ConnectionStrings__RedisConnection=${ConnectionStrings__RedisConnection}
 ARG ConnectionStrings__HostUrl=${ConnectionStrings__HostUrl}
 ENV ConnectionStrings__HostUrl=${ConnectionStrings__HostUrl}
+
+ARG HangfireDashboard__Username=${HangfireDashboard__Username}
+ENV HangfireDashboard__Username=${HangfireDashboard__Username}
+
+ARG HangfireDashboard__Password=${HangfireDashboard__Password}
+ENV HangfireDashboard__Password=${HangfireDashboard__Password}
+
+ARG JwtOptions__Issuer=${JwtOptions__Issuer}
+ENV JwtOptions__Issuer=${JwtOptions__Issuer}
+ARG JwtOptions__Audience=${JwtOptions__Audience}
+ENV JwtOptions__Audience=${JwtOptions__Audience}
+ARG JwtOptions__SecurityKey=${JwtOptions__SecurityKey}
+ENV JwtOptions__SecurityKey=${JwtOptions__SecurityKey}
+
 WORKDIR /app/api
 
 COPY *.sln ./

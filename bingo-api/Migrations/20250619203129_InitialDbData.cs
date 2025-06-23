@@ -40,6 +40,7 @@ namespace bingo_api.Migrations
                     cpf = table.Column<string>(type: "character varying(11)", unicode: false, maxLength: 11, nullable: false),
                     date_birth = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     comission = table.Column<decimal>(type: "numeric(15,2)", nullable: false),
+                    indicate_reward_value = table.Column<decimal>(type: "numeric(15,2)", nullable: false, defaultValue: 20m),
                     create_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     update_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
@@ -80,6 +81,7 @@ namespace bingo_api.Migrations
                     is_bot = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     date_birth = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     seller_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    indicate_tag = table.Column<string>(type: "character varying(50)", unicode: false, maxLength: 50, nullable: false),
                     create_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     update_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
@@ -123,7 +125,7 @@ namespace bingo_api.Migrations
                     value = table.Column<decimal>(type: "numeric(15,2)", nullable: false),
                     status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     qrcode = table.Column<string>(type: "character varying(200)", unicode: false, maxLength: 200, nullable: false),
-                    imagem_qrcode = table.Column<string>(type: "character varying(500)", unicode: false, maxLength: 500, nullable: false),
+                    imagem_qrcode = table.Column<string>(type: "text", unicode: false, maxLength: 500, nullable: false),
                     punter_id = table.Column<Guid>(type: "uuid", nullable: false),
                     create_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     update_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")

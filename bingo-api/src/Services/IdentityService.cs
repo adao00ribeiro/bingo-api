@@ -210,6 +210,8 @@ public class IdentityService : IIdentityService
 
     private string GerarToken(IEnumerable<Claim> claims, DateTime dataExpiracao)
     {
+       // var audienceForToken = _jwtOptions.Audience.FirstOrDefault() ?? throw new Exception("Nenhum audience configurado");
+
         var jwt = new JwtSecurityToken(
             issuer: _jwtOptions.Issuer,
             audience: _jwtOptions.Audience,

@@ -331,9 +331,10 @@ namespace bingo_api.Migrations
 
                     b.Property<string>("IndicateTag")
                         .IsRequired()
-                        .HasMaxLength(500)
+                        .HasMaxLength(50)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("indicate_tag");
 
                     b.Property<bool>("IsBot")
                         .ValueGeneratedOnAdd()
@@ -390,7 +391,7 @@ namespace bingo_api.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("imagem_qrcode");
 
                     b.Property<Guid>("PunterId")
@@ -628,7 +629,7 @@ namespace bingo_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("numeric(15, 2)")
                         .HasDefaultValue(20m)
-                        .HasColumnName("IndicateRewardValue");
+                        .HasColumnName("indicate_reward_value");
 
                     b.Property<decimal>("PrizeBalance")
                         .HasColumnType("numeric");

@@ -5,6 +5,7 @@ using bingo_api.src.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
+using bingo_api.src.DTOs.Response;
 namespace bingo_api.src.Controllers;
 
 [Authorize]
@@ -25,7 +26,10 @@ public class DepositController(IDepositService _deposityService) : ApiController
         {
             return Unauthorized(new { message = "Usuário não autenticado." });
         }
-
-        return Ok(await this.depositService.Deposit(userEmail, dto));
+        var recharge = await this.depositService.Deposit(userEmail, dto);
+        if (recharge ==null) {
+             return  NotFound();
+        }
+        return Ok(RechargeResponseDto.ConvertToDto(recharge));
     }
 }
