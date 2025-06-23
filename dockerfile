@@ -15,8 +15,10 @@ ENV HangfireDashboard__Password=${HangfireDashboard__Password}
 
 ARG JwtOptions__Issuer=${JwtOptions__Issuer}
 ENV JwtOptions__Issuer=${JwtOptions__Issuer}
+
 ARG JwtOptions__Audience=${JwtOptions__Audience}
 ENV JwtOptions__Audience=${JwtOptions__Audience}
+
 ARG JwtOptions__SecurityKey=${JwtOptions__SecurityKey}
 ENV JwtOptions__SecurityKey=${JwtOptions__SecurityKey}
 
