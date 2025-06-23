@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace bingo_api.src.Extensions;
+
 public static class AuthenticationSetup
 {
     public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
@@ -32,7 +33,7 @@ public static class AuthenticationSetup
             options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 6;
         });
-        
+
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -68,6 +69,16 @@ public static class AuthenticationSetup
             options.UseSecurityTokenValidators = true;
             options.TokenValidationParameters = tokenValidationParameters;
             options.EventsType = typeof(JwtSecurityExtensionEvents);
+
+            options.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    Console.WriteLine("JWT AUTH FAILED: " + context.Exception.Message);
+                    return Task.CompletedTask;
+                }
+            };
+
         });
 
         services.AddAuthorization(auth =>
@@ -92,4 +103,3 @@ public static class AuthenticationSetup
     }
 
 }
-

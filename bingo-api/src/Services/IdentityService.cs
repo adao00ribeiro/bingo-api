@@ -210,15 +210,18 @@ public class IdentityService : IIdentityService
 
     private string GerarToken(IEnumerable<Claim> claims, DateTime dataExpiracao)
     {
-       // var audienceForToken = _jwtOptions.Audience.FirstOrDefault() ?? throw new Exception("Nenhum audience configurado");
+        var audiences = _jwtOptions.Audience
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         var jwt = new JwtSecurityToken(
             issuer: _jwtOptions.Issuer,
-            audience: _jwtOptions.Audience,
             claims: claims,
             notBefore: DateTime.Now,
             expires: dataExpiracao,
             signingCredentials: _jwtOptions.SigningCredentials);
+
+          jwt.Payload["aud"] = audiences;
+
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }
 
