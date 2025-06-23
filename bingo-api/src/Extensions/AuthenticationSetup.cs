@@ -32,14 +32,15 @@ public static class AuthenticationSetup
             options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 6;
         });
-
+        
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidIssuer = configuration.GetSection("JwtOptions:Issuer").Value,
 
             ValidateAudience = true,
-            ValidAudience = configuration.GetSection("JwtOptions:Audience").Value,
+            ValidAudiences = configuration.GetSection("JwtOptions:Audience").Value
+    .Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
 
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = securityKey,

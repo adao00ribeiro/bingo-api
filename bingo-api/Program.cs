@@ -15,7 +15,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://bingo-web.srv813210.hstgr.cloud","http://homologation-bingo-web.srv813210.hstgr.cloud", "http://homologation-bingo-dashboard.srv813210.hstgr.cloud", "http://homologation-bingo-dashboard.captain.localhost", "http://localhost", "http://localhost:4200", "http://localhost:4300", "https://localhost:4200", "https://localhost:4300")
+        policy.WithOrigins("http://bingo-dashboard.srv813210.hstgr.cloud","http://bingo-web.srv813210.hstgr.cloud","http://homologation-bingo-web.srv813210.hstgr.cloud", "http://homologation-bingo-dashboard.srv813210.hstgr.cloud", "http://homologation-bingo-dashboard.captain.localhost", "http://localhost", "http://localhost:4200", "http://localhost:4300", "https://localhost:4200", "https://localhost:4300")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -46,20 +46,14 @@ builder.Services.AddRateLimiter(options =>
             }
         )
     );
-
-    
     options.OnRejected = async (context, cancellationToken) =>
     {
         // Custom rejection handling logic
         context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
         context.HttpContext.Response.Headers["Retry-After"] = "60";
-
         await context.HttpContext.Response.WriteAsync("Rate limit exceeded. Please try again later.", cancellationToken);
        
     };
-    
-
-
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddLogging();
@@ -109,7 +103,7 @@ app.UseAuthorization();
 app.UseHangfireJobs();
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
-    Authorization = HangFireDashboardAuthorization.AuthenticationFilters()
+    Authorization = HangFireDashboardAuthorization.AuthenticationFilters(builder.Configuration)
 });
 app.MapControllers();
 

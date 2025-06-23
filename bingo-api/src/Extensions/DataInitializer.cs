@@ -3,7 +3,6 @@ using bingo_api.src.Context;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
-using StackExchange.Redis;
 
 namespace bingo_api.src.Extensions;
 
@@ -45,8 +44,6 @@ public class DataInitializer
 
         if (!_context.Sellers.Any(s => s.Id == sellerId))
         {
-
-
             // Cria um Seller de desenvolvimento
             var seller = new Seller
             {
