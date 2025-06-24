@@ -24,7 +24,7 @@ public class DepositService(
                 return null;
             }
             Recharge recharge;
-            if (!env.IsDevelopment())
+            if (env.IsDevelopment())
             {
              recharge = new Recharge(dto.Value, Enums.ERechargeStatus.PENDING, punter.Id);
             }
