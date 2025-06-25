@@ -41,7 +41,7 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 {
                     var indicatePunter = await Context.Punters.FirstAsync(x => x.IndicateTag == punter.IndicateTag);
 
-                    if (indicatePunter != null)
+                    if (indicatePunter != null && indicatePunter.Id != punter.Id)
                     {
                         var bonusIndicate = seller.IndicateRewardValue;
                         var transactionIndicateHistory = new TransactionHistory
