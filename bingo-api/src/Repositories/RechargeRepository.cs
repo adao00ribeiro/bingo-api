@@ -26,7 +26,10 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 {
                     throw new Exception("Recharge nao encontrado.");
                 }
-
+                if (recharge.Status == ERechargeStatus.COMPLETED )
+                {
+                     throw new Exception("Esta recarga já foi concluída anteriormente.");
+                }
                 // Atualiza o status para COMPLETED
                 recharge.Status = ERechargeStatus.COMPLETED;
                 await Context.SaveChangesAsync();
