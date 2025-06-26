@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Asp.Versioning;
 using bingo_api.src.Controllers.Shared;
 using bingo_api.src.DTOs.Request;
@@ -16,20 +17,20 @@ public class WebHookController(ILogger<WebHookController> logger, IRechargeRepos
 
 
     [HttpPost("pushpay")]
-    public async Task<IActionResult> ReceivePushPayWebhook([FromQuery] PushPayNotificationRequestDto dto)
+    public async Task<IActionResult> ReceivePushPayWebhook([FromForm] PushPayNotificationRequestDto dto)
     {
         _logger.LogInformation("Webhook recebido: {payload}", dto);
 
-        var punter = await this._punterRepository.GetByCpfAsync(dto.payer_national_registration);
+        var punter = await this._punterRepository.GetByCpfAsync(dto.PayerNationalRegistration);
 
         if (punter is null)
             throw new Exception("Usuário não encontrado");
 
-        var recharge = await this._rechargeRepository.GetByIdAsync(dto.id);
+        var recharge = await this._rechargeRepository.GetByIdAsync(dto.Id);
         if (recharge is null)
             throw new Exception("recharge não encontrado");
 
-        await rechargeRepository.UpdateStatusToCompleted(dto.id, punter.Seller);
+        await rechargeRepository.UpdateStatusToCompleted(dto.Id, punter.Seller);
      
         return Ok();
     }
