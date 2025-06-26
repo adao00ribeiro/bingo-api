@@ -1,31 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace bingo_api.src.DTOs.Request;
 
 public record PushPayNotificationRequestDto
 {
 
-    [FromQuery(Name = "id")]
-    public Guid Id { get; set; }
+    public Guid id { get; set; }
 
-    [FromQuery(Name = "value")]
-    public decimal Value { get; set; }
 
-    [FromQuery(Name = "status")]
-    public string Status { get; set; }
+    public decimal value { get; set; }
 
-    [FromQuery(Name = "end_to_end_id")]
-    public string EndToEndId { get; set; }
 
-    [FromQuery(Name = "payer_name")]
-    public string PayerName { get; set; }
+    public string status { get; set; }
 
-    [FromQuery(Name = "payer_national_registration")]
-    public string PayerNationalRegistration { get; set; }
+
+    public string end_to_end_id { get; set; }
+
+
+    public string payer_name { get; set; }
+
+    public string payer_national_registration { get; set; }
 }
 
