@@ -35,10 +35,10 @@ public class SellerMap : IEntityTypeConfiguration<Seller>
                .HasDefaultValue(20.0)
                .HasColumnType("numeric(15, 2)");
 
-              builder.Property(x => x.Comission)
-                     .HasColumnName("comission")
-                     .IsRequired()
-               .HasColumnType("numeric(15, 2)");
+        builder.Property(x => x.Comission)
+               .HasColumnName("comission")
+               .IsRequired()
+         .HasColumnType("numeric(15, 2)");
 
         builder.Property(x => x.Email)
                .HasColumnName("email")
@@ -67,6 +67,11 @@ public class SellerMap : IEntityTypeConfiguration<Seller>
         builder.HasMany(s => s.Punters)
                .WithOne(p => p.Seller)
                .HasForeignKey(p => p.SellerId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(s => s.PaymentMethods)
+               .WithOne(pm => pm.Seller)
+               .HasForeignKey(pm => pm.SellerId)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }

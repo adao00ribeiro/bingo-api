@@ -21,8 +21,8 @@ public class RoomController(IRoomRepository _roomRepository) : ApiControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RoomResponseDto>>> GetAll()
     {
-         var entityId = User.FindFirst("entityid")?.Value;
-  
+        var entityId = User.FindFirst("entityid")?.Value;
+
         var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
         if (string.IsNullOrEmpty(entityId) || string.IsNullOrEmpty(userRole))
         {

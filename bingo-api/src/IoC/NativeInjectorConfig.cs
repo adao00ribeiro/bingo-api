@@ -14,6 +14,7 @@ using bingo_api.src.Jobs;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Jobs;
 using Npgsql;
+using bingo_api.src.Adapter;
 
 
 namespace bingo_api.src.IoC;
@@ -55,7 +56,7 @@ public static class NativeInjectorConfig
         services.AddScoped<DataInitializer>(); // Registrar o DataInitializer
 
         services.AddSingleton<IWebSocketService, WebSocketService>();
-        
+
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")));
         //repository
         services.AddScoped<JwtSecurityExtensionEvents>();
@@ -82,7 +83,10 @@ public static class NativeInjectorConfig
 
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();
-        services.AddScoped<IDepositService, DepositService>();
+        services.AddScoped<IPaymentProvider, PixManualAdapter>();
+        services.AddHttpClient<PushPayAdapter>();
+        services.AddScoped<IPaymentProvider, PushPayAdapter>();
+        services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IReportService, ReportService>();
 
 

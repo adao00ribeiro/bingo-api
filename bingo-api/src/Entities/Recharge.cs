@@ -1,6 +1,6 @@
+using bingo_api.src.Adapter;
 using bingo_api.src.Entities.Shared;
 using bingo_api.src.Enums;
-using bingo_api.src.Services;
 
 namespace bingo_api.src.Entities;
 
@@ -27,11 +27,11 @@ public class Recharge : Entity
         this.PunterId = punterId;
     }
 
-    public Recharge(QrCodeResponse qrCodeResponse,Guid punterId)
+    public Recharge(QrCodeResponse qrCodeResponse, Guid punterId)
     {
-        
-       this.Id = qrCodeResponse.Id;
-        this.Value = qrCodeResponse.Value/100;
+
+        this.Id = qrCodeResponse.Id;
+        this.Value = qrCodeResponse.Value / 100;
         this.Status = ERechargeStatus.PENDING;
         this.Qrcode = qrCodeResponse.QrCode;
         this.ImagemQrcode = qrCodeResponse.QrCodeBase64;

@@ -52,12 +52,36 @@ public class DataInitializer
                 Cpf = "11111111111",
                 DateBirth = DateTime.UtcNow,
                 Comission = 0,
-                IndicateRewardValue=20
+                IndicateRewardValue = 20
             };
             seller.SetIdGuid(sellerId);
             // Adiciona o Seller ao contexto
             var sellerAdded = _context.Sellers.Add(seller);
-
+            if (!_context.PaymentMethods.Any(pm => pm.SellerId == seller.Id))
+            {
+                var pixManualMethod = new PaymentMethod
+                (
+                   "PIX Manual",
+                   Enums.EPaymentMethodType.PIXMANUAL,
+                   "",
+                   "https://exemplo.com/qrcode.png",
+                   "Escaneie o QR Code e envie o comprovante para o suporte.",
+                    true,
+                    seller.Id
+                );
+                var pushPayMethod = new PaymentMethod
+                (
+                    "PushPay",
+                    Enums.EPaymentMethodType.PUSHPAY,
+                   "SEU_TOKEN_PADRAO_SE_FOR_APLICÁVEL",
+                    "",
+                    "",
+                    false, // Apenas Pix está ativo por padrão
+                    seller.Id
+                );
+                _context.PaymentMethods.Add(pushPayMethod);
+                _context.PaymentMethods.Add(pixManualMethod);
+            }
             var identityUser = new User
             {
                 Id = sellerId.ToString(),
