@@ -10,8 +10,13 @@ namespace bingo_api.src.DTOs.Request;
 public record PushPayNotificationRequestDto
 {
 
-     public Guid Id { get; set; }
+    [FromQuery(Name = "id")]
+    public Guid Id { get; set; }
+
+    [FromQuery(Name = "value")]
     public decimal Value { get; set; }
+
+    [FromQuery(Name = "status")]
     public string Status { get; set; }
 
     [FromQuery(Name = "end_to_end_id")]
