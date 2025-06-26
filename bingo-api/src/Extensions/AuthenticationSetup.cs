@@ -105,4 +105,3 @@ Console.WriteLine("SecurityKey: " + configuration["JwtOptions:SecurityKey"]);
     }
 
 }
-

@@ -39,6 +39,7 @@ public class Punter : Entity, ITransactionParticipant
         this.Cpf = cpf;
         this.DateBirth = datebirth;
         this.SellerId = sellerId;
+        this.IndicateTag = "";
         this.IsBot = isBot;
     }
 }

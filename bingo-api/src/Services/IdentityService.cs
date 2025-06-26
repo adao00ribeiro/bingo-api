@@ -220,7 +220,7 @@ public class IdentityService : IIdentityService
             expires: dataExpiracao,
             signingCredentials: _jwtOptions.SigningCredentials);
 
-          jwt.Payload["aud"] = audiences;
+        jwt.Payload["aud"] = audiences;
 
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }

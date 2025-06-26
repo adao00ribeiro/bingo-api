@@ -17,6 +17,8 @@ public class PunterRepository : RepositoryBase<Punter>, IPunterRepository
         var punter = await Context.Punters
              .Include(p => p.Seller)
                  .ThenInclude(s => s.OwnerRooms)
+             .Include(p => p.Seller)
+                 .ThenInclude(s => s.PaymentMethods) 
             .FirstOrDefaultAsync(punter => punter.Email == email);
 
         return punter;

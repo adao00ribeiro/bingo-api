@@ -5,7 +5,7 @@ public class HangFireDashboardAuthorization
 {
     public static BasicAuthAuthorizationFilter[] AuthenticationFilters(IConfiguration configuration)
     {
-         var username = configuration["HangfireDashboard:Username"];
+        var username = configuration["HangfireDashboard:Username"];
         var password = configuration["HangfireDashboard:Password"];
         return [new BasicAuthAuthorizationFilter(new BasicAuthAuthorizationFilterOptions
         {
