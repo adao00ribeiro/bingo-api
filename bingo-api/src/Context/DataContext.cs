@@ -21,6 +21,7 @@ public class DataContext : DbContext
     public DbSet<Accumulated> Accumulated { get; set; }
     public DbSet<BotConfig> BotConfigs { get; set; }
     public DbSet<TransactionHistory> TransactionHistories { get; set; }
+    public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

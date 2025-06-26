@@ -11,10 +11,11 @@ public class Seller : Entity, ITransactionParticipant
     public string Cpf { get; set; }
     public DateTime DateBirth { get; set; }
     public decimal Comission { get; set; }
+    public decimal IndicateRewardValue { get; set; }
     public IEnumerable<Punter> Punters { get; set; }
     public IEnumerable<RoomSeller> Rooms { get; set; }
     public IEnumerable<Room> OwnerRooms { get; set; }
-    public decimal IndicateRewardValue { get; set; }
+    public IEnumerable<PaymentMethod> PaymentMethods { get; set; }
 
     public Seller()
     {

@@ -96,7 +96,7 @@ public class WebSocketController : ApiControllerBase, IDisposable
                         if (channelMessage != null)
                         {
                             await _webSocketService.SendMessageToChannel(channel, channelMessage);
-                          //  await _webSocketService.SendMessageAsync(webSocket, "Message sent to channel");
+                            //  await _webSocketService.SendMessageAsync(webSocket, "Message sent to channel");
                         }
                         break;
                     default:
@@ -141,9 +141,9 @@ public class WebSocketController : ApiControllerBase, IDisposable
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         WriteIndented = true // Opcional, para formatar o JSON
                     };
-                         
+
                     var text = JsonSerializer.Serialize(new TimerEvent());
-                    var json = JsonSerializer.Serialize(new SocketMessage("ping",text , "success"), options);
+                    var json = JsonSerializer.Serialize(new SocketMessage("ping", text, "success"), options);
                     var heartbeatMessage = Encoding.UTF8.GetBytes(json);
                     await webSocket.SendAsync(new ArraySegment<byte>(heartbeatMessage), WebSocketMessageType.Text, true, CancellationToken.None);
                 }

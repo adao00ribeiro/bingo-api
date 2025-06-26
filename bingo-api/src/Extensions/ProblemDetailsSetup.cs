@@ -26,10 +26,10 @@ public static class ProblemDetailsSetup
 
     public static void MapExceptionToStatusCode(this ProblemDetailsContext context)
     {
-       // var env = context.HttpContext.RequestServices.GetRequiredService<IHostEnvironment>();
+        // var env = context.HttpContext.RequestServices.GetRequiredService<IHostEnvironment>();
         var exception = context.HttpContext.Features.Get<IExceptionHandlerPathFeature>()?.Error;
         var isProduction = context.HttpContext.RequestServices.GetRequiredService<IHostEnvironment>().IsProduction();
-          // Adiciona o TraceId para correlação de logs
+        // Adiciona o TraceId para correlação de logs
         var traceId = System.Diagnostics.Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
         context.ProblemDetails.Extensions["traceId"] = traceId;
 
@@ -44,18 +44,18 @@ public static class ProblemDetailsSetup
             var statusCode = _mapping.GetValueOrDefault(exception.GetType(), context.HttpContext.Response.StatusCode);
             context.HttpContext.Response.StatusCode = statusCode;
             context.ProblemDetails.Status = statusCode;
-            context.ProblemDetails.Detail = context.ProblemDetails.Detail == "" ? context.ProblemDetails.Detail: exception.Message;
+            context.ProblemDetails.Detail = context.ProblemDetails.Detail == "" ? context.ProblemDetails.Detail : exception.Message;
             context.ProblemDetails.Extensions["stackTrace"] = exception.StackTrace;
         }
 
-/*
-        if (exception is not null)
-        {
-            var statusCode = _mapping.GetValueOrDefault(exception.GetType(), context.HttpContext.Response.StatusCode);
-            context.HttpContext.Response.StatusCode = statusCode;
-            context.ProblemDetails.Status = statusCode;
-            context.ProblemDetails.Detail = env.IsProduction() || env.IsStaging() ? context.ProblemDetails.Detail : null;
-        }
-        */
+        /*
+                if (exception is not null)
+                {
+                    var statusCode = _mapping.GetValueOrDefault(exception.GetType(), context.HttpContext.Response.StatusCode);
+                    context.HttpContext.Response.StatusCode = statusCode;
+                    context.ProblemDetails.Status = statusCode;
+                    context.ProblemDetails.Detail = env.IsProduction() || env.IsStaging() ? context.ProblemDetails.Detail : null;
+                }
+                */
     }
 }

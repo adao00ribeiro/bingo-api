@@ -1,27 +1,38 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using bingo_api.src.Entities;
+using bingo_api.src.Interfaces.Services;
 
+namespace bingo_api.src.Adapter;
 
-namespace bingo_api.src.Services;
-
-public class Push
+public class PushPayAdapter : IPaymentProvider
 {
-    public async Task<QrCodeResponse> CriarPix(decimal value)
+    private readonly HttpClient _httpClient;
+
+    public PushPayAdapter(HttpClient httpClient)
     {
-        var client = new HttpClient();
+        _httpClient = httpClient;
+    }
+
+    public async Task<Recharge> CreateRechargeAsync(decimal value, Punter punter, PaymentMethod method)
+    {
+        if (string.IsNullOrEmpty(method.Token))
+        {
+            throw new Exception("PushPay sem token");
+        }
 
         var request = new HttpRequestMessage(HttpMethod.Post, "https://api.pushinpay.com.br/api/pix/cashIn");
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "34572|yzqObrfNiQqHMfW9B2VN2BVLLcinz37Uf9Hf2bnV69dd34ad");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", method.Token);
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
 
-        string jsonPayload = $@"{{ ""value"": {(int)(value * 100)}, ""webhook_url"": ""https://webhook.site/08a2f9a4-4070-419c-af84-d53ac6eff3cb"", ""split_rules"": [] }}";
-     
+        string jsonPayload = $@"{{ ""value"": {(int)(value * 100)}, ""webhook_url"": """", ""split_rules"": [] }}";
+
         var content = new StringContent(jsonPayload, null, "application/json");
 
         request.Content = content;
-        var response = await client.SendAsync(request);
+        var response = await _httpClient.SendAsync(request);
 
         response.EnsureSuccessStatusCode();
 
@@ -31,25 +42,25 @@ public class Push
             PropertyNameCaseInsensitive = true
         };
         var data = JsonSerializer.Deserialize<QrCodeResponse>(result, options);
-        Console.WriteLine(data.ToString());
-        return data;
+
+        return new Recharge(data, punter.Id);
     }
+
+
     public async Task ConsultarPix()
     {
-        var client = new HttpClient();
+
         var request = new HttpRequestMessage(HttpMethod.Get, "https://api.pushinpay.com.br/api/transactions/{ID}");
         request.Headers.Add("Authorization", "Bearer");
         request.Headers.Add("Accept", "application/json");
         var content = new StringContent(string.Empty);
         content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
         request.Content = content;
-        var response = await client.SendAsync(request);
+        var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
         Console.WriteLine(await response.Content.ReadAsStringAsync());
     }
-
 }
-
 public class QrCodeResponse
 {
     public Guid Id { get; set; }
