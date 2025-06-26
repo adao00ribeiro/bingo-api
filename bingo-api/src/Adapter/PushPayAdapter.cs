@@ -27,7 +27,7 @@ public class PushPayAdapter : IPaymentProvider
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
 
-        string jsonPayload = $@"{{ ""value"": {(int)(value * 100)}, ""webhook_url"": """", ""split_rules"": [] }}";
+        string jsonPayload = $@"{{ ""value"": {(int)(value * 100)}, ""webhook_url"": ""http://bingo-api.srv813210.hstgr.cloud/api/v1/webhook/pushpay"", ""split_rules"": [] }}";
 
         var content = new StringContent(jsonPayload, null, "application/json");
 
