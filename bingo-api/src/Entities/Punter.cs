@@ -19,18 +19,20 @@ public class Punter : Entity, ITransactionParticipant
     public Seller Seller { get; set; }
     public IEnumerable<Recharge>? Recharges { get; set; }
     public string IndicateTag { get; set; }
+    public string? RegisteredWithTag { get; set; } // usado só uma vez
     public Punter()
     {
 
     }
-    public Punter(string email, string name, string cpf, DateTime datebirth, Guid sellerId, string indicateTag)
+    public Punter(string email, string name, string cpf, DateTime datebirth, Guid sellerId, string RegisteredWithTag)
     {
         this.Email = email;
         this.Name = name;
         this.Cpf = cpf;
         this.DateBirth = datebirth;
         this.SellerId = sellerId;
-        this.IndicateTag = indicateTag;
+        this.IndicateTag = "";
+        this.RegisteredWithTag = RegisteredWithTag;
     }
     public Punter(string email, string name, string cpf, DateTime datebirth, Guid sellerId, bool isBot)
     {
@@ -40,6 +42,7 @@ public class Punter : Entity, ITransactionParticipant
         this.DateBirth = datebirth;
         this.SellerId = sellerId;
         this.IndicateTag = "";
+        this.RegisteredWithTag = "";
         this.IsBot = isBot;
     }
 }

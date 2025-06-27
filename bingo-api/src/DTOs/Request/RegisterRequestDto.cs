@@ -42,8 +42,7 @@ public record RegisterRequestDto
     [DataType(DataType.DateTime, ErrorMessage = "A Data de Nascimento não é válida.")]
     public DateTime DateBirth { get; set; }
 
-    [DefaultValue("")]
-    public string IndicateTag { get; set; }
+
 
     public static User ConvertToEntityUser(RegisterRequestDto dto)
     {
