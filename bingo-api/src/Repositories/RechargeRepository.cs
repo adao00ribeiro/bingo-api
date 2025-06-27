@@ -15,10 +15,10 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
     }
     public override async Task<Recharge?> GetByIdAsync(Guid id)
     {
-            var recharge = await Context.Recharges
-             .Include(r => r.Punter)
-                 .ThenInclude(p => p.Seller)
-            .FirstOrDefaultAsync(recharge => recharge.Id == id);
+        var recharge = await Context.Recharges
+         .Include(r => r.Punter)
+             .ThenInclude(p => p.Seller)
+        .FirstOrDefaultAsync(recharge => recharge.Id == id);
         return recharge;
     }
     public async Task<bool> UpdateStatusToCompleted(Guid id, Seller seller)
@@ -33,9 +33,9 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 {
                     throw new Exception("Recharge nao encontrado.");
                 }
-                if (recharge.Status == ERechargeStatus.COMPLETED )
+                if (recharge.Status == ERechargeStatus.COMPLETED)
                 {
-                     throw new Exception("Esta recarga já foi concluída anteriormente.");
+                    throw new Exception("Esta recarga já foi concluída anteriormente.");
                 }
                 // Atualiza o status para COMPLETED
                 recharge.Status = ERechargeStatus.COMPLETED;
@@ -46,26 +46,28 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 {
                     throw new Exception("Punter nao encontrado.");
                 }
+                var depositsCount = await Context.Recharges.CountAsync(r => r.PunterId == punter.Id);
 
-                if (punter.Balance == 0 && punter.IndicateTag is not null)
+                if (depositsCount == 1 && !string.IsNullOrEmpty(punter.RegisteredWithTag))
                 {
-                    var indicatePunter = await Context.Punters.FirstAsync(x => x.IndicateTag == punter.IndicateTag);
+                    // Buscar o punter que é dono da tag
+                    var referrer = await Context.Punters
+                        .FirstOrDefaultAsync(p => p.IndicateTag == punter.RegisteredWithTag);
 
-                    if (indicatePunter != null && indicatePunter.Id != punter.Id)
+                    if (referrer != null)
                     {
                         var bonusIndicate = seller.IndicateRewardValue;
                         var transactionIndicateHistory = new TransactionHistory
                         {
                             EntityType = "Punter",
-                            EntityId = indicatePunter.Id,
-                            PreviousBalance = indicatePunter.Balance,
-                            CurrentBalance = indicatePunter.Balance + bonusIndicate,
+                            EntityId = referrer.Id,
+                            PreviousBalance = referrer.Balance,
+                            CurrentBalance = referrer.Balance + bonusIndicate,
                             Amount = bonusIndicate,
                             Type = TransactionType.Reward,
                         };
-
                         await this.Context.TransactionHistories.AddAsync(transactionIndicateHistory);
-                        indicatePunter.Balance += bonusIndicate;
+                        referrer.Balance += bonusIndicate;
                     }
                 }
 
