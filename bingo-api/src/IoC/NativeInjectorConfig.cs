@@ -15,6 +15,7 @@ using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Jobs;
 using Npgsql;
 using bingo_api.src.Adapter;
+using bingo_api.src.Interceptors;
 
 
 namespace bingo_api.src.IoC;
@@ -26,9 +27,11 @@ public static class NativeInjectorConfig
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("DatabasePostgreSQL"));
         dataSourceBuilder.EnableDynamicJson();
         var dataSource = dataSourceBuilder.Build();
-        services.AddDbContext<DataContext>(options =>
+        services.AddDbContext<DataContext>((provider,options) =>
           {
+              var interceptor = provider.GetRequiredService<BalanceChangeInterceptor>();
               options.UseNpgsql(dataSource);
+              options.AddInterceptors(interceptor);
           }
         );
         services.AddDbContext<IdentityDataContext>(options =>
@@ -52,7 +55,7 @@ public static class NativeInjectorConfig
             logging.AddConsole();
             logging.SetMinimumLevel(LogLevel.Debug);
         });
-
+        services.AddScoped<BalanceChangeInterceptor>();
         services.AddScoped<DataInitializer>(); // Registrar o DataInitializer
 
         services.AddSingleton<IWebSocketService, WebSocketService>();
