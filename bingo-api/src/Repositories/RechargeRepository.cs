@@ -13,7 +13,14 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
     public RechargeRepository(DataContext dataContext) : base(dataContext)
     {
     }
-
+    public override async Task<Recharge?> GetByIdAsync(Guid id)
+    {
+            var recharge = await Context.Recharges
+             .Include(r => r.Punter)
+                 .ThenInclude(p => p.Seller)
+            .FirstOrDefaultAsync(recharge => recharge.Id == id);
+        return recharge;
+    }
     public async Task<bool> UpdateStatusToCompleted(Guid id, Seller seller)
     {
         using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
@@ -44,7 +51,7 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 {
                     var indicatePunter = await Context.Punters.FirstAsync(x => x.IndicateTag == punter.IndicateTag);
 
-                    if (indicatePunter != null)
+                    if (indicatePunter != null && indicatePunter.Id != punter.Id)
                     {
                         var bonusIndicate = seller.IndicateRewardValue;
                         var transactionIndicateHistory = new TransactionHistory

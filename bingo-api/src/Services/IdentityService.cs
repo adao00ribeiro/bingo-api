@@ -47,9 +47,15 @@ public class IdentityService : IIdentityService
 
             if (existPunter != null)
             {
-                throw new Exception("Email ja utilizado");
+                throw new Exception("Email já está em uso por outro usuário.");
             }
+               var existPunterCpf = await _punterRepository.GetByCpfAsync(punter.Cpf);
 
+            if (existPunterCpf != null)
+            {
+                throw new Exception("Cpf já está em uso por outro usuário.");
+            }
+          
             if (!String.IsNullOrEmpty(punter.IndicateTag))
             {
                 var validTag = await _punterRepository.GetPunterByTag(punter.IndicateTag);
@@ -59,12 +65,7 @@ public class IdentityService : IIdentityService
                     punter.IndicateTag = "";
                 }
             }
-
-            if (existPunter != null)
-            {
-                throw new Exception("Email ja utilizado");
-            }
-
+           
             var punterId = await _punterRepository.AddAsync(punter);
             identityUser.EntityId = punterId;
             identityUser.EntityType = nameof(Punter);
