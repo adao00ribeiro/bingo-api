@@ -1,11 +1,12 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using bingo_api.src.Attribute;
 using bingo_api.src.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace bingo_api.src.DTOs.Request;
 
-public record RegisterRequestDto
+public record RegisterRequestDto: IValidatableObject
 {
     [Required(ErrorMessage = "O campo Nome é obrigatório.")]
     [DefaultValue("Jodo joelso")]
@@ -26,6 +27,7 @@ public record RegisterRequestDto
     public string Phone { get; set; }
 
     [Required(ErrorMessage = "O campo CPF é obrigatório.")]
+    [CpfValidation(ErrorMessage = "O CPF informado não é válido.")]
     [DefaultValue("11111111111")]
     // [RegularExpression(@"\d{3}\.\d{3}\.\d{3}-\d{2}", ErrorMessage = "O CPF informado não é válido.")]
     public string Cpf { get; set; }
@@ -55,5 +57,18 @@ public record RegisterRequestDto
             PhoneNumber = dto.Phone,
         };
     }
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        var idadeMinima = 18;
+        var hoje = DateTime.Today;
+        var idade = hoje.Year - DateBirth.Year;
+        if (DateBirth > hoje.AddYears(-idade)) idade--;
 
+        if (idade < idadeMinima)
+        {
+            yield return new ValidationResult(
+                $"É necessário ter no mínimo {idadeMinima} anos.",
+                new[] { nameof(DateBirth) });
+        }
+    }
 }
