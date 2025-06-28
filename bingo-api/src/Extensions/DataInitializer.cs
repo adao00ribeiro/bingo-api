@@ -122,7 +122,7 @@ public class DataInitializer
             _context.Rooms.Add(room);
             _context.SaveChanges(); // Salva a Room no banco de dados
 
-            await this._botConfigRepository.CreateWithPuntersAsync(new BotConfig(room.Id));
+            await this._botConfigRepository.CreateWithPuntersAsync(new BotConfig(room));
 
         }
     }

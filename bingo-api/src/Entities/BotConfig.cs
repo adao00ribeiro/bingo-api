@@ -19,9 +19,11 @@ public class BotConfig : Entity
         PresenceRate = presenceRate;
         RoomId = roomId;
     }
-    public BotConfig(Guid roomId)
+    public BotConfig( Room room)
     {
         Enabled = false;
-        RoomId = roomId;
+        PresenceRate = 0.70;
+        RoomId = room.Id;
+        Room = room;
     }
 }
