@@ -63,7 +63,26 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
         Context.Entry(objetUpdate).State = EntityState.Modified;
         await Context.SaveChangesAsync();
     }
+    public virtual async Task UpdatePartialAsync(Guid id, Dictionary<string, object?> updatedValues)
+    {
+        var existingEntity = await GetByIdAsync(id) ?? throw new Exception("O registro não existe na base de dados.");
 
+        var entityType = typeof(TEntity);
+        foreach (var entry in updatedValues)
+        {
+            var propertyInfo = entityType.GetProperty(entry.Key);
+            if (propertyInfo == null || !propertyInfo.CanWrite)
+                continue;
+
+            var targetType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
+            object? convertedValue = entry.Value is null ? null : Convert.ChangeType(entry.Value, targetType);
+
+            propertyInfo.SetValue(existingEntity, convertedValue);
+        }
+
+        Context.Entry(existingEntity).State = EntityState.Modified;
+        await Context.SaveChangesAsync();
+    }
     public virtual async Task RemoveAsync(TEntity objeto)
     {
         Context.Set<TEntity>().Remove(objeto);
@@ -110,5 +129,5 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
     public void Dispose() =>
         Context.Dispose();
 
-
+   
 }

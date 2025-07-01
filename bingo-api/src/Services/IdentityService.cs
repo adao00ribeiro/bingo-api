@@ -144,6 +144,12 @@ public class IdentityService : IIdentityService
         }
 
     }
+    public async Task<IdentityResult> UpdateUser(User identityUser)
+    {
+        var identityResult = await _userManager.UpdateAsync(identityUser);
+
+        return identityResult;
+    }
     public async Task<LoginResponse> Login(LoginRequest usuarioLogin)
     {
         var usuarioLoginResponse = new LoginResponse();
@@ -257,7 +263,7 @@ public class IdentityService : IIdentityService
         return claims;
     }
 
-    public async Task<IdentityUser> GetByEmailAsync(string email)
+    public async Task<User> GetByEmailAsync(string email)
     {
         var usuario = await _userManager.FindByEmailAsync(email);
 

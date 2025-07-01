@@ -9,8 +9,9 @@ public interface IIdentityService
 {
     Task<RegisterResponseDto> CadastrarPunter(User identityUser, Punter punter);
     Task<RegisterResponseDto> CadastrarSeller(User identityUser, Seller seller);
+    Task<IdentityResult> UpdateUser(User identityUser);
     Task<LoginResponse> Login(LoginRequest usuarioLogin);
     Task<LoginResponse> LoginSemSenha(string usuarioId);
-    Task<IdentityUser> GetByEmailAsync(string email);
+    Task<User> GetByEmailAsync(string email);
 
 }

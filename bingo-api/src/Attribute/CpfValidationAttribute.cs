@@ -1,33 +1,25 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace bingo_api.src.Attribute;
 
-public class CpfValidationAttribute: ValidationAttribute
+public class CpfValidationAttribute : ValidationAttribute
 {
-     public override bool IsValid(object? value)
+    public override bool IsValid(object? value)
     {
-        if (value == null) return false;
-
+        if (value == null) return true; // Permite valores nulos
         var cpf = value.ToString();
+        if (string.IsNullOrWhiteSpace(cpf)) return true; // Permite string vazia
 
-        if (string.IsNullOrWhiteSpace(cpf)) return false;
-
-        cpf = Regex.Replace(cpf, "[^0-9]", ""); // Remove pontos e traços
+        cpf = Regex.Replace(cpf, "[^0-9]", "");
 
         if (cpf.Length != 11) return false;
-
-        // Rejeita CPFs com todos os dígitos iguais (ex: 111.111.111-11)
         if (new string(cpf[0], cpf.Length) == cpf) return false;
 
         int[] multiplicador1 = { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
         int[] multiplicador2 = { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
 
-        string tempCpf = cpf.Substring(0, 9);
+        string tempCpf = cpf[..9];
         int soma = 0;
 
         for (int i = 0; i < 9; i++)

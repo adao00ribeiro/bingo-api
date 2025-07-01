@@ -9,6 +9,7 @@ public interface IRepositoryBase<TEntity> : IDisposable where TEntity : Entity
     Task<TEntity?> GetByIdAsync(Guid id);
     Task<Guid> AddAsync(TEntity objeto);
     Task UpdateAsync(TEntity objeto);
+    Task UpdatePartialAsync(Guid Id, Dictionary<string, object?> updates);
     Task RemoveAsync(TEntity objeto);
     Task RemoveByIdAsync(Guid id);
     Task<int> CountAsync();
