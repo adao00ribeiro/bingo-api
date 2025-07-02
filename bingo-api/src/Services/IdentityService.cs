@@ -49,13 +49,13 @@ public class IdentityService : IIdentityService
             {
                 throw new Exception("Email já está em uso por outro usuário.");
             }
-               var existPunterCpf = await _punterRepository.GetByCpfAsync(punter.Cpf);
+            var existPunterCpf = await _punterRepository.GetByCpfAsync(punter.Cpf);
 
             if (existPunterCpf != null)
             {
                 throw new Exception("Cpf já está em uso por outro usuário.");
             }
-          
+
             if (!String.IsNullOrEmpty(punter.IndicateTag))
             {
                 var validTag = await _punterRepository.GetPunterByTag(punter.IndicateTag);
@@ -65,7 +65,7 @@ public class IdentityService : IIdentityService
                     punter.IndicateTag = "";
                 }
             }
-           
+
             var punterId = await _punterRepository.AddAsync(punter);
             identityUser.EntityId = punterId;
             identityUser.EntityType = nameof(Punter);
@@ -194,7 +194,25 @@ public class IdentityService : IIdentityService
 
         return usuarioLoginResponse;
     }
+    public async Task<IdentityResult> InactivateFor30Days(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
 
+        if (user == null)
+            throw new Exception("Usuário não encontrado");
+
+        // Habilita o lockout, se ainda não estiver
+        var enableLockoutResult = await _userManager.SetLockoutEnabledAsync(user, true);
+        if (!enableLockoutResult.Succeeded)
+            return enableLockoutResult;
+
+        var dataExpiracao = DateTimeOffset.UtcNow.AddDays(30);
+
+        // Define o bloqueio até a data
+        var result = await _userManager.SetLockoutEndDateAsync(user, dataExpiracao);
+
+        return result;
+    }
     private async Task<LoginResponse> GerarCredenciais(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);

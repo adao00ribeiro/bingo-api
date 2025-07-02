@@ -12,6 +12,7 @@ public interface IIdentityService
     Task<IdentityResult> UpdateUser(User identityUser);
     Task<LoginResponse> Login(LoginRequest usuarioLogin);
     Task<LoginResponse> LoginSemSenha(string usuarioId);
+    Task<IdentityResult> InactivateFor30Days(string userId);
     Task<User> GetByEmailAsync(string email);
 
 }
