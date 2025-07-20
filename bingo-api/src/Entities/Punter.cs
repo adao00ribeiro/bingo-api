@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Entities.Shared;
 using bingo_api.src.Interfaces.Services;
 
@@ -20,6 +21,7 @@ public class Punter : Entity, ITransactionParticipant
     public IEnumerable<Recharge>? Recharges { get; set; }
     public string IndicateTag { get; set; }
     public string? RegisteredWithTag { get; set; } // usado só uma vez
+    public IEnumerable<ScratchTicket> ScratchTickets { get; set; }
     public Punter()
     {
 

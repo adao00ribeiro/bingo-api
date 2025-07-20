@@ -2,6 +2,7 @@
 using System.Reflection;
 
 using bingo_api.src.Entities;
+using bingo_api.src.Entities.Scratch;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Context;
@@ -22,6 +23,8 @@ public class DataContext : DbContext
     public DbSet<BotConfig> BotConfigs { get; set; }
     public DbSet<TransactionHistory> TransactionHistories { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
+    public DbSet<ScratchGame> ScratchGames { get; set; }
+    public DbSet<ScratchTicket> ScratchTickets { get; set; }
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

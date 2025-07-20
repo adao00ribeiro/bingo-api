@@ -4,5 +4,6 @@ public enum TransactionType
     Deposit,
     Withdrawal,
     CardPurchased,
+    ScratchPurchased,
     Reward
 }

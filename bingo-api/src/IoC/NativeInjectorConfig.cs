@@ -16,6 +16,8 @@ using bingo_api.src.Interfaces.Jobs;
 using Npgsql;
 using bingo_api.src.Adapter;
 using bingo_api.src.Interceptors;
+using bingo_api.src.Interfaces.Repositories.Scratch;
+using bingo_api.src.Repositories.Scratch;
 
 
 namespace bingo_api.src.IoC;
@@ -77,6 +79,8 @@ public static class NativeInjectorConfig
         services.AddScoped<IBotConfigRepository, BotConfigRepository>();
         services.AddScoped<IAccumulatedRepository, AccumulatedRepository>();
         services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
+        services.AddScoped<IScratchGameRepository, ScratchGameRepository>();
+        services.AddScoped<IScratchTicketRepository, ScratchTicketRepository>();
         services.AddScoped<InsertBotRoundService>();
 
         //jobs
