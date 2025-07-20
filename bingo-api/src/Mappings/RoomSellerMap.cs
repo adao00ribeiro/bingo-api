@@ -26,13 +26,13 @@ public class RoomSellerMap : IEntityTypeConfiguration<RoomSeller>
 
         builder.Property(rs => rs.SellerId)
                .HasColumnName("seller_id");
-        builder.Property(x => x.CreateAt)
-                    .HasColumnName("create_at")
+        builder.Property(x => x.CreatedAt)
+                    .HasColumnName("created_at")
                     .IsRequired()
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.Property(x => x.UpdateAt)
-               .HasColumnName("update_at")
+        builder.Property(x => x.UpdatedAt)
+               .HasColumnName("updated_at")
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.HasOne(rs => rs.Room)

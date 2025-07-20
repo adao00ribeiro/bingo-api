@@ -85,8 +85,8 @@
     "incrementBallCumulative": true,
     "roomId": "13240740-5d00-44de-a0a0-fee61a7712db",
     "id": "e2732d25-8323-4cb3-8024-5d6c3e11f202",
-    "createAt": "2025-03-31T20:10:07.119107Z",
-    "updateAt": "2025-03-31T20:10:07.119107Z"
+    "CreatedAt": "2025-03-31T20:10:07.119107Z",
+    "UpdatedAt": "2025-03-31T20:10:07.119107Z"
   },
   "isAccumulated": false,
   "round": {

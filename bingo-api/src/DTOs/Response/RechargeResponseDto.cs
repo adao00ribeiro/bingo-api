@@ -26,9 +26,9 @@ public record RechargeResponseDto : EntityResponseDto
         string imagemQrcode,
         Guid punterId,
         PunterResponseDto? punter,
-        DateTime createAt,
-        DateTime updateAt
-        ) : base(id, createAt, updateAt)
+        DateTime CreatedAt,
+        DateTime UpdatedAt
+        ) : base(id, CreatedAt, UpdatedAt)
     {
         Id = id;
         Value = value;
@@ -37,8 +37,8 @@ public record RechargeResponseDto : EntityResponseDto
         ImagemQrcode = imagemQrcode;
         PunterId = punterId;
         Punter = punter;
-        CreateAt = createAt;
-        UpdateAt = updateAt;
+        CreatedAt = CreatedAt;
+        UpdatedAt = UpdatedAt;
     }
 
     internal static RechargeResponseDto ConvertToDto(Recharge recharge)
@@ -52,8 +52,8 @@ public record RechargeResponseDto : EntityResponseDto
             recharge.ImagemQrcode,
             recharge.PunterId,
             punterResponse,
-            recharge.CreateAt,
-            recharge.UpdateAt
+            recharge.CreatedAt,
+            recharge.UpdatedAt
         );
     }
 }
