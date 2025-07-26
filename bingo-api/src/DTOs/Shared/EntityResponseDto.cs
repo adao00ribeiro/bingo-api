@@ -6,11 +6,11 @@ public record EntityResponseDto
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public EntityResponseDto(Guid id, DateTime CreatedAt, DateTime UpdatedAt)
+    public EntityResponseDto(Guid id, DateTime createdAt, DateTime updatedAt)
     {
         Id = id;
-        CreatedAt = CreatedAt;
-        UpdatedAt = UpdatedAt;
+        CreatedAt = createdAt;
+        UpdatedAt = updatedAt;
     }
 
 }
