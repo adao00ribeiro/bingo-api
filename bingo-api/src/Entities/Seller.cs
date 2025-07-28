@@ -16,7 +16,7 @@ public class Seller : Entity, ITransactionParticipant
     public IEnumerable<RoomSeller> Rooms { get; set; }
     public IEnumerable<Room> OwnerRooms { get; set; }
     public IEnumerable<PaymentMethod> PaymentMethods { get; set; }
-
+    public IEnumerable<SellerWithdrawal> Withdrawals { get; set; }
     public Seller()
     {
 

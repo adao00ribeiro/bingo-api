@@ -169,6 +169,36 @@ namespace bingo_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "withdrawals",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    amount = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    status = table.Column<string>(type: "text", nullable: false),
+                    withdrawal_type = table.Column<string>(type: "character varying(500)", unicode: false, maxLength: 500, nullable: false),
+                    PunterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    SellerId = table.Column<Guid>(type: "uuid", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_withdrawals", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_withdrawals_punters_PunterId",
+                        column: x => x.PunterId,
+                        principalTable: "punters",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_withdrawals_sellers_SellerId",
+                        column: x => x.SellerId,
+                        principalTable: "sellers",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "accumulateds",
                 columns: table => new
                 {
@@ -450,6 +480,16 @@ namespace bingo_api.Migrations
                 name: "IX_rounds_room_id",
                 table: "rounds",
                 column: "room_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_withdrawals_PunterId",
+                table: "withdrawals",
+                column: "PunterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_withdrawals_SellerId",
+                table: "withdrawals",
+                column: "SellerId");
         }
 
         /// <inheritdoc />
@@ -475,6 +515,9 @@ namespace bingo_api.Migrations
 
             migrationBuilder.DropTable(
                 name: "transaction_histories");
+
+            migrationBuilder.DropTable(
+                name: "withdrawals");
 
             migrationBuilder.DropTable(
                 name: "cards");

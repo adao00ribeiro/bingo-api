@@ -5,6 +5,7 @@ using bingo_api.src.Enums;
 using bingo_api.src.Factory;
 using bingo_api.src.Interfaces.Jobs;
 using bingo_api.src.Interfaces.Repositories;
+using bingo_api.src.Services;
 using bingo_api.src.Structs;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,8 @@ namespace bingo_api.src.Jobs;
 public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
  IServiceScopeFactory scopeFactory,
  IWebSocketService _webSocketService,
- InsertBotRoundService _insertBotRoundServiceWinnerRepository
+ InsertBotRoundService _insertBotRoundServiceWinnerRepository,
+ TelegamNotifierService _notifier
 
  ) : IRoundExecutionJob
 {
@@ -22,6 +24,8 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
     private readonly ILogger<IRoundExecutionJob> _logger = logger;
     private readonly IWebSocketService webSocketService = _webSocketService;
     private readonly InsertBotRoundService InsertBotRoundService = _insertBotRoundServiceWinnerRepository;
+
+    private readonly TelegamNotifierService notifier = _notifier;
     private List<int> remainingNumbers = new List<int>();
 
     public async Task Execute(Guid roundId)
@@ -221,6 +225,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro no Job2 ao processar Round {RoundId}", roundId);
+            await notifier.SendMessageAsync($"❌ Erro no Job ao processar Round {roundId}: {ex.Message}");
             throw;
         }
     }

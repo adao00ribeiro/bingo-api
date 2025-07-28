@@ -719,6 +719,49 @@ namespace bingo_api.Migrations
                     b.ToTable("sellers", (string)null);
                 });
 
+            modelBuilder.Entity("bingo_api.src.Entities.Shared.Withdrawal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("withdrawal_type")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("withdrawals", (string)null);
+
+                    b.HasDiscriminator<string>("withdrawal_type").HasValue("Withdrawal");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("bingo_api.src.Entities.TransactionHistory", b =>
                 {
                     b.Property<Guid>("Id")
@@ -768,6 +811,30 @@ namespace bingo_api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("transaction_histories", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.PunterWithdrawal", b =>
+                {
+                    b.HasBaseType("bingo_api.src.Entities.Shared.Withdrawal");
+
+                    b.Property<Guid>("PunterId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("PunterId");
+
+                    b.HasDiscriminator().HasValue("Punter");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.SellerWithdrawal", b =>
+                {
+                    b.HasBaseType("bingo_api.src.Entities.Shared.Withdrawal");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("SellerId");
+
+                    b.HasDiscriminator().HasValue("Seller");
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Accumulated", b =>
@@ -931,6 +998,28 @@ namespace bingo_api.Migrations
                     b.Navigation("Room");
                 });
 
+            modelBuilder.Entity("bingo_api.src.Entities.PunterWithdrawal", b =>
+                {
+                    b.HasOne("bingo_api.src.Entities.Punter", "Punter")
+                        .WithMany("Withdrawals")
+                        .HasForeignKey("PunterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Punter");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.SellerWithdrawal", b =>
+                {
+                    b.HasOne("bingo_api.src.Entities.Seller", "Seller")
+                        .WithMany("Withdrawals")
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Seller");
+                });
+
             modelBuilder.Entity("bingo_api.src.Entities.Card", b =>
                 {
                     b.Navigation("CardWinners");
@@ -951,6 +1040,8 @@ namespace bingo_api.Migrations
                     b.Navigation("Cards");
 
                     b.Navigation("Recharges");
+
+                    b.Navigation("Withdrawals");
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Room", b =>
@@ -982,6 +1073,8 @@ namespace bingo_api.Migrations
                     b.Navigation("Punters");
 
                     b.Navigation("Rooms");
+
+                    b.Navigation("Withdrawals");
                 });
 #pragma warning restore 612, 618
         }

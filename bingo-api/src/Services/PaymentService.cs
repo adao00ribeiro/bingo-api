@@ -23,7 +23,7 @@ public class PaymentService : IPaymentService
     {
         if (!_providers.TryGetValue(method.Type, out var provider))
             throw new Exception("Tipo de pagamento não suportado");
-
+        
         return await provider.CreateRechargeAsync(value, punter, method);
     }
 }

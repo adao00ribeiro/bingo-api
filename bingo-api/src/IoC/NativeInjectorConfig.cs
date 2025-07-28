@@ -27,7 +27,7 @@ public static class NativeInjectorConfig
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("DatabasePostgreSQL"));
         dataSourceBuilder.EnableDynamicJson();
         var dataSource = dataSourceBuilder.Build();
-        services.AddDbContext<DataContext>((provider,options) =>
+        services.AddDbContext<DataContext>((provider, options) =>
           {
               var interceptor = provider.GetRequiredService<BalanceChangeInterceptor>();
               options.UseNpgsql(dataSource);
@@ -88,9 +88,12 @@ public static class NativeInjectorConfig
         services.AddScoped<ICardBuyService, CardBuyService>();
         services.AddScoped<IPaymentProvider, PixManualAdapter>();
         services.AddHttpClient<PushPayAdapter>();
+        services.AddHttpClient<TelegamNotifierService>();
         services.AddScoped<IPaymentProvider, PushPayAdapter>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IWithdrawalService, WithdrawalService>();
+        
 
 
     }
