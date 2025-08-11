@@ -6,7 +6,7 @@ namespace bingo_api.src.Adapter;
 
 public class PixManualAdapter : IPaymentProvider
 {
-    public Task<Recharge> CreateRechargeAsync(decimal value, Punter punter, PaymentMethod method)
+    public Task<Recharge> CreateRechargeAsync(decimal value, Punter punter, PaymentMethod method, string? network = null, string? Token = null, string? destinationAddress = null, string? txHash = null)
     {
         var recharge = new Recharge(value, ERechargeStatus.PENDING, punter.Id)
         {

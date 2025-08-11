@@ -16,6 +16,8 @@ using bingo_api.src.Interfaces.Jobs;
 using Npgsql;
 using bingo_api.src.Adapter;
 using bingo_api.src.Interceptors;
+using bingo_api.src.Interfaces.blockchain;
+using bingo_api.src.Factory;
 
 
 namespace bingo_api.src.IoC;
@@ -61,6 +63,7 @@ public static class NativeInjectorConfig
         services.AddSingleton<IWebSocketService, WebSocketService>();
 
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")));
+        services.AddSingleton<BlockchainServiceFactory>();
         //repository
         services.AddScoped<JwtSecurityExtensionEvents>();
         services.AddScoped<IIdentityService, IdentityService>();
@@ -77,6 +80,7 @@ public static class NativeInjectorConfig
         services.AddScoped<IBotConfigRepository, BotConfigRepository>();
         services.AddScoped<IAccumulatedRepository, AccumulatedRepository>();
         services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
+    
         services.AddScoped<InsertBotRoundService>();
 
         //jobs
@@ -93,7 +97,7 @@ public static class NativeInjectorConfig
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IWithdrawalService, WithdrawalService>();
-        
+
 
 
     }

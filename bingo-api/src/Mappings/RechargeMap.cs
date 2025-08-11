@@ -35,10 +35,35 @@ public class RechargeMap : IEntityTypeConfiguration<Recharge>
         builder.Property(r => r.ImagemQrcode)
                .HasColumnName("imagem_qrcode")
                .IsRequired()
-               .HasColumnType("text");  // para aceitar textos longos
+               .HasColumnType("text");  // para textos longos
 
         builder.Property(r => r.PunterId)
-               .HasColumnName("punter_id");
+               .HasColumnName("punter_id")
+               .IsRequired();
+
+              builder.Property(r => r.Network)
+                     .HasColumnName("network")
+                  .IsRequired(false)
+               .HasMaxLength(50);
+
+              builder.Property(r => r.Token)
+                     .HasColumnName("token")
+                 .IsRequired(false)
+               .HasMaxLength(50);
+
+              builder.Property(r => r.DestinationAddress)
+                     .HasColumnName("destination_address")
+                 .IsRequired(false)
+               .HasMaxLength(100);
+
+              builder.Property(r => r.TxHash)
+                     .HasColumnName("tx_hash")
+                 .IsRequired(false)
+               .HasMaxLength(100);
+
+              builder.Property(r => r.ConfirmedAt)
+                     .HasColumnName("confirmed_at")
+                       .IsRequired(false);
 
         builder.Property(x => x.CreatedAt)
                .HasColumnName("created_at")

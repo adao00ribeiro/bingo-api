@@ -6,6 +6,7 @@ using bingo_api.src.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using Nethereum.Signer;
 namespace bingo_api.src.Controllers;
 
 [ApiVersion("1.0")]
@@ -74,6 +75,18 @@ public class IdentityController(IIdentityService _identityService) : ApiControll
             return Ok(resultado);
         }
         return Unauthorized(resultado);
+    }
+    [HttpPost("login-wallet")]
+    public async Task<ActionResult<RegisterResponseDto>> LoginWallet(WalletLoginRequestDto  dto)
+    {
+          var signer = new EthereumMessageSigner();
+        var recoveredAddress = signer.EncodeUTF8AndEcRecover(dto.Message, dto.Signature);
+
+        if (!string.Equals(recoveredAddress, dto.Address, StringComparison.OrdinalIgnoreCase))
+            return Unauthorized("Assinatura inválida.");
+
+        // Autenticar o usuário (JWT, sessão, etc)
+        return Ok(new { token = "FAKE_JWT_OR_SESSION_TOKEN" });
     }
     [Authorize]
     [HttpPost("refresh-login")]

@@ -79,8 +79,19 @@ public class DataInitializer
                     false, // Apenas Pix está ativo por padrão
                     seller.Id
                 );
+                var cryptoMethod = new PaymentMethod
+                (
+                    "Crypto",
+                    Enums.EPaymentMethodType.CRYPTO,
+                   "SEU_TOKEN_PADRAO_SE_FOR_APLICÁVEL",
+                    "",
+                    "",
+                    false, // Apenas Pix está ativo por padrão
+                    seller.Id
+                );
                 _context.PaymentMethods.Add(pushPayMethod);
                 _context.PaymentMethods.Add(pixManualMethod);
+                _context.PaymentMethods.Add(cryptoMethod);
             }
             var identityUser = new User
             {
