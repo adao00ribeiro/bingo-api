@@ -2,6 +2,7 @@
 using System.Reflection;
 
 using bingo_api.src.Entities;
+using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Entities.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,9 @@ public class DataContext : DbContext
     public DbSet<TransactionHistory> TransactionHistories { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<Withdrawal> Withdrawals { get; set; }
+    public DbSet<Network> BlockchainNetworks { get; set; }
+    public DbSet<Token> BlockchainTokens { get; set; }
+    public DbSet<TokenAddress> BlockchainTokenAddresss { get; set; }
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -38,20 +42,20 @@ public class DataContext : DbContext
 
         modelBuilder.ApplyAllConfigurationsFromCurrentAssembly("bingo_api.src.Mappings");
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
- modelBuilder.Entity<Withdrawal>()
-        .HasDiscriminator<string>("withdrawal_type")
-        .HasValue<PunterWithdrawal>("Punter")
-        .HasValue<SellerWithdrawal>("Seller");
-        
-    modelBuilder.Entity<PunterWithdrawal>()
-        .HasOne(pw => pw.Punter)
-        .WithMany(p => p.Withdrawals)
-        .HasForeignKey(pw => pw.PunterId);
+        modelBuilder.Entity<Withdrawal>()
+               .HasDiscriminator<string>("withdrawal_type")
+               .HasValue<PunterWithdrawal>("Punter")
+               .HasValue<SellerWithdrawal>("Seller");
 
-    modelBuilder.Entity<SellerWithdrawal>()
-        .HasOne(sw => sw.Seller)
-        .WithMany(s => s.Withdrawals)
-        .HasForeignKey(sw => sw.SellerId);
+        modelBuilder.Entity<PunterWithdrawal>()
+            .HasOne(pw => pw.Punter)
+            .WithMany(p => p.Withdrawals)
+            .HasForeignKey(pw => pw.PunterId);
+
+        modelBuilder.Entity<SellerWithdrawal>()
+            .HasOne(sw => sw.Seller)
+            .WithMany(s => s.Withdrawals)
+            .HasForeignKey(sw => sw.SellerId);
 
 
         base.OnModelCreating(modelBuilder);

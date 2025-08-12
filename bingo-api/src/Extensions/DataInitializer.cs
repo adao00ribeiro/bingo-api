@@ -1,6 +1,7 @@
 using bingo_api.src.Constants;
 using bingo_api.src.Context;
 using bingo_api.src.Entities;
+using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
 
@@ -135,6 +136,57 @@ public class DataInitializer
 
             await this._botConfigRepository.CreateWithPuntersAsync(new BotConfig(room));
 
+        }
+
+        if (!_context.BlockchainNetworks.Any())
+        {
+            var bsc = new Network(
+                "BNB Smart Chain Testnet",
+                "https://data-seed-prebsc-1-s1.binance.org:8545",
+                97
+            );
+
+            _context.BlockchainNetworks.AddRange(bsc);
+            _context.SaveChanges();
+        }
+
+        if (!_context.BlockchainTokens.Any())
+        {
+            var usdt = new Token(
+                "USDT",
+                "USDT Testnet",
+                18
+            );
+            var tbnb = new Token(
+               "TBNB",
+               "",
+               6,
+               true
+           );
+
+            _context.BlockchainTokens.AddRange(usdt, tbnb);
+            _context.SaveChanges();
+        }
+
+        if (!_context.BlockchainTokenAddresss.Any())
+        {
+
+            var bscId = _context.BlockchainNetworks.First(n => n.Name == "BNB Smart Chain Testnet").Id;
+            var USDTId = _context.BlockchainTokens.First(t => t.Symbol == "USDT").Id;
+            var TBNBId = _context.BlockchainTokens.First(t => t.Symbol == "TBNB").Id;
+
+            var usdtBsc = new TokenAddress(
+                USDTId,
+                bscId,
+                "0x7ef95a0fee0b8ce4e3efbe19d7b2c349aef7f6f9"
+            );
+            var TBNBBsc = new TokenAddress(
+               TBNBId,
+               bscId,
+               ""
+           );
+            _context.BlockchainTokenAddresss.AddRange(usdtBsc,TBNBBsc);
+            _context.SaveChanges();
         }
     }
 }
