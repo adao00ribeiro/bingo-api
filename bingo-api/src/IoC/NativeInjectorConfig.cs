@@ -18,6 +18,7 @@ using bingo_api.src.Adapter;
 using bingo_api.src.Interceptors;
 using bingo_api.src.Interfaces.blockchain;
 using bingo_api.src.Factory;
+using bingo_api.src.Repositories.Blockchain;
 
 
 namespace bingo_api.src.IoC;
@@ -80,6 +81,9 @@ public static class NativeInjectorConfig
         services.AddScoped<IBotConfigRepository, BotConfigRepository>();
         services.AddScoped<IAccumulatedRepository, AccumulatedRepository>();
         services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
+        services.AddScoped<INetworkRepository, NetworkRepository>();
+        services.AddScoped<ITokenRepository, TokenRepository>();
+        services.AddScoped<ITokenAddressRepository, TokenAddressRepository>();
     
         services.AddScoped<InsertBotRoundService>();
 
