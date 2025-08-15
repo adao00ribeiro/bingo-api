@@ -14,7 +14,7 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync(int? pageNumber = null, int? pageSize = null,
     Expression<Func<TEntity, bool>>? filter = null,
     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-    params Expression<Func<TEntity, object>>[] includeProperties
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeProperties = null
     )
     {
         IQueryable<TEntity> query = BuildQueryWithIncludes(includeProperties);
@@ -110,14 +110,12 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
             property.SetValue(entity, localValue);
         }
     }
-    protected IQueryable<TEntity> BuildQueryWithIncludes(params Expression<Func<TEntity, object>>[] includeProperties)
+    protected IQueryable<TEntity> BuildQueryWithIncludes(Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeProperties)
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
-        foreach (var includeProperty in includeProperties)
-        {
-            query = query.Include(includeProperty);
-        }
+         if (includeProperties != null)
+        query = includeProperties(query);
 
         return query;
     }

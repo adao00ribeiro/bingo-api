@@ -16,10 +16,12 @@ public record TokenAddressResponseDto
     public NetworkResponseDto Network { get; set; } = null!;
 
 
-    internal static TokenAddressResponseDto ConvertToDto(TokenAddress tokenAddress)
+    internal static TokenAddressResponseDto ConvertToDto(TokenAddress tokenAddress,bool includeNetwork = true)
     {
         var tokenResponse = tokenAddress.Token != null ? TokenResponseDto.ConvertToDto(tokenAddress.Token) : null;
-        var networkResponse = tokenAddress.Network != null ? NetworkResponseDto.ConvertToDto(tokenAddress.Network) : null;
+        var networkResponse = includeNetwork && tokenAddress.Network != null
+                ? NetworkResponseDto.ConvertToDto(tokenAddress.Network, includeTokenAddresses: false)
+                : null;
 
         return new TokenAddressResponseDto
         {

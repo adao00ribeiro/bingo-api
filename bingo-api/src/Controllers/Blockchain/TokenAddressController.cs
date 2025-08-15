@@ -8,6 +8,7 @@ using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Interfaces.blockchain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Controllers.Blockchain;
 
@@ -28,9 +29,10 @@ public class TokenAddressController(ITokenAddressRepository tokenAddressReposito
         int totalCount;
         IEnumerable<TokenAddress> tokenAddress;
         totalCount = await _tokenAddressRepository.CountAsync();
-        tokenAddress = await _tokenAddressRepository.GetAllAsync(page, size ,includeProperties: [x => x.Network, x => x.Token] );
+        tokenAddress = await _tokenAddressRepository.GetAllAsync(page, size ,includeProperties:q => q.Include(x => x.Network)
+          .Include(x => x.Token) );
 
-        var networkResponse = tokenAddress.Select(TokenAddressResponseDto.ConvertToDto);
+        var networkResponse = tokenAddress.Select(t => TokenAddressResponseDto.ConvertToDto(t));
 
         return Ok(new PagedResponseDto<TokenAddressResponseDto>
         {

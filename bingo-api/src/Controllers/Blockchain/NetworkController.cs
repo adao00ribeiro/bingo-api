@@ -8,6 +8,7 @@ using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Interfaces.blockchain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Controllers.Blockchain;
 
@@ -26,9 +27,9 @@ public class NetworkController(INetworkRepository networkRepository) : ApiContro
         int totalCount;
         IEnumerable<Network> networks;
         totalCount = await _networkRepository.CountAsync();
-        networks = await _networkRepository.GetAllAsync(page, size);
+        networks = await _networkRepository.GetAllAsync(page, size , includeProperties: q => q.Include(x=>x.TokenAddresses).ThenInclude(t=>t.Token));
 
-        var networkResponse = networks.Select(NetworkResponseDto.ConvertToDto);
+        var networkResponse = networks.Select(n => NetworkResponseDto.ConvertToDto(n));
 
         return Ok(new PagedResponseDto<NetworkResponseDto>
         {

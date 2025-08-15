@@ -10,6 +10,7 @@ using Asp.Versioning;
 using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Repositories.Shared;
 using bingo_api.src.Entities;
+using Microsoft.EntityFrameworkCore;
 namespace bingo_api.src.Controllers;
 
 [Authorize]
@@ -24,7 +25,7 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PunterResponseDto>>> GetAll()
     {
-        var punters = await this.punterRepository.GetAllAsync(filter: x => x.IsBot == false, includeProperties: x => x.Seller);
+        var punters = await this.punterRepository.GetAllAsync(filter: x => x.IsBot == false, includeProperties: x => x.Include(x=> x.Seller));
         return Ok(punters.Select(p => PunterResponseDto.ConvertToDto(p)));
     }
     [HttpGet("me")]

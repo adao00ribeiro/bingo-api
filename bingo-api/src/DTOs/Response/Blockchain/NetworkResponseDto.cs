@@ -14,15 +14,21 @@ public record NetworkResponseDto
     public int ChainId { get; set; }
     public IEnumerable<TokenAddressResponseDto> TokenAddresses { get; set; } = null!;
 
-    internal static NetworkResponseDto ConvertToDto(Network network)
+    internal static NetworkResponseDto ConvertToDto(Network network ,  bool includeTokenAddresses = true)
     {
-        var tokenAddressesResponse = network.TokenAddresses?.Select(x => TokenAddressResponseDto.ConvertToDto(x)) ?? Enumerable.Empty<TokenAddressResponseDto>();
+        var tokenAddressesResponse = includeTokenAddresses 
+            ? network.TokenAddresses?
+                .Select(x => TokenAddressResponseDto.ConvertToDto(x, includeNetwork: false)) 
+                ?? Enumerable.Empty<TokenAddressResponseDto>()
+            : Enumerable.Empty<TokenAddressResponseDto>();
+      
         return new NetworkResponseDto
         {
             Id = network.Id,
             Name = network.Name,
             RpcUrl = network.RpcUrl,
             ChainId = network.ChainId,
+            TokenAddresses = tokenAddressesResponse
         };
     }
 }

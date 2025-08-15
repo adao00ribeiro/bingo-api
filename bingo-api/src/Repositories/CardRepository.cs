@@ -19,7 +19,7 @@ public class CardRepository : RepositoryBase<Card>, ICardRepository
         Context.SaveChanges();
     }
 
-    public async Task<IEnumerable<Card>> GetAllByRoundId(Guid punterId, Guid roundId, int? page = null, int? size = null, params Expression<Func<Card, object>>[] includeProperties)
+    public async Task<IEnumerable<Card>> GetAllByRoundId(Guid punterId, Guid roundId, int? page = null, int? size = null, Func<IQueryable<Card>, IQueryable<Card>>? includeProperties = null)
     {
         // Cria a consulta base com os Includes passados
         IQueryable<Card> query = base.BuildQueryWithIncludes(includeProperties);
