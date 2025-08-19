@@ -95,9 +95,10 @@ public static class NativeInjectorConfig
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();
         services.AddScoped<IPaymentProvider, PixManualAdapter>();
+        services.AddScoped<IPaymentProvider, CryptoAdapter>();
+        services.AddScoped<IPaymentProvider, PushPayAdapter>();
         services.AddHttpClient<PushPayAdapter>();
         services.AddHttpClient<TelegamNotifierService>();
-        services.AddScoped<IPaymentProvider, PushPayAdapter>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IWithdrawalService, WithdrawalService>();

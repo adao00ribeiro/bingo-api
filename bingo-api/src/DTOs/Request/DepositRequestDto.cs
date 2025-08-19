@@ -8,7 +8,7 @@ public record DepositRequestDto
     public decimal Value { get; set; }
     public string? Network { get; set; }
     public string? Token { get; set; } 
-    public string? transactionHash { get; set; } 
-    public string? address { get; set; } 
+    public string? TransactionHash { get; set; } 
+    public string? DestinationAddress { get; set; } 
 
 }

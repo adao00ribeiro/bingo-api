@@ -145,8 +145,12 @@ public class DataInitializer
                 "https://data-seed-prebsc-1-s1.binance.org:8545",
                 97
             );
-
-            _context.BlockchainNetworks.AddRange(bsc);
+            var tenderly = new Network(
+                "Tenderly Binance Rialto",
+                "https://virtual.binance-rialto.eu.rpc.tenderly.co/7d062b05-a250-47e7-af27-7ce855e8583a",
+                1336
+            );
+            _context.BlockchainNetworks.AddRange(bsc,tenderly);
             _context.SaveChanges();
         }
 
@@ -172,6 +176,7 @@ public class DataInitializer
         {
 
             var bscId = _context.BlockchainNetworks.First(n => n.Name == "BNB Smart Chain Testnet").Id;
+            var tenderlyId = _context.BlockchainNetworks.First(n => n.Name == "Tenderly Binance Rialto").Id;
             var USDTId = _context.BlockchainTokens.First(t => t.Symbol == "USDT").Id;
             var TBNBId = _context.BlockchainTokens.First(t => t.Symbol == "TBNB").Id;
 
@@ -185,7 +190,12 @@ public class DataInitializer
                bscId,
                ""
            );
-            _context.BlockchainTokenAddresss.AddRange(usdtBsc,TBNBBsc);
+             var TBNBtenderly = new TokenAddress(
+               TBNBId,
+               tenderlyId,
+               ""
+           );
+            _context.BlockchainTokenAddresss.AddRange(usdtBsc,TBNBBsc,TBNBtenderly);
             _context.SaveChanges();
         }
     }
