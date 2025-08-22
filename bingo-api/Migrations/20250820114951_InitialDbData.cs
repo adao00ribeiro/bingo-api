@@ -14,6 +14,41 @@ namespace bingo_api.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "blockchain_networks",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: false),
+                    rpc_url = table.Column<string>(type: "character varying(500)", unicode: false, maxLength: 500, nullable: false),
+                    chain_id = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    discarded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_blockchain_networks", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "blockchain_tokens",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    symbol = table.Column<string>(type: "character varying(20)", unicode: false, maxLength: 20, nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: false),
+                    decimals = table.Column<int>(type: "integer", nullable: false),
+                    is_native = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    discarded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_blockchain_tokens", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "card_buys",
                 columns: table => new
                 {
@@ -22,7 +57,8 @@ namespace bingo_api.Migrations
                     round_id = table.Column<Guid>(type: "uuid", nullable: false),
                     punter_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -42,7 +78,8 @@ namespace bingo_api.Migrations
                     comission = table.Column<decimal>(type: "numeric(15,2)", nullable: false),
                     indicate_reward_value = table.Column<decimal>(type: "numeric(15,2)", nullable: false, defaultValue: 20m),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -61,11 +98,41 @@ namespace bingo_api.Migrations
                     amount = table.Column<decimal>(type: "numeric(15,2)", nullable: false),
                     type = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_transaction_histories", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "blockchain_token_addresses",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    token_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    network_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    contract_address = table.Column<string>(type: "character varying(42)", unicode: false, maxLength: 42, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    discarded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_blockchain_token_addresses", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_blockchain_token_addresses_network_id",
+                        column: x => x.network_id,
+                        principalTable: "blockchain_networks",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_blockchain_token_addresses_token_id",
+                        column: x => x.token_id,
+                        principalTable: "blockchain_tokens",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -81,7 +148,8 @@ namespace bingo_api.Migrations
                     active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     seller_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -110,7 +178,8 @@ namespace bingo_api.Migrations
                     indicate_tag = table.Column<string>(type: "character varying(50)", unicode: false, maxLength: 50, nullable: false),
                     registered_with_tag = table.Column<string>(type: "character varying(50)", unicode: false, maxLength: 50, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -131,7 +200,8 @@ namespace bingo_api.Migrations
                     name = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: false),
                     owner_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -149,13 +219,20 @@ namespace bingo_api.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    network = table.Column<string>(type: "character varying(50)", unicode: false, maxLength: 50, nullable: true),
+                    token = table.Column<string>(type: "character varying(50)", unicode: false, maxLength: 50, nullable: true),
+                    destination_address = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: true),
+                    tx_hash = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: true),
+                    confirmed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     value = table.Column<decimal>(type: "numeric(15,2)", nullable: false),
+                    amount = table.Column<decimal>(type: "numeric(18,8)", nullable: false),
                     status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     qrcode = table.Column<string>(type: "character varying(200)", unicode: false, maxLength: 200, nullable: false),
                     imagem_qrcode = table.Column<string>(type: "text", unicode: false, maxLength: 500, nullable: false),
                     punter_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    discarded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -179,7 +256,8 @@ namespace bingo_api.Migrations
                     PunterId = table.Column<Guid>(type: "uuid", nullable: true),
                     SellerId = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -212,7 +290,8 @@ namespace bingo_api.Migrations
                     increment_ball_cumulative = table.Column<bool>(type: "boolean", nullable: false),
                     room_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -234,7 +313,8 @@ namespace bingo_api.Migrations
                     presence_rate = table.Column<double>(type: "double precision", nullable: false),
                     room_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -256,7 +336,8 @@ namespace bingo_api.Migrations
                     seller_id = table.Column<Guid>(type: "uuid", nullable: false),
                     assigned_by = table.Column<string>(type: "character varying(100)", unicode: false, maxLength: 100, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -292,7 +373,8 @@ namespace bingo_api.Migrations
                     room_id = table.Column<Guid>(type: "uuid", nullable: false),
                     timeline = table.Column<List<TimelineEvent>>(type: "jsonb", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -317,7 +399,8 @@ namespace bingo_api.Migrations
                     punter_id = table.Column<Guid>(type: "uuid", nullable: false),
                     card_buy_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -351,7 +434,8 @@ namespace bingo_api.Migrations
                     type = table.Column<int>(type: "integer", nullable: false),
                     round_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -373,7 +457,8 @@ namespace bingo_api.Migrations
                     card_id = table.Column<Guid>(type: "uuid", nullable: false),
                     prize_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    DiscardedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -396,6 +481,17 @@ namespace bingo_api.Migrations
                 name: "IX_accumulateds_room_id",
                 table: "accumulateds",
                 column: "room_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_blockchain_token_addresses_network_id",
+                table: "blockchain_token_addresses",
+                column: "network_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ux_blockchain_token_addresses_token_network",
+                table: "blockchain_token_addresses",
+                columns: new[] { "token_id", "network_id" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -499,6 +595,9 @@ namespace bingo_api.Migrations
                 name: "accumulateds");
 
             migrationBuilder.DropTable(
+                name: "blockchain_token_addresses");
+
+            migrationBuilder.DropTable(
                 name: "bot_configs");
 
             migrationBuilder.DropTable(
@@ -518,6 +617,12 @@ namespace bingo_api.Migrations
 
             migrationBuilder.DropTable(
                 name: "withdrawals");
+
+            migrationBuilder.DropTable(
+                name: "blockchain_networks");
+
+            migrationBuilder.DropTable(
+                name: "blockchain_tokens");
 
             migrationBuilder.DropTable(
                 name: "cards");

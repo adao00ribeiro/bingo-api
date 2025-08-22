@@ -3,7 +3,7 @@ using bingo_api.src.Interfaces.Repositories.Shared;
 
 namespace bingo_api.src.Interfaces.blockchain;
 
-public interface ITokenAddressRepository: IRepositoryBase<TokenAddress>
+public interface ITokenAddressRepository : IRepositoryBase<TokenAddress>
 {
-    
+    Task<TokenAddress?> GetByNetworkNameAndTokenSymbol(string networkName, string tokenName);
 }

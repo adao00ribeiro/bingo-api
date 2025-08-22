@@ -15,6 +15,7 @@ public class Recharge : Entity
     public string? TxHash { get; set; } // transaction hash sent by the user
     public DateTime? ConfirmedAt { get; set; } // date/time it was confirmed
     public decimal Value { get; set; }
+    public decimal Amount { get; set; }
     public ERechargeStatus Status { get; set; } = ERechargeStatus.COMPLETED;
     public string Qrcode { get; set; }
     public string ImagemQrcode { get; set; }
@@ -23,9 +24,10 @@ public class Recharge : Entity
     public bool IsConfirmed => ConfirmedAt.HasValue; // calculated property
 
 
-    public Recharge(decimal value, ERechargeStatus status, Guid punterId)
+    public Recharge(decimal value, decimal amount , ERechargeStatus status, Guid punterId)
     {
         this.Value = value;
+        this.Amount = amount;
         this.Status = status;
         this.Qrcode = "";
         this.ImagemQrcode = "";

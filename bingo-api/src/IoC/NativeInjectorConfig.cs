@@ -19,6 +19,7 @@ using bingo_api.src.Interceptors;
 using bingo_api.src.Interfaces.blockchain;
 using bingo_api.src.Factory;
 using bingo_api.src.Repositories.Blockchain;
+using bingo_api.src.Services.Blockchain;
 
 
 namespace bingo_api.src.IoC;
@@ -84,13 +85,17 @@ public static class NativeInjectorConfig
         services.AddScoped<INetworkRepository, NetworkRepository>();
         services.AddScoped<ITokenRepository, TokenRepository>();
         services.AddScoped<ITokenAddressRepository, TokenAddressRepository>();
-    
+        services.AddScoped<ITokenAddressRepository, TokenAddressRepository>();
+
+
+        services.AddScoped<BlockchainServiceFactory>();
         services.AddScoped<InsertBotRoundService>();
 
         //jobs
         services.AddScoped<IRoundFetcherJob, RoundFetcherJob>();
         services.AddScoped<IRoundExecutionJob, RoundExecutionJob>();
         services.AddScoped<IShowTimelineStepJob, ShowTimelineStepJob>();
+        services.AddScoped<DepositWatcher>();
 
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();
@@ -102,8 +107,9 @@ public static class NativeInjectorConfig
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IWithdrawalService, WithdrawalService>();
+        services.AddScoped<IBlockchainConfigService, BlockchainConfigService>();
 
-
+        services.AddHostedService<DepositWatcher>();
 
     }
 

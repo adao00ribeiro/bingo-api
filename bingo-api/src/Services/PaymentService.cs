@@ -20,11 +20,11 @@ public class PaymentService : IPaymentService
                 _ => throw new Exception("Adapter não registrado")
             });
     }
-    public async Task<Recharge> CreateRechargeAsync(decimal value, Punter punter, PaymentMethod method, string? network = null, string? Token = null, string? destinationAddress = null, string? txHash = null)
+    public async Task<Recharge> CreateRechargeAsync(decimal value,decimal amount, Punter punter, PaymentMethod method, string? network = null, string? Token = null, string? destinationAddress = null, string? txHash = null)
     {
         if (!_providers.TryGetValue(method.Type, out var provider))
             throw new Exception("Tipo de pagamento não suportado");
         
-        return await provider.CreateRechargeAsync(value, punter, method, network , Token , destinationAddress,txHash);
+        return await provider.CreateRechargeAsync(value, amount,punter, method, network , Token , destinationAddress,txHash);
     }
 }

@@ -630,6 +630,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric(18, 8)")
+                        .HasColumnName("amount");
+
                     b.Property<DateTime?>("ConfirmedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("confirmed_at");
@@ -647,7 +651,8 @@ namespace bingo_api.Migrations
                         .HasColumnName("destination_address");
 
                     b.Property<DateTime?>("DiscardedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("discarded_at");
 
                     b.Property<string>("ImagemQrcode")
                         .IsRequired()

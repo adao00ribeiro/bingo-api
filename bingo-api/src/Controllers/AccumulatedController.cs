@@ -3,16 +3,18 @@ using bingo_api.src.Controllers.Shared;
 using bingo_api.src.DTOs.Request;
 using bingo_api.src.DTOs.Response;
 using bingo_api.src.Interfaces.Repositories;
+using bingo_api.src.Jobs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.src.Controllers;
 
-[Authorize]
+
 [ApiVersion("1.0")]
-public class AccumulatedController(IAccumulatedRepository _repository) : ApiControllerBase
+public class AccumulatedController(IAccumulatedRepository _repository , DepositWatcher watch) : ApiControllerBase
 {
     private readonly IAccumulatedRepository accumulatedRepository = _repository;
+    private readonly DepositWatcher _watch = watch;
 
     [HttpGet("id/{id}")]
     public async Task<ActionResult<RoomResponseDto>> GetById(Guid id)
@@ -40,4 +42,5 @@ public class AccumulatedController(IAccumulatedRepository _repository) : ApiCont
 
         return Ok(AccumulatedResponseDto.ConvertToDto(objeto));
     }
+
 }

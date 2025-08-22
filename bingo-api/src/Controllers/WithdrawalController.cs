@@ -14,9 +14,9 @@ namespace bingo_api.src.Controllers;
 public class WithdrawalController(IWithdrawalService withdrawalService) : ApiControllerBase
 {
     private readonly IWithdrawalService _withdrawalService = withdrawalService;
-      
 
-       [HttpPost]
+
+    [HttpPost]
     public async Task<IActionResult> RequestWithdrawal([FromBody] WithdrawalRequestDto request)
     {
         if (!ModelState.IsValid)

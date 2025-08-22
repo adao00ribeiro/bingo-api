@@ -1,4 +1,5 @@
 using System.Numerics;
+using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Interfaces.blockchain;
 using bingo_api.src.Providers;
 using Nethereum.Hex.HexTypes;
@@ -10,67 +11,110 @@ namespace bingo_api.src.Services.Blockchain;
 
 public class EvmBlockchainService : IBlockchainService
 {
-     private readonly IBlockchainProvider _provider;
-    private readonly Dictionary<string, string> _tokenContracts;
+    private readonly IBlockchainProvider _provider;
+    private readonly List<TokenAddress> _tokenAddresses;
     private readonly ILogger<EvmBlockchainService>? _logger;
 
     public string NetworkName { get; }
 
-    public EvmBlockchainService(string networkName, IBlockchainProvider provider, Dictionary<string, string> tokenContracts, ILogger<EvmBlockchainService>? logger = null)
+    public EvmBlockchainService(string networkName, IBlockchainProvider provider, List<TokenAddress> tokenAddresses, ILogger<EvmBlockchainService>? logger = null)
     {
+
         NetworkName = networkName;
         _provider = provider ?? throw new ArgumentNullException(nameof(provider));
-        _tokenContracts = tokenContracts ?? throw new ArgumentNullException(nameof(tokenContracts));
+        _tokenAddresses = tokenAddresses ?? throw new ArgumentNullException(nameof(tokenAddresses));
         _logger = logger;
     }
 
     private Web3 Web3 => _provider.GetClient();
 
-    public async Task<int> GetTokenDecimalsAsync(string tokenSymbol)
+    private TokenAddress GetTokenAddress(string tokenName)
+    {
+        var tokenAddress = _tokenAddresses.FirstOrDefault(t =>
+            t.Token.Name.Equals(tokenName, StringComparison.OrdinalIgnoreCase));
+
+        if (tokenAddress == null)
+            throw new InvalidOperationException($"Token {tokenName} não encontrado para a rede {NetworkName}.");
+
+        return tokenAddress;
+    }
+
+    private bool IsNative(TokenAddress tokenAddress) =>
+       tokenAddress.Token.IsNative;
+
+    // ---------------- NATIVE ----------------
+    public async Task<decimal> GetNativeBalanceAsync(string address)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(tokenSymbol))
-                throw new ArgumentException("Símbolo do token não pode ser nulo ou vazio.", nameof(tokenSymbol));
-
-            if (!_tokenContracts.TryGetValue(tokenSymbol, out var contractAddress))
-                throw new InvalidOperationException($"Token {tokenSymbol} não encontrado na configuração.");
-            var tokenService = new StandardTokenService(Web3, contractAddress);
-            var decimals = await tokenService.DecimalsQueryAsync();
-            
-            _logger?.LogDebug("Token {TokenSymbol} tem {Decimals} casas decimais", tokenSymbol, decimals);
-            return (int)decimals;
+            var balanceWei = await Web3.Eth.GetBalance.SendRequestAsync(address);
+            var balance = Web3.Convert.FromWei(balanceWei);
+            _logger?.LogDebug("Saldo nativo da rede {NetworkName} para {Address}: {Balance}", NetworkName, address, balance);
+            return balance;
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Erro ao obter decimais do token {TokenSymbol}", tokenSymbol);
+            _logger?.LogError(ex, "Erro ao obter saldo nativo para {Address}", address);
             throw;
         }
     }
 
-  public async Task<decimal> GetTokenBalanceAsync(string address, string tokenSymbol)
+    public async Task<string> SendNativeAsync(string fromPrivateKey, string toAddress, decimal amount)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(address))
-                throw new ArgumentException("Endereço não pode ser nulo ou vazio.", nameof(address));
+            var account = new Account(fromPrivateKey);
+            var web3 = new Web3(account, ((EvmBlockchainProvider)_provider).GetRpcUrl());
 
-            if (string.IsNullOrWhiteSpace(tokenSymbol))
-                throw new ArgumentException("Símbolo do token não pode ser nulo ou vazio.", nameof(tokenSymbol));
+            var transaction = await web3.Eth.GetEtherTransferService()
+                .TransferEtherAndWaitForReceiptAsync(toAddress, amount);
 
-            if (!_tokenContracts.TryGetValue(tokenSymbol, out var contractAddress))
-                throw new InvalidOperationException($"Token {tokenSymbol} não encontrado na configuração.");
+            _logger?.LogInformation("Transferência nativa bem-sucedida. Hash: {TxHash}", transaction.TransactionHash);
+            return transaction.TransactionHash;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Erro ao enviar moeda nativa");
+            throw;
+        }
+    }
 
-            var web3 = Web3;
-            var tokenService = new StandardTokenService(web3, contractAddress);
-            
+    // ---------------- ERC20 ----------------
+    public async Task<int> GetTokenDecimalsAsync(string tokenName)
+    {
+        try
+        {
+            var tokenAddress = GetTokenAddress(tokenName);
+            if (IsNative(tokenAddress)) return 18; // padrão para ETH/BNB
+
+            var tokenService = new StandardTokenService(Web3, tokenAddress.ContractAddress);
+            var decimals = await tokenService.DecimalsQueryAsync();
+            _logger?.LogDebug("Token {TokenSymbol} tem {Decimals} casas decimais", tokenName, decimals);
+            return (int)decimals;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Erro ao obter decimais do token {TokenSymbol}", tokenName);
+            throw;
+        }
+    }
+
+    public async Task<decimal> GetTokenBalanceAsync(string address, string tokenSymbol)
+    {
+        try
+        {
+            var tokenAddress = GetTokenAddress(tokenSymbol);
+            if (IsNative(tokenAddress))
+                return await GetNativeBalanceAsync(address);
+
+            var tokenService = new StandardTokenService(Web3, tokenAddress.ContractAddress);
+
             var decimals = await tokenService.DecimalsQueryAsync();
             var balance = await tokenService.BalanceOfQueryAsync(address);
-            
-            // Conversão mais segura
+
             var divisor = BigInteger.Pow(10, (int)decimals);
             var balanceDecimal = (decimal)balance / (decimal)divisor;
-            
+
             _logger?.LogDebug("Saldo do token {TokenSymbol} para {Address}: {Balance}", tokenSymbol, address, balanceDecimal);
             return balanceDecimal;
         }
@@ -81,53 +125,33 @@ public class EvmBlockchainService : IBlockchainService
         }
     }
 
-
     public async Task<string> SendTokenAsync(string fromPrivateKey, string toAddress, decimal amount, string tokenSymbol)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(fromPrivateKey))
-                throw new ArgumentException("Chave privada não pode ser nula ou vazia.", nameof(fromPrivateKey));
+            var tokenAddress = GetTokenAddress(tokenSymbol);
 
-            if (string.IsNullOrWhiteSpace(toAddress))
-                throw new ArgumentException("Endereço de destino não pode ser nulo ou vazio.", nameof(toAddress));
+            if (IsNative(tokenAddress))
+                return await SendNativeAsync(fromPrivateKey, toAddress, amount);
 
-            if (amount <= 0)
-                throw new ArgumentException("Quantidade deve ser maior que zero.", nameof(amount));
-
-            if (!_tokenContracts.TryGetValue(tokenSymbol, out var contractAddress))
-                throw new InvalidOperationException($"Token {tokenSymbol} não encontrado na configuração.");
-
-            // Criar conta a partir da chave privada
             var account = new Account(fromPrivateKey);
             var web3 = new Web3(account, ((EvmBlockchainProvider)_provider).GetRpcUrl());
-            
-            var tokenService = new StandardTokenService(web3, contractAddress);
-            
-            // Obter decimais do token
-            var decimals = await tokenService.DecimalsQueryAsync();
-            
-            // Converter amount para a unidade base do token (wei-like)
-            var amountInSmallestUnit = Web3.Convert.ToWei(amount, (int)decimals);
-            
-            _logger?.LogInformation("Enviando {Amount} {TokenSymbol} de {From} para {To}", 
-                amount, tokenSymbol, account.Address, toAddress);
 
-            // Executar transferência
-            var transferReceipt = await tokenService.TransferRequestAndWaitForReceiptAsync(
-                toAddress, 
-                amountInSmallestUnit
-            );
+            var tokenService = new StandardTokenService(web3, tokenAddress.ContractAddress);
+            var decimals = await tokenService.DecimalsQueryAsync();
+            var amountInSmallestUnit = Web3.Convert.ToWei(amount, (int)decimals);
+
+            _logger?.LogInformation("Enviando {Amount} {TokenSymbol} de {From} para {To}", amount, tokenSymbol, account.Address, toAddress);
+
+            var transferReceipt = await tokenService.TransferRequestAndWaitForReceiptAsync(toAddress, amountInSmallestUnit);
 
             if (transferReceipt.Status != null && transferReceipt.Status.Value == 1)
             {
                 _logger?.LogInformation("Transferência bem-sucedida. Hash: {TxHash}", transferReceipt.TransactionHash);
                 return transferReceipt.TransactionHash;
             }
-            else
-            {
-                throw new InvalidOperationException($"Transferência falhou. Status: {transferReceipt.Status}");
-            }
+
+            throw new InvalidOperationException($"Transferência falhou. Status: {transferReceipt.Status}");
         }
         catch (Exception ex)
         {
@@ -136,87 +160,73 @@ public class EvmBlockchainService : IBlockchainService
         }
     }
 
-    public async Task<bool> VerifyTransactionAsync(string txHash, string expectedToAddress, decimal expectedAmount, string tokenSymbol)
+    // ---------------- VERIFICAÇÃO ----------------
+    public async Task<bool> VerifyTransactionAsync(string txHash, string expectedToAddress, decimal expectedAmount, string tokenName)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(txHash))
-                throw new ArgumentException("Hash da transação não pode ser nulo ou vazio.", nameof(txHash));
-
-            if (string.IsNullOrWhiteSpace(expectedToAddress))
-                throw new ArgumentException("Endereço esperado não pode ser nulo ou vazio.", nameof(expectedToAddress));
-
-            if (!_tokenContracts.TryGetValue(tokenSymbol, out var contractAddress))
-                throw new InvalidOperationException($"Token {tokenSymbol} não encontrado na configuração.");
-
+            var tokenAddress = GetTokenAddress(tokenName);
             var web3 = Web3;
-            
-            // Obter o recibo da transação
+
             var receipt = await web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(txHash);
-            if (receipt == null)
+            if (receipt == null || receipt.Status == null || receipt.Status.Value == 0)
             {
-                _logger?.LogWarning("Recibo da transação {TxHash} não encontrado", txHash);
+                _logger?.LogWarning("Transação {TxHash} falhou ou não encontrada", txHash);
                 return false;
             }
 
-            // Verificar se a transação foi bem-sucedida
-            if (receipt.Status == null || receipt.Status.Value == 0)
+            // caso seja nativo
+            if (IsNative(tokenAddress))
             {
-                _logger?.LogWarning("Transação {TxHash} falhou (status: {Status})", txHash, receipt.Status?.Value);
-                return false;
-            }
+                var tx = await web3.Eth.Transactions.GetTransactionByHash.SendRequestAsync(txHash);
+                if (tx == null) return false;
 
-            // Obter decimais do token
-            var decimals = await GetTokenDecimalsAsync(tokenSymbol);
-            var divisor = BigInteger.Pow(10, decimals);
-
-            // Analisar eventos Transfer nos logs
-            var transferEventSignature = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"; // Transfer(address,address,uint256)
-            
-            foreach (var logItem in receipt.Logs)
-            {
-                var log = logItem as Nethereum.RPC.Eth.DTOs.FilterLog;
-                if (log == null) continue;
-
-                // Verificar se é do contrato correto
-                if (!string.Equals(log.Address, contractAddress, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-        // Verificar se é um evento Transfer
-                if (log.Topics == null || log.Topics.Count() < 3)
-                    continue;
-
-                if (!string.Equals(log.Topics[0]?.ToString(), transferEventSignature, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                // Decodificar endereço 'to' (terceiro tópico)
-                var toAddressTopic = log.Topics[2]?.ToString() ?? "";
-                var toAddress = "0x" + toAddressTopic.Substring(26); // Remove os primeiros 26 caracteres (0x + 24 zeros)
-                
-                if (!string.Equals(toAddress, expectedToAddress, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                // Decodificar valor dos dados
-                if (string.IsNullOrEmpty(log.Data?.ToString()) || log.Data?.ToString() == "0x")
-                    continue;
-
-                var valueHex = log.Data?.ToString() ?? "0x0";
-                var value = new HexBigInteger(valueHex).Value;
-                var valueDecimal = (decimal)value / (decimal)divisor;
-
-                _logger?.LogDebug("Evento Transfer encontrado: {Value} para {ToAddress}", valueDecimal, toAddress);
-
-                // Verificar se o valor é pelo menos o esperado
-                if (valueDecimal >= expectedAmount)
+                var valueDecimal = Web3.Convert.FromWei(tx.Value.Value);
+                Console.WriteLine("opa" + valueDecimal);
+                if (string.Equals(tx.To, expectedToAddress, StringComparison.OrdinalIgnoreCase) && valueDecimal >= expectedAmount)
                 {
-                    _logger?.LogInformation("Transação verificada com sucesso. Valor: {ActualValue}, Esperado: {ExpectedValue}", 
-                        valueDecimal, expectedAmount);
+                    _logger?.LogInformation("Transação nativa verificada: valor {ActualValue}, esperado {ExpectedValue}", valueDecimal, expectedAmount);
                     return true;
                 }
-            }
 
-            _logger?.LogWarning("Evento Transfer não encontrado ou valor insuficiente para transação {TxHash}", txHash);
-            return false;
+                _logger?.LogWarning("Transação nativa {TxHash} não corresponde ao esperado", txHash);
+                return false;
+            }
+            else
+            {
+                var decimals = await GetTokenDecimalsAsync(tokenName);
+                var divisor = BigInteger.Pow(10, decimals);
+
+                var transferEventSignature = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+
+                foreach (var logItem in receipt.Logs)
+                {
+                    var log = logItem as Nethereum.RPC.Eth.DTOs.FilterLog;
+                    if (log == null || !string.Equals(log.Address, tokenAddress.ContractAddress, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    if (log.Topics == null || log.Topics.Length < 3)
+                        continue;
+
+                    if (!string.Equals(log.Topics[0]?.ToString(), transferEventSignature, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var toAddressTopic = log.Topics[2]?.ToString() ?? "";
+                    var toAddr = "0x" + toAddressTopic.Substring(26);
+
+                    if (!string.Equals(toAddr, expectedToAddress, StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    var value = new HexBigInteger(log.Data).Value;
+                    var valueDecimal = (decimal)value / (decimal)divisor;
+
+                    if (valueDecimal >= expectedAmount)
+                        _logger?.LogInformation("Transação verificada: valor {ActualValue}, esperado {ExpectedValue}", valueDecimal, expectedAmount);
+                    return true;
+                }
+                _logger?.LogWarning("Evento Transfer não encontrado ou valor insuficiente para {TxHash}", txHash);
+                return false;
+            }
         }
         catch (Exception ex)
         {
@@ -225,31 +235,21 @@ public class EvmBlockchainService : IBlockchainService
         }
     }
 
-    // Método auxiliar para validar endereço Ethereum
-    private static bool IsValidEthereumAddress(string address)
-    {
-        if (string.IsNullOrWhiteSpace(address))
-            return false;
-
-        return address.StartsWith("0x") && address.Length == 42 && 
-               address.Substring(2).All(c => char.IsAsciiHexDigit(c));
-    }
-
-    // Método para obter informações do token
+    // ---------------- INFO ----------------
     public async Task<(string Name, string Symbol, int Decimals)> GetTokenInfoAsync(string tokenSymbol)
     {
         try
         {
-            if (!_tokenContracts.TryGetValue(tokenSymbol, out var contractAddress))
-                throw new InvalidOperationException($"Token {tokenSymbol} não encontrado na configuração.");
+            var tokenAddress = GetTokenAddress(tokenSymbol);
 
-            var web3 = Web3;
-            var tokenService = new StandardTokenService(web3, contractAddress);
-            
+            if (IsNative(tokenAddress))
+                return (NetworkName, tokenSymbol.ToUpper(), 18);
+
+            var tokenService = new StandardTokenService(Web3, tokenAddress.ContractAddress);
             var name = await tokenService.NameQueryAsync();
             var symbol = await tokenService.SymbolQueryAsync();
             var decimals = await tokenService.DecimalsQueryAsync();
-            
+
             return (name, symbol, (int)decimals);
         }
         catch (Exception ex)

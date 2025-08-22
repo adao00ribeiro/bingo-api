@@ -74,7 +74,7 @@ public class DepositController(
             throw new Exception("Nenhum método de pagamento válido encontrado.");
         }
 
-        var recharge = await _paymentService.CreateRechargeAsync(dto.Value, punter, method, dto.Network, dto.Token , dto.destinationAddress , dto.TransactionHash);
+        var recharge = await _paymentService.CreateRechargeAsync(dto.Value ,dto.Amount, punter, method, dto.Network, dto.Token , dto.DestinationAddress , dto.TransactionHash);
         if (recharge == null)
         {
             throw new Exception("Não foi possível criar a recarga.");

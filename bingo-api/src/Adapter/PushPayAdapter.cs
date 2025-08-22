@@ -15,7 +15,7 @@ public class PushPayAdapter : IPaymentProvider
         _httpClient = httpClient;
     }
 
-    public async Task<Recharge> CreateRechargeAsync(decimal value, Punter punter, PaymentMethod method, string? network = null, string? Token = null, string? destinationAddress = null, string? txHash = null)
+    public async Task<Recharge> CreateRechargeAsync(decimal value, decimal amount, Punter punter, PaymentMethod method, string? network = null, string? Token = null, string? destinationAddress = null, string? txHash = null)
     {
         if (string.IsNullOrEmpty(method.Token))
         {

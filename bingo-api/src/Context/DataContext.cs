@@ -57,9 +57,28 @@ public class DataContext : DbContext
             .WithMany(s => s.Withdrawals)
             .HasForeignKey(sw => sw.SellerId);
 
-
+    foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+    {
+        foreach (var property in entityType.GetProperties())
+        {
+            if (property.ClrType == typeof(DateTime))
+            {
+                property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+                    v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(), // antes de salvar -> garante UTC
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc)            // ao ler do banco -> marca como UTC
+                ));
+            }
+            else if (property.ClrType == typeof(DateTime?))
+            {
+                property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime?, DateTime?>(
+                    v => v.HasValue ? (v.Value.Kind == DateTimeKind.Utc ? v : v.Value.ToUniversalTime()) : v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v
+                ));
+            }
+        }
+    }
         base.OnModelCreating(modelBuilder);
-
+    
         /*
         var allWithdrawals = await _context.Withdrawals.ToListAsync(); // Inclui ambos
         Buscar só de Seller:
