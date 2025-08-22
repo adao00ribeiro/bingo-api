@@ -66,6 +66,7 @@ builder.Services.AddAuthorizationPolicies();
 builder.Services.AddAuthorization();
 builder.Services.RegisterServices(builder.Configuration);
 builder.Services.AddHangfireServer();
+//builder.Services.AddRabbitMQService();
 var app = builder.Build();
 app.MigrateDatabase<DataContext>();
 app.MigrateDatabase<IdentityDataContext>();
