@@ -27,6 +27,7 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
     [HttpGet("filter/room/{id}")]
     public async Task<ActionResult<IEnumerable<RoundResponseDto>>> FilterByRoomIdAsync(Guid id)
     {
+
         var identity = User.Identity as ClaimsIdentity;
         var userEmail = identity?.FindFirst(ClaimTypes.Email)?.Value;
 
@@ -41,7 +42,7 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         {
             return NotFound();
         }
-
+            await Task.Delay(TimeSpan.FromSeconds(15));
         var rounds = await roundRepository.FilterByRoomIdAsync(id, punter.Id);
 
         var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
