@@ -66,6 +66,7 @@ builder.Services.AddAuthorizationPolicies();
 builder.Services.AddAuthorization();
 builder.Services.RegisterServices(builder.Configuration);
 builder.Services.AddHangfireServer();
+
 var app = builder.Build();
 app.MigrateDatabase<DataContext>();
 app.MigrateDatabase<IdentityDataContext>();
@@ -94,13 +95,14 @@ using (var scope = app.Services.CreateScope())
 }
 app.UseWebSockets();
 app.UseHsts();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseExceptionHandler();
 app.UseRouting();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHangfireJobs();
+app.MapHealthChecks("/health");
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     Authorization = HangFireDashboardAuthorization.AuthenticationFilters(builder.Configuration)

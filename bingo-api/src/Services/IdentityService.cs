@@ -9,6 +9,7 @@ using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace bingo_api.src.Services;
@@ -21,11 +22,18 @@ public class IdentityService : IIdentityService
     private readonly JwtOptions _jwtOptions;
     private readonly ISellerRepository _sellerRepository;
     private readonly IPunterRepository _punterRepository;
+    private readonly IEmailSenderService _emailSender;
+    private readonly IConfiguration _configuration;
+
+
     public IdentityService(DataContext dataContext, SignInManager<User> signInManager,
                            UserManager<User> userManager,
                            IOptions<JwtOptions> jwtOptions,
                            ISellerRepository sellerRepository,
-                           IPunterRepository punterRepository
+                           IPunterRepository punterRepository,
+                           IEmailSenderService emailSender,
+                                IConfiguration configuration
+
                            )
     {
         _dataContext = dataContext;
@@ -34,6 +42,8 @@ public class IdentityService : IIdentityService
         _jwtOptions = jwtOptions.Value;
         _sellerRepository = sellerRepository;
         _punterRepository = punterRepository;
+        _emailSender = emailSender;
+        _configuration = configuration;
 
     }
 
@@ -233,6 +243,39 @@ public class IdentityService : IIdentityService
         );
     }
 
+    public async Task<IActionResult> ForgotPasswordAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        // Retorno genérico por segurança
+        if (user == null)
+            return new OkObjectResult("Se este e-mail estiver registrado, você receberá um link para redefinir a senha.");
+
+        // Gerar token de reset
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = System.Web.HttpUtility.UrlEncode(resetToken);
+
+        var resetLink = $"{_configuration["ConnectionStrings:HostUrl"]}reset-password?email={user.Email}&token={encodedToken}";
+
+        // Enviar e-mail com fallback SMTP
+        await _emailSender.SendEmailAsync(user.Email, "Recuperação de senha",
+            $"Olá!<br>Clique aqui para redefinir sua senha: <a href='{resetLink}'>Redefinir senha</a>");
+
+        return new OkObjectResult("Se este e-mail estiver registrado, você receberá um link para redefinir a senha.");
+    }
+        public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequestDto request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null)
+            return new BadRequestObjectResult("Usuário não encontrado.");
+
+        var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+        if (result.Succeeded)
+            return new OkObjectResult("Senha redefinida com sucesso.");
+
+        return new BadRequestObjectResult(result.Errors.Select(e => e.Description));
+    }
     private string GerarToken(IEnumerable<Claim> claims, DateTime dataExpiracao)
     {
         var audiences = _jwtOptions.Audience

@@ -9,10 +9,10 @@ using Asp.Versioning;
 namespace bingo_api.src.Controllers;
 
 [ApiVersion("1.0")]
-public class IdentityController(IIdentityService _identityService) : ApiControllerBase
+public class IdentityController(IIdentityService _identityService , IEmailSenderService _emailSenderService) : ApiControllerBase
 {
     private readonly IIdentityService identityService = _identityService;
-
+     private readonly IEmailSenderService emailSender = _emailSenderService;
 
     [HttpPost("cadastro/seller")]
     public async Task<IActionResult> CadastrarSeller(SellerRequestDto dto)
@@ -89,5 +89,19 @@ public class IdentityController(IIdentityService _identityService) : ApiControll
             return Ok(resultado);
 
         return Unauthorized();
+    }
+
+    [HttpPost("forgot-password")]
+      [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
+    {
+        return await _identityService.ForgotPasswordAsync(model.Email);
+    }
+
+    [HttpPost("reset-password")]
+      [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
+    {
+        return await _identityService.ResetPasswordAsync(request);
     }
 }

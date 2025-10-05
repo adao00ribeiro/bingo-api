@@ -33,7 +33,11 @@ public static class AuthenticationSetup
             options.Password.RequireUppercase = true;
             options.Password.RequiredLength = 6;
         });
-
+        // Token de reset de senha válido por 10 minutos
+        services.Configure<DataProtectionTokenProviderOptions>(opt =>
+        {
+            opt.TokenLifespan = TimeSpan.FromMinutes(10);
+        });
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
