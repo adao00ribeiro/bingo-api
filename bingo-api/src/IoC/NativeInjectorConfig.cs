@@ -16,6 +16,7 @@ using bingo_api.src.Interfaces.Jobs;
 using Npgsql;
 using bingo_api.src.Adapter;
 using bingo_api.src.Interceptors;
+using bingo_api.src.Structs;
 
 
 namespace bingo_api.src.IoC;
@@ -93,8 +94,12 @@ public static class NativeInjectorConfig
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IWithdrawalService, WithdrawalService>();
-        
 
+        services.AddSingleton<IEmailSenderService, MailKitEmailSenderService>();
+        services.Configure<EmailOptions>(configuration.GetSection("Email"));
+        services.AddHealthChecks()
+            .AddCheck("smtp_primary", new SmtpHealthCheck(configuration.GetSection("Email:PrimarySmtp").Get<SmtpSettings>()));
+  
 
     }
 
