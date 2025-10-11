@@ -243,13 +243,13 @@ public class IdentityService : IIdentityService
         );
     }
 
-    public async Task<IActionResult> ForgotPasswordAsync(string email)
+    public async Task<bool> ForgotPasswordAsync(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
 
         // Retorno genérico por segurança
         if (user == null)
-            return new OkObjectResult("Se este e-mail estiver registrado, você receberá um link para redefinir a senha.");
+            return false;
 
         // Gerar token de reset
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -261,9 +261,9 @@ public class IdentityService : IIdentityService
         await _emailSender.SendEmailAsync(user.Email, "Recuperação de senha",
             $"Olá!<br>Clique aqui para redefinir sua senha: <a href='{resetLink}'>Redefinir senha</a>");
 
-        return new OkObjectResult("Se este e-mail estiver registrado, você receberá um link para redefinir a senha.");
+        return true;
     }
-        public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequestDto request)
+       public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequestDto request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)

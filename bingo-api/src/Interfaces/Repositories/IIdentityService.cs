@@ -15,6 +15,6 @@ public interface IIdentityService
     Task<LoginResponse> LoginSemSenha(string usuarioId);
     Task<IdentityResult> InactivateFor30Days(string userId);
     Task<User> GetByEmailAsync(string email);
-    Task<IActionResult> ForgotPasswordAsync(string email);
+    Task<bool> ForgotPasswordAsync(string email);
     Task<IActionResult> ResetPasswordAsync(ResetPasswordRequestDto request);
 }

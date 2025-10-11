@@ -92,8 +92,8 @@ public class IdentityController(IIdentityService _identityService , IEmailSender
     }
 
     [HttpPost("forgot-password")]
-      [AllowAnonymous]
-    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
+    [AllowAnonymous]
+    public async Task<bool> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
     {
         return await _identityService.ForgotPasswordAsync(model.Email);
     }
