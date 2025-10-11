@@ -66,7 +66,6 @@ builder.Services.AddAuthorizationPolicies();
 builder.Services.AddAuthorization();
 builder.Services.RegisterServices(builder.Configuration);
 builder.Services.AddHangfireServer();
-
 var app = builder.Build();
 app.MigrateDatabase<DataContext>();
 app.MigrateDatabase<IdentityDataContext>();

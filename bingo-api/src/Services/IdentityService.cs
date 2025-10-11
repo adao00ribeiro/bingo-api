@@ -47,7 +47,7 @@ public class IdentityService : IIdentityService
 
     }
 
-    public async Task<RegisterResponseDto> CadastrarPunter(User identityUser, Punter punter)
+    public async Task<ResultResponseDto> CadastrarPunter(User identityUser, Punter punter)
     {
         await using var transaction = await this._dataContext.Database.BeginTransactionAsync();
 
@@ -99,7 +99,7 @@ public class IdentityService : IIdentityService
 
 
             await transaction.CommitAsync();
-            return new RegisterResponseDto(true);
+            return new ResultResponseDto(true);
         }
         catch (Exception ex)
         {
@@ -109,7 +109,7 @@ public class IdentityService : IIdentityService
 
     }
 
-    public async Task<RegisterResponseDto> CadastrarSeller(User identityUser, Seller seller)
+    public async Task<ResultResponseDto> CadastrarSeller(User identityUser, Seller seller)
     {
         await using var transaction = await this._dataContext.Database.BeginTransactionAsync();
         try
@@ -129,7 +129,7 @@ public class IdentityService : IIdentityService
             var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Seller);
 
 
-            var response = new RegisterResponseDto(createResult.Succeeded);
+            var response = new ResultResponseDto(createResult.Succeeded);
 
 
             if (!createResult.Succeeded && createResult.Errors.Any())
@@ -148,7 +148,7 @@ public class IdentityService : IIdentityService
         }
         catch (Exception ex)
         {
-            var usuarioCadastroResponse = new RegisterResponseDto(false);
+            var usuarioCadastroResponse = new ResultResponseDto(false);
             usuarioCadastroResponse.AdicionarErros(new List<string> { ex.Message });
             return usuarioCadastroResponse;
         }
@@ -253,6 +253,7 @@ public class IdentityService : IIdentityService
 
         // Gerar token de reset
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
         var encodedToken = System.Web.HttpUtility.UrlEncode(resetToken);
 
         var resetLink = $"{_configuration["ConnectionStrings:HostUrl"]}reset-password?email={user.Email}&token={encodedToken}";
@@ -263,18 +264,20 @@ public class IdentityService : IIdentityService
 
         return true;
     }
-       public async Task<IActionResult> ResetPasswordAsync(ResetPasswordRequestDto request)
+    public async Task<ResultResponseDto> ResetPasswordAsync(ResetPasswordRequestDto request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
-            return new BadRequestObjectResult("Usuário não encontrado.");
+            return new ResultResponseDto(false, "Usuário não encontrado.");
+
 
         var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
 
         if (result.Succeeded)
-            return new OkObjectResult("Senha redefinida com sucesso.");
-
-        return new BadRequestObjectResult(result.Errors.Select(e => e.Description));
+            return new ResultResponseDto(true, "Senha redefinida com sucesso.");
+        var res = new ResultResponseDto(false);
+        res.AdicionarErros(result.Errors.Select(e => e.Description));
+        return res;
     }
     private string GerarToken(IEnumerable<Claim> claims, DateTime dataExpiracao)
     {

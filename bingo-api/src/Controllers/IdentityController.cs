@@ -9,10 +9,10 @@ using Asp.Versioning;
 namespace bingo_api.src.Controllers;
 
 [ApiVersion("1.0")]
-public class IdentityController(IIdentityService _identityService , IEmailSenderService _emailSenderService) : ApiControllerBase
+public class IdentityController(IIdentityService _identityService, IEmailSenderService _emailSenderService) : ApiControllerBase
 {
     private readonly IIdentityService identityService = _identityService;
-     private readonly IEmailSenderService emailSender = _emailSenderService;
+    private readonly IEmailSenderService emailSender = _emailSenderService;
 
     [HttpPost("cadastro/seller")]
     public async Task<IActionResult> CadastrarSeller(SellerRequestDto dto)
@@ -62,7 +62,7 @@ public class IdentityController(IIdentityService _identityService , IEmailSender
         }
     }
     [HttpPost("login")]
-    public async Task<ActionResult<RegisterResponseDto>> Login(LoginRequest usuarioLogin)
+    public async Task<ActionResult<ResultResponseDto>> Login(LoginRequest usuarioLogin)
     {
         if (!ModelState.IsValid)
             return BadRequest();
@@ -77,7 +77,7 @@ public class IdentityController(IIdentityService _identityService , IEmailSender
     }
     [Authorize]
     [HttpPost("refresh-login")]
-    public async Task<ActionResult<RegisterResponseDto>> RefreshLogin()
+    public async Task<ActionResult<ResultResponseDto>> RefreshLogin()
     {
         var identity = HttpContext.User.Identity as ClaimsIdentity;
         var usuarioId = identity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -99,9 +99,14 @@ public class IdentityController(IIdentityService _identityService , IEmailSender
     }
 
     [HttpPost("reset-password")]
-      [AllowAnonymous]
+    [AllowAnonymous]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
     {
-        return await _identityService.ResetPasswordAsync(request);
+        var result = await _identityService.ResetPasswordAsync(request);
+
+        if (result.Sucesso)
+            return Ok(result);
+
+        return BadRequest(result);
     }
 }
