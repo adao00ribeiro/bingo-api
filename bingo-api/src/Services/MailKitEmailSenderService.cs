@@ -2,7 +2,6 @@ using MailKit.Net.Smtp;
 using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Structs;
 using MailKit.Security;
-using Microsoft.Extensions.Options;
 using MimeKit;
 using Polly;
 using Polly.Retry;
@@ -11,14 +10,14 @@ namespace bingo_api.src.Services;
 
 public class MailKitEmailSenderService : IEmailSenderService
 {
-    private readonly EmailOptions _options;
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly IWebHostEnvironment _env;
-    public MailKitEmailSenderService(IOptions<EmailOptions> options, IWebHostEnvironment env)
-    {
-        _options = options.Value;
-        _env = env;
 
+    public MailKitEmailSenderService( IWebHostEnvironment env)
+    {
+     
+        _env = env;
+    
         // configurar retry: por exemplo, 3 tentativas para falhas transitórias
         _retryPolicy = Policy
             .Handle<Exception>()
@@ -32,11 +31,11 @@ public class MailKitEmailSenderService : IEmailSenderService
                 });
     }
 
-    public async Task SendEmailAsync(string to, string subject, string htmlBody, CancellationToken cancellationToken = default)
+    public async Task SendEmailAsync(string to, string subject, string htmlBody,EmailOptions options, CancellationToken cancellationToken = default)
     {
-    
+       
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(_options.FromName, _options.FromAddress));
+        message.From.Add(new MailboxAddress(options.FromName, options.FromAddress));
         message.To.Add(MailboxAddress.Parse(to));
         message.Subject = subject;
 
@@ -64,7 +63,7 @@ public class MailKitEmailSenderService : IEmailSenderService
         // Tentar primeiro com Primary, se falhar, tentar com Secondary
         try
         {
-            await _retryPolicy.ExecuteAsync(() => SendWithSmtp(_options.PrimarySmtp));
+            await _retryPolicy.ExecuteAsync(() => SendWithSmtp(options.PrimarySmtp));
         }
         catch (Exception primaryEx)
         {

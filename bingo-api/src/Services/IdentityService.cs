@@ -24,6 +24,7 @@ public class IdentityService : IIdentityService
     private readonly IPunterRepository _punterRepository;
     private readonly IEmailSenderService _emailSender;
     private readonly IConfiguration _configuration;
+    private readonly TelegamNotifierService _notifier;
 
 
     public IdentityService(DataContext dataContext, SignInManager<User> signInManager,
@@ -32,7 +33,8 @@ public class IdentityService : IIdentityService
                            ISellerRepository sellerRepository,
                            IPunterRepository punterRepository,
                            IEmailSenderService emailSender,
-                                IConfiguration configuration
+                                IConfiguration configuration,
+                            TelegamNotifierService notifier
 
                            )
     {
@@ -44,6 +46,7 @@ public class IdentityService : IIdentityService
         _punterRepository = punterRepository;
         _emailSender = emailSender;
         _configuration = configuration;
+        _notifier = notifier;
 
     }
 
@@ -247,8 +250,10 @@ public class IdentityService : IIdentityService
     {
         var user = await _userManager.FindByEmailAsync(email);
 
+        var punter = await _punterRepository.GetByEmailAsync(email);
+
         // Retorno genérico por segurança
-        if (user == null)
+        if (user == null && punter == null)
             return false;
 
         // Gerar token de reset
@@ -257,10 +262,15 @@ public class IdentityService : IIdentityService
         var encodedToken = System.Web.HttpUtility.UrlEncode(resetToken);
 
         var resetLink = $"{_configuration["ConnectionStrings:HostUrl"]}reset-password?email={user.Email}&token={encodedToken}";
-
+        
+        if (punter.Seller.Settings.EmailConfig == null)
+        {
+            await _notifier.SendMessageAsync($"⚠️ Configuracao STMP Null para Vendedor {punter.SellerId} ");
+            return false;
+        }
         // Enviar e-mail com fallback SMTP
         await _emailSender.SendEmailAsync(user.Email, "Recuperação de senha",
-            $"Olá!<br>Clique aqui para redefinir sua senha: <a href='{resetLink}'>Redefinir senha</a>");
+            $"Olá!<br>Clique aqui para redefinir sua senha: <a href='{resetLink}'>Redefinir senha</a>", punter.Seller.Settings.EmailConfig);
 
         return true;
     }

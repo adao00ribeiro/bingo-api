@@ -96,9 +96,9 @@ public static class NativeInjectorConfig
         services.AddScoped<IWithdrawalService, WithdrawalService>();
 
         services.AddSingleton<IEmailSenderService, MailKitEmailSenderService>();
-        services.Configure<EmailOptions>(configuration.GetSection("Email"));
-        services.AddHealthChecks()
-            .AddCheck("smtp_primary", new SmtpHealthCheck(configuration.GetSection("Email:PrimarySmtp").Get<SmtpSettings>()));
+      
+       // services.AddHealthChecks()
+         //   .AddCheck("smtp_primary", new SmtpHealthCheck(configuration.GetSection("Email:PrimarySmtp").Get<SmtpSettings>()));
   
 
     }
