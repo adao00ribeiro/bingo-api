@@ -35,10 +35,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("activated");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("CumulativePercentage")
@@ -69,10 +69,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("room_id");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -90,10 +90,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<bool>("Enabled")
@@ -108,10 +108,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("room_id");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -137,10 +137,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("code");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Name")
@@ -163,10 +163,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("round_id");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -187,10 +187,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<Guid>("PunterId")
@@ -205,10 +205,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("round_id");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -227,20 +227,20 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("card_id");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<Guid>("PrizeId")
                         .HasColumnType("uuid")
                         .HasColumnName("prize_id");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("Value")
@@ -269,10 +269,10 @@ namespace bingo_api.Migrations
                         .HasDefaultValue(true)
                         .HasColumnName("active");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Instructions")
@@ -308,10 +308,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("type");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -328,10 +328,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<Guid>("RoundId")
@@ -342,10 +342,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("type");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("Value")
@@ -377,10 +377,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("character varying(11)")
                         .HasColumnName("cpf");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime>("DateBirth")
@@ -428,10 +428,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("seller_id");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -455,10 +455,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("ImagemQrcode")
@@ -485,10 +485,10 @@ namespace bingo_api.Migrations
                         .HasDefaultValue(0)
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("Value")
@@ -509,10 +509,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Name")
@@ -526,10 +526,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("owner_id");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -553,10 +553,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("assigned_by");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<Guid>("RoomId")
@@ -567,10 +567,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("seller_id");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -607,10 +607,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("numeric(15, 2)")
                         .HasColumnName("card_value");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("Finished")
@@ -647,10 +647,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("timeline");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
@@ -682,10 +682,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("character varying(11)")
                         .HasColumnName("cpf");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime>("DateBirth")
@@ -708,15 +708,65 @@ namespace bingo_api.Migrations
                     b.Property<decimal>("PrizeBalance")
                         .HasColumnType("numeric");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<SellerSettings>("Settings")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("settings")
+                        .HasDefaultValueSql("'{}'::jsonb");
+
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
                     b.ToTable("sellers", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Shared.Withdrawal", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("withdrawal_type")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("withdrawals", (string)null);
+
+                    b.HasDiscriminator<string>("withdrawal_type").HasValue("Withdrawal");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.TransactionHistory", b =>
@@ -730,10 +780,10 @@ namespace bingo_api.Migrations
                         .HasColumnType("decimal(15,2)")
                         .HasColumnName("amount");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at")
+                        .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<decimal>("CurrentBalance")
@@ -759,15 +809,39 @@ namespace bingo_api.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("type");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at")
+                        .HasColumnName("updated_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.HasKey("Id");
 
                     b.ToTable("transaction_histories", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.PunterWithdrawal", b =>
+                {
+                    b.HasBaseType("bingo_api.src.Entities.Shared.Withdrawal");
+
+                    b.Property<Guid>("PunterId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("PunterId");
+
+                    b.HasDiscriminator().HasValue("Punter");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.SellerWithdrawal", b =>
+                {
+                    b.HasBaseType("bingo_api.src.Entities.Shared.Withdrawal");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("SellerId");
+
+                    b.HasDiscriminator().HasValue("Seller");
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Accumulated", b =>
@@ -931,6 +1005,28 @@ namespace bingo_api.Migrations
                     b.Navigation("Room");
                 });
 
+            modelBuilder.Entity("bingo_api.src.Entities.PunterWithdrawal", b =>
+                {
+                    b.HasOne("bingo_api.src.Entities.Punter", "Punter")
+                        .WithMany("Withdrawals")
+                        .HasForeignKey("PunterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Punter");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.SellerWithdrawal", b =>
+                {
+                    b.HasOne("bingo_api.src.Entities.Seller", "Seller")
+                        .WithMany("Withdrawals")
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Seller");
+                });
+
             modelBuilder.Entity("bingo_api.src.Entities.Card", b =>
                 {
                     b.Navigation("CardWinners");
@@ -951,6 +1047,8 @@ namespace bingo_api.Migrations
                     b.Navigation("Cards");
 
                     b.Navigation("Recharges");
+
+                    b.Navigation("Withdrawals");
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Room", b =>
@@ -982,6 +1080,8 @@ namespace bingo_api.Migrations
                     b.Navigation("Punters");
 
                     b.Navigation("Rooms");
+
+                    b.Navigation("Withdrawals");
                 });
 #pragma warning restore 612, 618
         }

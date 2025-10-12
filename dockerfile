@@ -22,6 +22,11 @@ ENV JwtOptions__Audience=${JwtOptions__Audience}
 ARG JwtOptions__SecurityKey=${JwtOptions__SecurityKey}
 ENV JwtOptions__SecurityKey=${JwtOptions__SecurityKey}
 
+ARG TelegramBot__Token=${TelegramBot__Token}
+ENV TelegramBot__Token=${TelegramBot__Token}
+ARG TelegramBot__ChatId=${TelegramBot__ChatId}
+ENV TelegramBot__ChatId=${TelegramBot__ChatId}
+
 WORKDIR /app/api
 
 COPY *.sln ./

@@ -13,8 +13,8 @@ public record TransactionHistoryResponseDto : EntityResponseDto
     public decimal Amount { get; set; }
     public TransactionType Type { get; set; }
 
-    public TransactionHistoryResponseDto(Guid id, DateTime createAt, DateTime updateAt, Guid entityId, string entityType, decimal previousBalance, decimal amount, decimal currentBalance, TransactionType type)
-    : base(id, createAt, updateAt)
+    public TransactionHistoryResponseDto(Guid id, DateTime CreatedAt, DateTime UpdatedAt, Guid entityId, string entityType, decimal previousBalance, decimal amount, decimal currentBalance, TransactionType type)
+    : base(id, CreatedAt, UpdatedAt)
     {
         EntityId = entityId;
         EntityType = entityType;
@@ -29,8 +29,8 @@ public record TransactionHistoryResponseDto : EntityResponseDto
     {
         return new TransactionHistoryResponseDto(
             r.Id,
-            r.CreateAt,
-            r.UpdateAt,
+            r.CreatedAt,
+            r.UpdatedAt,
             r.EntityId,
             r.EntityType,
             r.PreviousBalance,

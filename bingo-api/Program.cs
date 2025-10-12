@@ -94,13 +94,14 @@ using (var scope = app.Services.CreateScope())
 }
 app.UseWebSockets();
 app.UseHsts();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseExceptionHandler();
 app.UseRouting();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHangfireJobs();
+//app.MapHealthChecks("/health");
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     Authorization = HangFireDashboardAuthorization.AuthenticationFilters(builder.Configuration)

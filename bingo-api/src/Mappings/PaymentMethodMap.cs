@@ -15,13 +15,13 @@ public class PaymentMethodMap : IEntityTypeConfiguration<PaymentMethod>
                .HasColumnName("id")
                .ValueGeneratedOnAdd();
 
-        builder.Property(pm => pm.CreateAt)
-               .HasColumnName("create_at")
+        builder.Property(pm => pm.CreatedAt)
+               .HasColumnName("created_at")
                .IsRequired()
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.Property(pm => pm.UpdateAt)
-               .HasColumnName("update_at")
+        builder.Property(pm => pm.UpdatedAt)
+               .HasColumnName("updated_at")
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.Property(pm => pm.Name)

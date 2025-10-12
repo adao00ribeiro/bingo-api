@@ -8,6 +8,8 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using bingo_api.src.Entities;
+using bingo_api.src.Repositories.Shared;
 
 namespace bingo_api.src.Controllers;
 
@@ -85,7 +87,37 @@ public class SellerController(ISellerRepository _sellerRepository) : ApiControll
         await sellerRepository.UpdateAsync(seller);
         return Ok();
     }
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Patch(Guid id , [FromBody] SellerPatchRequestDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
+        var entityId = User.FindFirst("entityid")?.Value;
+        if (string.IsNullOrWhiteSpace(entityId))
+            return Unauthorized("Identificador de entidade não encontrado.");
+
+        var punter = await sellerRepository.GetByIdAsync(id);
+        if (punter is null)
+            return NotFound("Punter não encontrado.");
+
+        // Converte DTO em dicionário de propriedades para atualização parcial
+        var updates = request.GetType()
+            .GetProperties()
+            .Where(p => p.GetValue(request) != null)
+            .ToDictionary(
+                prop => prop.Name,
+                prop => prop.GetValue(request)
+            );
+
+        // Atualiza punter via método parcial
+        if (sellerRepository is RepositoryBase<Seller> baseRepo)
+        {
+            await baseRepo.UpdatePartialAsync(id, updates);
+        }
+
+        return Ok();
+    }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)

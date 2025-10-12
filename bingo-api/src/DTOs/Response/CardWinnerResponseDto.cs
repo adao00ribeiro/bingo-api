@@ -12,16 +12,16 @@ public record CardWinnerResponseDto : EntityResponseDto
     public Guid PrizeId { get; set; }
     public PrizeResponseDto? Prize { get; set; }
 
-    public CardWinnerResponseDto(Guid id, decimal value, Guid cardId, CardResponseDto? card, Guid prizeId, DateTime createAt,
-        DateTime updateAt, PrizeResponseDto? prize) : base(id, createAt, updateAt)
+    public CardWinnerResponseDto(Guid id, decimal value, Guid cardId, CardResponseDto? card, Guid prizeId, DateTime CreatedAt,
+        DateTime UpdatedAt, PrizeResponseDto? prize) : base(id, CreatedAt, UpdatedAt)
     {
         Id = id;
         Value = value;
         CardId = cardId;
         Card = card;
         PrizeId = prizeId;
-        CreateAt = createAt;
-        UpdateAt = updateAt;
+        CreatedAt = CreatedAt;
+        UpdatedAt = UpdatedAt;
         Prize = prize;
     }
     internal static CardWinnerResponseDto ConvertToDto(CardWinner cardWinner)
@@ -34,8 +34,8 @@ public record CardWinnerResponseDto : EntityResponseDto
         cardWinner.CardId,
         cardResponse,
         cardWinner.PrizeId,
-          cardWinner.CreateAt,
-            cardWinner.UpdateAt,
+          cardWinner.CreatedAt,
+            cardWinner.UpdatedAt,
         prizeResponse
      );
     }

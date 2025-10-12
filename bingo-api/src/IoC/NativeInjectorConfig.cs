@@ -16,6 +16,7 @@ using bingo_api.src.Interfaces.Jobs;
 using Npgsql;
 using bingo_api.src.Adapter;
 using bingo_api.src.Interceptors;
+using bingo_api.src.Structs;
 
 
 namespace bingo_api.src.IoC;
@@ -27,7 +28,7 @@ public static class NativeInjectorConfig
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("DatabasePostgreSQL"));
         dataSourceBuilder.EnableDynamicJson();
         var dataSource = dataSourceBuilder.Build();
-        services.AddDbContext<DataContext>((provider,options) =>
+        services.AddDbContext<DataContext>((provider, options) =>
           {
               var interceptor = provider.GetRequiredService<BalanceChangeInterceptor>();
               options.UseNpgsql(dataSource);
@@ -88,10 +89,17 @@ public static class NativeInjectorConfig
         services.AddScoped<ICardBuyService, CardBuyService>();
         services.AddScoped<IPaymentProvider, PixManualAdapter>();
         services.AddHttpClient<PushPayAdapter>();
+        services.AddHttpClient<TelegamNotifierService>();
         services.AddScoped<IPaymentProvider, PushPayAdapter>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IWithdrawalService, WithdrawalService>();
 
+        services.AddSingleton<IEmailSenderService, MailKitEmailSenderService>();
+      
+       // services.AddHealthChecks()
+         //   .AddCheck("smtp_primary", new SmtpHealthCheck(configuration.GetSection("Email:PrimarySmtp").Get<SmtpSettings>()));
+  
 
     }
 

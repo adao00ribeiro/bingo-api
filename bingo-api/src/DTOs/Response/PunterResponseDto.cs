@@ -24,13 +24,13 @@ public record PunterResponseDto : EntityResponseDto
         string cpf,
         decimal balance,
         decimal prizeBalance,
-        DateTime createAt,
-        DateTime updateAt,
+        DateTime CreatedAt,
+        DateTime UpdatedAt,
         IEnumerable<CardResponseDto> cards,
         Guid sellerId,
         SellerResponseToPunterDto seller,
         IEnumerable<RechargeResponseDto> recharges)
-    : base(id, createAt, updateAt)
+    : base(id, CreatedAt, UpdatedAt)
     {
         Id = id;
         Name = name;
@@ -54,8 +54,8 @@ public record PunterResponseDto : EntityResponseDto
             punter.Cpf,
             punter.Balance,
             punter.PrizeBalance,
-            punter.CreateAt,
-            punter.UpdateAt,
+            punter.CreatedAt,
+            punter.UpdatedAt,
             null,
             punter.SellerId,
             SellerResponse,
@@ -71,8 +71,8 @@ public record PunterResponseDto : EntityResponseDto
             "",
             0,
             0,
-            punter.CreateAt,
-            punter.UpdateAt,
+            punter.CreatedAt,
+            punter.UpdatedAt,
             null,
             punter.SellerId,
             null,

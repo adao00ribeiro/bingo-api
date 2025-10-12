@@ -39,13 +39,13 @@ public class CardMap : IEntityTypeConfiguration<Card>
         builder.Property(e => e.CardBuyId)
                .HasColumnName("card_buy_id")
                .IsRequired();
-        builder.Property(x => x.CreateAt)
-                    .HasColumnName("create_at")
+        builder.Property(x => x.CreatedAt)
+                    .HasColumnName("created_at")
                     .IsRequired()
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.Property(x => x.UpdateAt)
-               .HasColumnName("update_at")
+        builder.Property(x => x.UpdatedAt)
+               .HasColumnName("updated_at")
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         builder.HasOne(c => c.Round)
