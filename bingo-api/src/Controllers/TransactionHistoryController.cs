@@ -30,14 +30,14 @@ public class TransactionHistoryController(ITransactionHistoryRepository reposito
         {
             // Se for Admin, retorna todas as recargas
             totalCount = await _transactionRepository.CountAsync();
-            transactionHistory = await _transactionRepository.GetAllAsync(page, size, orderBy: q => q.OrderByDescending(x => x.CreateAt));
+            transactionHistory = await _transactionRepository.GetAllAsync(page, size, orderBy: q => q.OrderByDescending(x => x.CreatedAt));
         }
         else if (User.IsInRole(Roles.Punter) && Guid.TryParse(entityId, out _))
         {
             totalCount = await _transactionRepository.CountAsync(Guid.Parse(entityId));
             transactionHistory = await _transactionRepository.GetAllAsync(page, size,
                 filter: r => r.EntityId == Guid.Parse(entityId),
-                 orderBy: q => q.OrderByDescending(x => x.CreateAt)
+                 orderBy: q => q.OrderByDescending(x => x.CreatedAt)
                );
         }
         else

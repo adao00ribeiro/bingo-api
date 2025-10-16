@@ -3,6 +3,7 @@ using System.Reflection;
 
 using bingo_api.src.Entities;
 using bingo_api.src.Entities.Scratch;
+using bingo_api.src.Entities.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Context;
@@ -25,6 +26,7 @@ public class DataContext : DbContext
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<ScratchGame> ScratchGames { get; set; }
     public DbSet<ScratchTicket> ScratchTickets { get; set; }
+    public DbSet<Withdrawal> Withdrawals { get; set; }
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -39,9 +41,30 @@ public class DataContext : DbContext
 
         modelBuilder.ApplyAllConfigurationsFromCurrentAssembly("bingo_api.src.Mappings");
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+ modelBuilder.Entity<Withdrawal>()
+        .HasDiscriminator<string>("withdrawal_type")
+        .HasValue<PunterWithdrawal>("Punter")
+        .HasValue<SellerWithdrawal>("Seller");
+        
+    modelBuilder.Entity<PunterWithdrawal>()
+        .HasOne(pw => pw.Punter)
+        .WithMany(p => p.Withdrawals)
+        .HasForeignKey(pw => pw.PunterId);
+
+    modelBuilder.Entity<SellerWithdrawal>()
+        .HasOne(sw => sw.Seller)
+        .WithMany(s => s.Withdrawals)
+        .HasForeignKey(sw => sw.SellerId);
+
+
         base.OnModelCreating(modelBuilder);
 
-
+        /*
+        var allWithdrawals = await _context.Withdrawals.ToListAsync(); // Inclui ambos
+        Buscar só de Seller:
+        var sellerWithdrawals = await _context.Withdrawals
+    .OfType<SellerWithdrawal>()
+    .ToListAsync();*/
     }
 
 }

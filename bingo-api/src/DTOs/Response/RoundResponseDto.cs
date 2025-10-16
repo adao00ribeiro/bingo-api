@@ -10,7 +10,6 @@ public record RoundResponseDto
     public Guid Id { get; set; }
     public decimal CardValue { get; set; }
     public int[] Numbers { get; set; }
-    public int CardSaleCount { get; set; }
     public int TimeBetweenBalls { get; set; }
     public int MaxBalls { get; set; }//utilizado para jogos de 90 ,80,75, 50 ,30
     public int CardRows { get; set; } // Número de linhas na cartela
@@ -30,7 +29,6 @@ public record RoundResponseDto
         Guid id, decimal cardValue,
 
         int[] numbers,
-        int cardSaleCount,
         int timeBetweenBalls,
         int maxBalls,
         int cardRows,
@@ -46,7 +44,6 @@ public record RoundResponseDto
         Id = id;
         CardValue = cardValue;
         Numbers = numbers;
-        CardSaleCount = cardSaleCount;
         TimeBetweenBalls = timeBetweenBalls;
         MaxBalls = maxBalls;
         CardRows = cardRows;
@@ -69,7 +66,6 @@ public record RoundResponseDto
                 round.Id,
                 round.CardValue,
                 round.Numbers,
-                round.CardSaleCount,
                 round.TimeBetweenBalls,
                 round.MaxBalls,
                 round.CardRows,
@@ -92,7 +88,6 @@ public record RoundResponseDto
                 round.Id,
                 round.CardValue,
                 round.Numbers,
-                round.CardSaleCount,
                 round.TimeBetweenBalls,
                 round.MaxBalls,
                 round.CardRows,
