@@ -11,8 +11,8 @@ public record ScratchTicketResponseDto
     public decimal PrizeWon { get; set; }
     public bool Revealed { get; set; }
     public ScratchTicketAttributesDto? Attributes { get; set; }
-    public Guid ScratchGameId { get; set; }
-    public ScratchGameResponseDto? ScratchGame { get; set; }
+    public Guid ScratchSellerGameId { get; set; }
+    public ScratchSellerGameResponseDto? ScratchSellerGame { get; set; }
 
     internal static ScratchTicketResponseDto ConvertToDto(ScratchTicket entity)
     {
@@ -22,13 +22,13 @@ public record ScratchTicketResponseDto
             Multiplier = entity.Multiplier,
             PrizeWon = entity.PrizeWon,
             Revealed = entity.Revealed,
-            ScratchGameId = entity.ScratchGameId,
+            ScratchSellerGameId = entity.ScratchSellerGameId,
             Attributes = entity.Attributes is null
                 ? null
                 : ScratchTicketAttributesDto.ConvertToDto(entity.Attributes),
-            ScratchGame = entity.ScratchGame is null
+            ScratchSellerGame = entity.ScratchSellerGame is null
                 ? null
-                : ScratchGameResponseDto.ConvertToDto(entity.ScratchGame)
+                : ScratchSellerGameResponseDto.ConvertToDto(entity.ScratchSellerGame)
         };
     }
 }

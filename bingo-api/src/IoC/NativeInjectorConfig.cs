@@ -18,6 +18,7 @@ using bingo_api.src.Adapter;
 using bingo_api.src.Interceptors;
 using bingo_api.src.Interfaces.Repositories.Scratch;
 using bingo_api.src.Repositories.Scratch;
+using bingo_api.src.Extensions.Seeds;
 
 
 
@@ -77,10 +78,12 @@ public static class NativeInjectorConfig
         services.AddScoped<ISellerRepository, SellerRepository>();
         services.AddScoped<IRoundRepository, RoundRepository>();
         services.AddScoped<ICardBuyRepository, CardBuyRepository>();
+        services.AddScoped<IScratchBuyRepository, ScratchBuyRepository>();
         services.AddScoped<IBotConfigRepository, BotConfigRepository>();
         services.AddScoped<IAccumulatedRepository, AccumulatedRepository>();
         services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
         services.AddScoped<IScratchGameRepository, ScratchGameRepository>();
+        services.AddScoped<IScratchSellerGameRepository, ScratchSellerGameRepository>();
         services.AddScoped<IScratchTicketRepository, ScratchTicketRepository>();
         services.AddScoped<InsertBotRoundService>();
 
@@ -91,6 +94,7 @@ public static class NativeInjectorConfig
 
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();
+        services.AddScoped<IScratchBuyService, ScratchBuyService>();
         services.AddScoped<IPaymentProvider, PixManualAdapter>();
         services.AddHttpClient<PushPayAdapter>();
         services.AddHttpClient<TelegamNotifierService>();
@@ -100,10 +104,19 @@ public static class NativeInjectorConfig
         services.AddScoped<IWithdrawalService, WithdrawalService>();
 
         services.AddSingleton<IEmailSenderService, MailKitEmailSenderService>();
-      
-       // services.AddHealthChecks()
-         //   .AddCheck("smtp_primary", new SmtpHealthCheck(configuration.GetSection("Email:PrimarySmtp").Get<SmtpSettings>()));
-  
+
+
+        services.AddScoped<PaymentMethodSeeder>();
+        services.AddScoped<RoomSeeder>();
+
+        services.AddScoped<IDataSeeder, RoleSeeder>();
+        services.AddScoped<IDataSeeder, ScratchGameSeeder>();
+        services.AddScoped<IDataSeeder, SellerSeeder>();
+
+
+        // services.AddHealthChecks()
+        //   .AddCheck("smtp_primary", new SmtpHealthCheck(configuration.GetSection("Email:PrimarySmtp").Get<SmtpSettings>()));
+
 
     }
 

@@ -7,5 +7,5 @@ namespace bingo_api.src.Enums;
 
 public enum EScratchLayoutType
 {
-    Layout3x3  = 0,
+    Layout3x3 = 0,
 }

@@ -13,7 +13,7 @@ public record ScratchTicketAttributesDto
         return new ScratchTicketAttributesDto
         {
             PunterId = entity.PunterId,
-            Items = entity.Items?.Select(p=> ScratchItemDto.ConvertToDto(p)).ToList() ?? new List<ScratchItemDto>()
+            Items = entity.Items?.Select(p => ScratchItemDto.ConvertToDto(p)).ToList() ?? new List<ScratchItemDto>()
         };
     }
 }

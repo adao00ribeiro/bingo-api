@@ -2,7 +2,7 @@ using bingo_api.src.Entities.Shared;
 
 namespace bingo_api.src.Entities.Scratch;
 
-public class ScratchPrize :Entity
+public class ScratchPrize : Entity
 {
     public string Description { get; set; }
     public decimal Amount { get; set; }

@@ -25,6 +25,7 @@ public class DataContext : DbContext
     public DbSet<TransactionHistory> TransactionHistories { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<ScratchGame> ScratchGames { get; set; }
+    public DbSet<ScratchSellerGame> ScratchSellerGames { get; set; }
     public DbSet<ScratchTicket> ScratchTickets { get; set; }
     public DbSet<Withdrawal> Withdrawals { get; set; }
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
@@ -41,20 +42,20 @@ public class DataContext : DbContext
 
         modelBuilder.ApplyAllConfigurationsFromCurrentAssembly("bingo_api.src.Mappings");
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
- modelBuilder.Entity<Withdrawal>()
-        .HasDiscriminator<string>("withdrawal_type")
-        .HasValue<PunterWithdrawal>("Punter")
-        .HasValue<SellerWithdrawal>("Seller");
-        
-    modelBuilder.Entity<PunterWithdrawal>()
-        .HasOne(pw => pw.Punter)
-        .WithMany(p => p.Withdrawals)
-        .HasForeignKey(pw => pw.PunterId);
+        modelBuilder.Entity<Withdrawal>()
+               .HasDiscriminator<string>("withdrawal_type")
+               .HasValue<PunterWithdrawal>("Punter")
+               .HasValue<SellerWithdrawal>("Seller");
 
-    modelBuilder.Entity<SellerWithdrawal>()
-        .HasOne(sw => sw.Seller)
-        .WithMany(s => s.Withdrawals)
-        .HasForeignKey(sw => sw.SellerId);
+        modelBuilder.Entity<PunterWithdrawal>()
+            .HasOne(pw => pw.Punter)
+            .WithMany(p => p.Withdrawals)
+            .HasForeignKey(pw => pw.PunterId);
+
+        modelBuilder.Entity<SellerWithdrawal>()
+            .HasOne(sw => sw.Seller)
+            .WithMany(s => s.Withdrawals)
+            .HasForeignKey(sw => sw.SellerId);
 
 
         base.OnModelCreating(modelBuilder);

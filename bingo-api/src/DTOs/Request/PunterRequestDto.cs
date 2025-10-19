@@ -12,7 +12,7 @@ public record PunterRequestDto : RegisterRequestDto
     public string Name { get; set; } = "";
 
     [DefaultValue("")]
-    public string RegisteredWithTag { get; set; }= "";
+    public string RegisteredWithTag { get; set; } = "";
     internal static Punter ConvertToEntity(PunterRequestDto dto)
     {
         return new Punter(

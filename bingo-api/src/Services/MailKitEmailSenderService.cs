@@ -13,11 +13,11 @@ public class MailKitEmailSenderService : IEmailSenderService
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly IWebHostEnvironment _env;
 
-    public MailKitEmailSenderService( IWebHostEnvironment env)
+    public MailKitEmailSenderService(IWebHostEnvironment env)
     {
-     
+
         _env = env;
-    
+
         // configurar retry: por exemplo, 3 tentativas para falhas transitórias
         _retryPolicy = Policy
             .Handle<Exception>()
@@ -31,9 +31,9 @@ public class MailKitEmailSenderService : IEmailSenderService
                 });
     }
 
-    public async Task SendEmailAsync(string to, string subject, string htmlBody,EmailOptions options, CancellationToken cancellationToken = default)
+    public async Task SendEmailAsync(string to, string subject, string htmlBody, EmailOptions options, CancellationToken cancellationToken = default)
     {
-       
+
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(options.FromName, options.FromAddress));
         message.To.Add(MailboxAddress.Parse(to));

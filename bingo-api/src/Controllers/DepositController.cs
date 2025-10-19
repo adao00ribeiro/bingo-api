@@ -40,7 +40,7 @@ public class DepositController(
         if (seller is null)
             throw new Exception("Sem vendedor associado");
 
-        var method =  seller.PaymentMethods
+        var method = seller.PaymentMethods
                ?.FirstOrDefault(m => m.Active);
 
         if (method is null)

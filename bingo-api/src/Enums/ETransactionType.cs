@@ -1,9 +1,10 @@
 public enum TransactionType
 {
-    PrizeReceived,
+    BingoPrizeReceived,
     Deposit,
     Withdrawal,
     CardPurchased,
     ScratchPurchased,
-    Reward
+    Reward,
+    ScratchPrizeReceived            
 }

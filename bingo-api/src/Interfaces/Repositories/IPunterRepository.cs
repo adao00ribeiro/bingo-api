@@ -6,7 +6,7 @@ namespace bingo_api.src.Interfaces.Repositories;
 
 public interface IPunterRepository : IRepositoryBase<Punter>
 {
-      Task<Punter> GetByCpfAsync(string cpf);
+    Task<Punter> GetByCpfAsync(string cpf);
     Task<Punter> GetByEmailAsync(string email);
     Task<Punter> GetPunterByTag(string email);
 }

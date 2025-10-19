@@ -20,13 +20,13 @@ public class WebHookController(ILogger<WebHookController> logger, IRechargeRepos
     public async Task<IActionResult> ReceivePushPayWebhook([FromForm] PushPayNotificationRequestDto dto)
     {
         _logger.LogInformation("Webhook recebido: {payload}", dto);
-       
+
         var recharge = await this._rechargeRepository.GetByIdAsync(dto.Id);
         if (recharge is null)
             throw new Exception("recharge não encontrado");
 
         await rechargeRepository.UpdateStatusToCompleted(dto.Id, recharge.Punter.Seller);
-     
+
         return Ok();
     }
 }

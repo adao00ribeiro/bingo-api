@@ -12,7 +12,9 @@ public class ScratchSellerGameMap : IEntityTypeConfiguration<ScratchSellerGame>
 
         // Chave primária
         builder.HasKey(x => x.Id);
-
+      
+        builder.HasIndex(x => new { x.SellerId, x.ScratchGameId })
+               .IsUnique();
         // ID do vendedor
         builder.Property(x => x.SellerId)
                .HasColumnName("seller_id")
@@ -24,12 +26,12 @@ public class ScratchSellerGameMap : IEntityTypeConfiguration<ScratchSellerGame>
                .IsRequired();
 
         // Timestamps
-        builder.Property(x => x.CreateAt)
+        builder.Property(x => x.CreatedAt)
                .HasColumnName("created_at")
                .IsRequired()
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.Property(x => x.UpdateAt)
+        builder.Property(x => x.UpdatedAt)
                .HasColumnName("updated_at")
                .IsRequired()
                .HasDefaultValueSql("CURRENT_TIMESTAMP");

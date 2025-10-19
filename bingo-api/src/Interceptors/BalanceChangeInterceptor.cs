@@ -40,7 +40,7 @@ public class BalanceChangeInterceptor : SaveChangesInterceptor
                     balance = newBalance
                 };
 
-                await _webSocketService.SendMessageToChannel($"cash_box_{punterId}",  JsonSerializer.Serialize(message));
+                await _webSocketService.SendMessageToChannel($"cash_box_{punterId}", JsonSerializer.Serialize(message));
             }
         }
 

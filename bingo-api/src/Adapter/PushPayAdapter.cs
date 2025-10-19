@@ -66,20 +66,20 @@ public class QrCodeResponse
     public Guid Id { get; set; }
 
     [JsonPropertyName("qr_code")]
-    public string QrCode { get; set; }= "";
-    public string Status { get; set; }= "";
+    public string QrCode { get; set; } = "";
+    public string Status { get; set; } = "";
 
     [JsonPropertyName("value")]
     public decimal Value { get; set; }
 
     [JsonPropertyName("webhook_url")]
-    public string WebhookUrl { get; set; }= "";
+    public string WebhookUrl { get; set; } = "";
 
     [JsonPropertyName("qr_code_base64")]
-    public string QrCodeBase64 { get; set; }= "";
+    public string QrCodeBase64 { get; set; } = "";
     public object[] SplitRules { get; set; }
-    public string EndToEndId { get; set; }= "";
-    public string PayerName { get; set; }= "";
-    public string PayerNationalRegistration { get; set; }= "";
+    public string EndToEndId { get; set; } = "";
+    public string PayerName { get; set; } = "";
+    public string PayerNationalRegistration { get; set; } = "";
 
 }

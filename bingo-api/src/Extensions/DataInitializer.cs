@@ -1,190 +1,27 @@
-using bingo_api.src.Constants;
-using bingo_api.src.Context;
-using bingo_api.src.Entities;
 using bingo_api.src.Entities.Scratch;
-using bingo_api.src.Enums;
-using bingo_api.src.Interfaces.Repositories;
-using Microsoft.AspNetCore.Identity;
+using bingo_api.src.Extensions.Seeds;
+
 
 namespace bingo_api.src.Extensions;
 
 public class DataInitializer
 {
 
-    private readonly DataContext _context;
-    private readonly UserManager<User> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IBotConfigRepository _botConfigRepository;
+    private readonly IEnumerable<IDataSeeder> _seeders;
 
-
-    public DataInitializer(
-       DataContext context,
-       UserManager<User> userManager,
-       RoleManager<IdentityRole> roleManager,
-       IBotConfigRepository botConfigRepository)
+    public DataInitializer(IEnumerable<IDataSeeder> seeders)
     {
-        _context = context;
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _botConfigRepository = botConfigRepository;
+        _seeders = seeders;
     }
-    public async Task Seed()
+
+    public async Task SeedAsync()
     {
-        if (!_context.Set<ScratchGame>().Any())
+        foreach (var seeder in _seeders)
         {
-            var games =
-            new ScratchGame
-            {
-                Name = "Fortuna 3x3",
-                LayoutType = EScratchLayoutType.Layout3x3,
-                Price = 5.00m,
-                MaxPrize = 500_000m,
-                Probability = 3.1m,
-                //Rtp = 85.05m,
-                AllowedMultipliers = new[] { 1, 5, 10, 25 },
-                Attributes = new ScratchGameAttributes
-                {
-                    PayoutTable = new Dictionary<string, decimal>
-                {
-                        { "1x", 5.00m },
-                        { "2x", 10.00m },
-                        { "5x", 25.00m },
-                        { "10x", 50.00m },
-                        { "50x", 250.00m },
-                        { "100x", 500.00m },
-                        { "500x", 2500.00m },
-                        { "1,000x", 5000.00m },
-                        { "10,000x", 50000.00m },
-                        { "100,000x", 500000.00m }
-                },
-                    Symbols = new List<ScratchSymbol>
-{
-    new ScratchSymbol { Symbol = "🐄", Name = "Vaca Dourada", PrizeValue = 5.00m, Weight = 100 },
-    new ScratchSymbol { Symbol = "🦝", Name = "Guaxinim Ninja", PrizeValue = 10.00m, Weight = 80 },
-    new ScratchSymbol { Symbol = "🐨", Name = "Coala Zen", PrizeValue = 25.00m, Weight = 60 },
-    new ScratchSymbol { Symbol = "🦘", Name = "Canguru Boxeador", PrizeValue = 50.00m, Weight = 40 },
-    new ScratchSymbol { Symbol = "🦓", Name = "Zebra Listrada", PrizeValue = 250.00m, Weight = 25 },
-    new ScratchSymbol { Symbol = "🐵", Name = "Macaco Sábio", PrizeValue = 500.00m, Weight = 15 },
-    new ScratchSymbol { Symbol = "🦏", Name = "Rinoceronte Blindado", PrizeValue = 2_500.00m, Weight = 8 },
-    new ScratchSymbol { Symbol = "🐘", Name = "Elefante Real", PrizeValue = 5_000.00m, Weight = 4 },
-    new ScratchSymbol { Symbol = "🦁", Name = "Leão Dourado", PrizeValue = 50_000.00m, Weight = 2 },
-    new ScratchSymbol { Symbol = "🐯", Name = "Tigre Feroz", PrizeValue = 500_000.00m, Weight = 1 },
-}
-                },
-                CreateAt = DateTime.UtcNow,
-                UpdateAt = DateTime.UtcNow
-            };
-
-            _context.Set<ScratchGame>().AddRange(games);
-            await _context.SaveChangesAsync();
-
-            var tickets = GenerateTickets(games, count: 100); // 100 tickets
-            _context.Set<ScratchTicket>().AddRange(tickets);
-            await _context.SaveChangesAsync();
-            var roles = new[] { Roles.Admin, Roles.Seller, Roles.Punter };
-
-            foreach (var role in roles)
-            {
-                var roleExist = await _roleManager.RoleExistsAsync(role);
-                if (!roleExist)
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(role));
-                }
-            }
-
-
-            var sellerId = Guid.Parse("b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06");
-            var sellerEmail = "default@seller.com";
-
-            if (!_context.Sellers.Any(s => s.Id == sellerId))
-            {
-                // Cria um Seller de desenvolvimento
-                var seller = new Seller
-                {
-                    Balance = 0,
-                    Email = sellerEmail,
-                    Cpf = "11111111111",
-                    DateBirth = DateTime.UtcNow,
-                    Comission = 0,
-                    IndicateRewardValue = 20
-                };
-                seller.SetIdGuid(sellerId);
-                // Adiciona o Seller ao contexto
-                var sellerAdded = _context.Sellers.Add(seller);
-                if (!_context.PaymentMethods.Any(pm => pm.SellerId == seller.Id))
-                {
-                    var pixManualMethod = new PaymentMethod
-                    (
-                       "PIX Manual",
-                       Enums.EPaymentMethodType.PIXMANUAL,
-                       "",
-                       "https://exemplo.com/qrcode.png",
-                       "Escaneie o QR Code e envie o comprovante para o suporte.",
-                        true,
-                        seller.Id
-                    );
-                    var pushPayMethod = new PaymentMethod
-                    (
-                        "PushPay",
-                        Enums.EPaymentMethodType.PUSHPAY,
-                       "SEU_TOKEN_PADRAO_SE_FOR_APLICÁVEL",
-                        "",
-                        "",
-                        false, // Apenas Pix está ativo por padrão
-                        seller.Id
-                    );
-                    _context.PaymentMethods.Add(pushPayMethod);
-                    _context.PaymentMethods.Add(pixManualMethod);
-                }
-                var identityUser = new User
-                {
-                    Id = sellerId.ToString(),
-                    EntityId = sellerAdded.Entity.Id,
-                    EntityType = nameof(Seller),
-                    UserName = sellerEmail,
-                    Email = sellerEmail,
-                    EmailConfirmed = true,
-                    PhoneNumber = "11111111111"
-                };
-
-                var result = _userManager.CreateAsync(identityUser, "Admin@123").Result;
-                if (!result.Succeeded)
-                {
-                    throw new Exception("Falha ao criar o usuário Identity para o Seller.");
-                }
-                var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Admin);
-                if (!roleResult.Succeeded)
-                {
-                    throw new Exception("Falha ao adicionar o Role ao usuário Seller.");
-                }
-
-                // Cria uma Room associada ao Seller
-                var room = new Room("Sala de Desenvolvimento", sellerId);
-
-                room.Accumulated = new Accumulated
-                {
-                    Activated = true,
-                    MinimumValue = 50,
-                    MaximumValue = 5000,
-                    CurrentValue = 100,
-                    MaximumNumberOfBalls = 45,
-                    CumulativePercentage = 2.5m,
-                    IncrementBallCumulative = true,
-                    RoomId = room.Id
-                };
-
-                _context.Rooms.Add(room);
-                _context.SaveChanges(); // Salva a Room no banco de dados
-
-                await this._botConfigRepository.CreateWithPuntersAsync(new BotConfig(room));
-
-
-
-
-            }
+            await seeder.SeedAsync();
         }
     }
-
+    /*
     private static List<ScratchTicket> GenerateTickets(ScratchGame game, int count)
     {
         var tickets = new List<ScratchTicket>();
@@ -262,13 +99,13 @@ public class DataInitializer
                     PunterId = Guid.Empty, // Pode ser atualizado depois com o ID correto
                     Items = items
                 },
-                CreateAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow
             });
         }
 
         return tickets;
     }
-
+*/
     private static ScratchSymbol WeightedRandomSymbol(List<ScratchSymbol> symbols, int totalWeight, Random rnd)
     {
         int value = rnd.Next(1, totalWeight + 1);

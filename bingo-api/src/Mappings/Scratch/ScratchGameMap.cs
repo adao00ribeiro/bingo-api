@@ -9,13 +9,13 @@ public class ScratchGameMap : IEntityTypeConfiguration<ScratchGame>
 {
     public void Configure(EntityTypeBuilder<ScratchGame> builder)
     {
-      
+
         builder.ToTable("scratch_games");
 
         // Chave primária
         builder.HasKey(x => x.Id);
 
-             // Nome do jogo
+        // Nome do jogo
         builder.Property(x => x.Name)
                .HasColumnName("name")
                .IsRequired()
@@ -52,21 +52,21 @@ public class ScratchGameMap : IEntityTypeConfiguration<ScratchGame>
                .HasColumnName("allowed_multipliers")
                .HasColumnType("integer[]");
 
-              // Tabela de pagamento (ex: { "1x": 5.00, "10x": 50.00 })
-       builder.Property(x => x.Attributes)
-                     .HasColumnName("attributes")
-                     .HasColumnType("jsonb");
+        // Tabela de pagamento (ex: { "1x": 5.00, "10x": 50.00 })
+        builder.Property(x => x.Attributes)
+                      .HasColumnName("attributes")
+                      .HasColumnType("jsonb");
         // Timestamps
-        builder.Property(x => x.CreateAt)
+        builder.Property(x => x.CreatedAt)
                .HasColumnName("created_at")
                .IsRequired()
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.Property(x => x.UpdateAt)
+        builder.Property(x => x.UpdatedAt)
                .HasColumnName("updated_at")
                .IsRequired()
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
-  // Relacionamentos
+        // Relacionamentos
         builder.HasMany(x => x.ScratchSellerGames)
                .WithOne(s => s.ScratchGame)
                .HasForeignKey(s => s.ScratchGameId)

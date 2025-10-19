@@ -10,6 +10,7 @@ using Asp.Versioning;
 using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Repositories.Shared;
 using bingo_api.src.Entities;
+using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
 [Authorize]
@@ -22,10 +23,27 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
     private readonly IConfiguration configuration = _configuration;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PunterResponseDto>>> GetAll()
+    public async Task<ActionResult<ReportResponseDto<PunterResponseDto, object>>> GetAll(
+        int? page = null,
+        int? size = null)
     {
-        var punters = await this.punterRepository.GetAllAsync(filter: x => x.IsBot == false, includeProperties: x => x.Seller);
-        return Ok(punters.Select(p => PunterResponseDto.ConvertToDto(p)));
+        var punters = await this.punterRepository.GetAllAsync(pageNumber: page, pageSize: size, filter: x => x.IsBot == false, includeProperties: x => x.Seller);
+
+        var punterDtOS = punters.Select(p => PunterResponseDto.ConvertToDto(p)).ToList();
+        var totalCount = await punterRepository.CountAsync();
+
+        var response = new ReportResponseDto<PunterResponseDto, object>
+        {
+            Rows = punterDtOS,
+            Stats = null,
+            StartingOn = null,
+            EndingOn = null,
+            Page = page,
+            PerPage = size,
+            RowsCount = totalCount
+        };
+
+        return Ok(response);
     }
     [HttpGet("me")]
     public async Task<ActionResult<PunterResponseDto>> GetMe()

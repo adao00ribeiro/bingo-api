@@ -9,7 +9,7 @@ public class ScratchSellerGame : Entity
     public Seller Seller { get; set; }
     public ScratchGame ScratchGame { get; set; }
     public ICollection<ScratchTicket> ScratchTickets { get; set; }
-     public ScratchSellerGame(Guid sellerId, Guid scratchGameId)
+    public ScratchSellerGame(Guid sellerId, Guid scratchGameId)
     {
         SellerId = sellerId;
         ScratchGameId = scratchGameId;

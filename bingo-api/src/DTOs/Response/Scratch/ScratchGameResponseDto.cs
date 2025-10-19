@@ -7,6 +7,7 @@ namespace bingo_api.src.DTOs.Response.Scratch;
 
 public record ScratchGameResponseDto
 {
+    public Guid Id { get; set; }
     public string? Name { get; set; }
     public EScratchLayoutType? LayoutType { get; set; }
     public decimal? Price { get; set; }
@@ -19,6 +20,7 @@ public record ScratchGameResponseDto
     {
         return new ScratchGameResponseDto
         {
+            Id = entity.Id,
             Name = entity.Name,
             LayoutType = entity.LayoutType,
             Price = entity.Price,

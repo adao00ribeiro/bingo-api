@@ -25,5 +25,5 @@ public class ScratchItem
     public string Name { get; set; }
     public int Position { get; set; }
     public string Symbol { get; set; } = string.Empty;
-    public bool IsWinner { get; set; } 
+    public bool IsWinner { get; set; }
 }

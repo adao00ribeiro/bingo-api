@@ -36,12 +36,12 @@ public class ScratchPrizeMap : IEntityTypeConfiguration<ScratchPrize>
                .IsRequired();
 
         // Timestamps
-        builder.Property(x => x.CreateAt)
+        builder.Property(x => x.CreatedAt)
                .HasColumnName("created_at")
                .IsRequired()
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        builder.Property(x => x.UpdateAt)
+        builder.Property(x => x.UpdatedAt)
                .HasColumnName("updated_at")
                .IsRequired()
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
