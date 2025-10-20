@@ -1,4 +1,3 @@
-using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Extensions.Seeds;
 
 
@@ -106,20 +105,7 @@ public class DataInitializer
         return tickets;
     }
 */
-    private static ScratchSymbol WeightedRandomSymbol(List<ScratchSymbol> symbols, int totalWeight, Random rnd)
-    {
-        int value = rnd.Next(1, totalWeight + 1);
-        int cumulative = 0;
 
-        foreach (var symbol in symbols)
-        {
-            cumulative += symbol.Weight;
-            if (value <= cumulative)
-                return symbol;
-        }
-
-        return symbols.Last(); // fallback
-    }
     private static HashSet<int> GetRandomDistinctPositions(int max, int count, Random rnd)
     {
         var result = new HashSet<int>();

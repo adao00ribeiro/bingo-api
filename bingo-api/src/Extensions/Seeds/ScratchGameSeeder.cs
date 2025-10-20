@@ -34,31 +34,31 @@ namespace bingo_api.src.Extensions.Seeds
                 Attributes = new ScratchGameAttributes
                 {
                     PayoutTable = new List<ScratchPayout>
-                    {
-                        new(1, 5.00m),
-                        new(2, 10.00m),
-                        new(5, 25.00m),
-                        new(10, 50.00m),
-                        new(50, 250.00m),
-                        new(100, 500.00m),
-                        new(500, 2_500.00m),
-                        new(1_000, 5_000.00m),
-                        new(10_000, 50_000.00m),
-                        new(100_000, 500_000.00m),
-                    },
+                {
+                    new(0.50, 0),
+                    new(0.30, 10.00),
+                    new(0.10, 25.00),
+                    new(0.05, 50.00),
+                    new(0.025, 250.00),
+                    new(0.01, 500.00),
+                    new(0.007, 2_500.00),
+                    new(0.004, 5_000.00),
+                    new(0.002, 50_000.00),
+                    new(0.001, 500_000.00),
+                    new(0.0001, 5_000_000.00)
+                },
                     Symbols = new List<ScratchSymbol>
                     {
-                        new() { Symbol = "🐄", Name = "Vaca Dourada", PrizeValue = 5.00m, Weight = 100 },
-                        new() { Symbol = "🦝", Name = "Guaxinim Ninja", PrizeValue = 10.00m, Weight = 80 },
-                        new() { Symbol = "🐨", Name = "Coala Zen", PrizeValue = 25.00m, Weight = 60 },
-                        new() { Symbol = "🦘", Name = "Canguru Boxeador", PrizeValue = 50.00m, Weight = 40 },
-                        new() { Symbol = "🦓", Name = "Zebra Listrada", PrizeValue = 250.00m, Weight = 25 },
-                        new() { Symbol = "🐵", Name = "Macaco Sábio", PrizeValue = 500.00m, Weight = 15 },
-                        new() { Symbol = "🦏", Name = "Rinoceronte Blindado", PrizeValue = 2_500.00m, Weight = 8 },
-                        new() { Symbol = "🐘", Name = "Elefante Real", PrizeValue = 5_000.00m, Weight = 4 },
-                        new() { Symbol = "🦁", Name = "Leão Dourado", PrizeValue = 50_000.00m, Weight = 2 },
-                        new() { Symbol = "🐯", Name = "Tigre Feroz", PrizeValue = 500_000.00m, Weight = 1 },
-                    }
+                        new() { Symbol = "🐄", Name = "Vaca Dourada", PrizeValue = 0},
+                        new() { Symbol = "🦝", Name = "Guaxinim Ninja", PrizeValue = 10.00},
+                        new() { Symbol = "🐨", Name = "Coala Zen", PrizeValue = 25.00},
+                        new() { Symbol = "🦘", Name = "Canguru Boxeador", PrizeValue = 50.00},
+                        new() { Symbol = "🦓", Name = "Zebra Listrada", PrizeValue = 250.00 },
+                        new() { Symbol = "🐵", Name = "Macaco Sábio", PrizeValue = 500.00},
+                        new() { Symbol = "🦏", Name = "Rinoceronte Blindado", PrizeValue = 2_500.00 },
+                        new() { Symbol = "🐘", Name = "Elefante Real", PrizeValue = 5_000.00 },
+                        new() { Symbol = "🦁", Name = "Leão Dourado", PrizeValue = 50_000.00 },
+                        new() { Symbol = "🐯", Name = "Tigre Feroz", PrizeValue = 500_000.00 }                    }
                 },
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -77,29 +77,29 @@ namespace bingo_api.src.Extensions.Seeds
                 {
                     PayoutTable = new List<ScratchPayout>
                     {
-                        new(1, 10.00m),
-                        new(2, 20.00m),
-                        new(5, 50.00m),
-                        new(10, 100.00m),
-                        new(50, 500.00m),
-                        new(100, 1_000.00m),
-                        new(500, 5_000.00m),
-                        new(1_000, 10_000.00m),
-                        new(10_000, 100_000.00m),
-                        new(100_000, 1_000_000.00m),
+                        new(1, 10.00),
+                        new(2, 20.00),
+                        new(5, 50.00),
+                        new(10, 100.00),
+                        new(50, 500.00),
+                        new(100, 1_000.00),
+                        new(500, 5_000.00),
+                        new(1_000, 10_000.00),
+                        new(10_000, 100_000.00),
+                        new(100_000, 1_000_000.00),
                     },
                     Symbols = new List<ScratchSymbol>
                     {
-                        new() { Symbol = "🍀", Name = "Trevo da Sorte", PrizeValue = 10.00m, Weight = 100 },
-                        new() { Symbol = "💎", Name = "Diamante", PrizeValue = 20.00m, Weight = 80 },
-                        new() { Symbol = "🔔", Name = "Sino da Fortuna", PrizeValue = 50.00m, Weight = 60 },
-                        new() { Symbol = "🍒", Name = "Cereja", PrizeValue = 100.00m, Weight = 40 },
-                        new() { Symbol = "💰", Name = "Saco de Dinheiro", PrizeValue = 500.00m, Weight = 25 },
-                        new() { Symbol = "👑", Name = "Coroa Real", PrizeValue = 1_000.00m, Weight = 15 },
-                        new() { Symbol = "🔥", Name = "Chama Dourada", PrizeValue = 5_000.00m, Weight = 8 },
-                        new() { Symbol = "🌈", Name = "Arco-Íris da Fortuna", PrizeValue = 10_000.00m, Weight = 4 },
-                        new() { Symbol = "⭐", Name = "Estrela Suprema", PrizeValue = 100_000.00m, Weight = 2 },
-                        new() { Symbol = "👼", Name = "Anjo da Sorte", PrizeValue = 1_000_000.00m, Weight = 1 },
+                        new() { Symbol = "🍀", Name = "Trevo da Sorte", PrizeValue = 10.00},
+                        new() { Symbol = "💎", Name = "Diamante", PrizeValue = 20.00 },
+                        new() { Symbol = "🔔", Name = "Sino da Fortuna", PrizeValue = 50.00 },
+                        new() { Symbol = "🍒", Name = "Cereja", PrizeValue = 100.00 },
+                        new() { Symbol = "💰", Name = "Saco de Dinheiro", PrizeValue = 500.00 },
+                        new() { Symbol = "👑", Name = "Coroa Real", PrizeValue = 1_000.00 },
+                        new() { Symbol = "🔥", Name = "Chama Dourada", PrizeValue = 5_000.00 },
+                        new() { Symbol = "🌈", Name = "Arco-Íris da Fortuna", PrizeValue = 10_000.00 },
+                        new() { Symbol = "⭐", Name = "Estrela Suprema", PrizeValue = 100_000.00 },
+                        new() { Symbol = "👼", Name = "Anjo da Sorte", PrizeValue = 1_000_000.00 },
                     }
                 },
                 CreatedAt = DateTime.UtcNow,
@@ -112,5 +112,5 @@ namespace bingo_api.src.Extensions.Seeds
     }
 
     // Record simples, usado no PayoutTable
-    public record ScratchPayout(decimal Multiplier, decimal Prize);
+    public record ScratchPayout(double probability, double Prize);
 }

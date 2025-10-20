@@ -30,6 +30,6 @@ public class ScratchSymbol
 {
     public string Name { get; set; }
     public string Symbol { get; set; } = "";
-    public int Weight { get; set; } = 1; // peso para distribuição
-    public decimal PrizeValue;
+    public double Weight { get; set; }
+    public double PrizeValue;
 }
