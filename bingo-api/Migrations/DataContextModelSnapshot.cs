@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using bingo_api.src.Context;
+using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Structs;
 
 #nullable disable
@@ -660,6 +661,248 @@ namespace bingo_api.Migrations
                     b.ToTable("rounds", (string)null);
                 });
 
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchBuy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("PunterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("punter_id");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<Guid>("SellerGameId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_game_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("scratch_buys", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchGame", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int[]>("AllowedMultipliers")
+                        .IsRequired()
+                        .HasColumnType("integer[]")
+                        .HasColumnName("allowed_multipliers");
+
+                    b.Property<ScratchGameAttributes>("Attributes")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("attributes");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("LayoutType")
+                        .HasMaxLength(10)
+                        .HasColumnType("integer")
+                        .HasColumnName("layout_type");
+
+                    b.Property<decimal>("MaxPrize")
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("max_prize");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("price");
+
+                    b.Property<decimal?>("Probability")
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("probability");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("scratch_games", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchPrize", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("description");
+
+                    b.Property<Guid>("ScratchGameId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("scratch_game_id");
+
+                    b.Property<Guid>("ScratchTicketId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("scratch_ticket_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScratchGameId");
+
+                    b.ToTable("scratch_prizes", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchSellerGame", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("ScratchGameId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("scratch_game_id");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("seller_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScratchGameId");
+
+                    b.HasIndex("SellerId", "ScratchGameId")
+                        .IsUnique();
+
+                    b.ToTable("scratch_seller_games", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchTicket", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<ScratchTicketAttributes>("Attributes")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("attributes");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("Multiplier")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("multiplier");
+
+                    b.Property<decimal>("PrizeWon")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("numeric(12,2)")
+                        .HasDefaultValue(0m)
+                        .HasColumnName("prize_won");
+
+                    b.Property<Guid?>("PunterId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Revealed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("revealed");
+
+                    b.Property<Guid?>("ScratchBuyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("scratch_buy_id");
+
+                    b.Property<Guid?>("ScratchPrizeId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("scratch_prize_id");
+
+                    b.Property<Guid>("ScratchSellerGameId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("scratch_seller_game_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PunterId");
+
+                    b.HasIndex("ScratchBuyId");
+
+                    b.HasIndex("ScratchPrizeId")
+                        .IsUnique();
+
+                    b.HasIndex("ScratchSellerGameId");
+
+                    b.ToTable("scratch_tickets", (string)null);
+                });
+
             modelBuilder.Entity("bingo_api.src.Entities.Seller", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1005,6 +1248,65 @@ namespace bingo_api.Migrations
                     b.Navigation("Room");
                 });
 
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchPrize", b =>
+                {
+                    b.HasOne("bingo_api.src.Entities.Scratch.ScratchGame", "ScratchGame")
+                        .WithMany("ScratchPrizes")
+                        .HasForeignKey("ScratchGameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ScratchGame");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchSellerGame", b =>
+                {
+                    b.HasOne("bingo_api.src.Entities.Scratch.ScratchGame", "ScratchGame")
+                        .WithMany("ScratchSellerGames")
+                        .HasForeignKey("ScratchGameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("bingo_api.src.Entities.Seller", "Seller")
+                        .WithMany()
+                        .HasForeignKey("SellerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ScratchGame");
+
+                    b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchTicket", b =>
+                {
+                    b.HasOne("bingo_api.src.Entities.Punter", null)
+                        .WithMany("ScratchTickets")
+                        .HasForeignKey("PunterId");
+
+                    b.HasOne("bingo_api.src.Entities.Scratch.ScratchBuy", "ScratchBuy")
+                        .WithMany("ScratchTickets")
+                        .HasForeignKey("ScratchBuyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("bingo_api.src.Entities.Scratch.ScratchPrize", "ScratchPrize")
+                        .WithOne("ScratchTicket")
+                        .HasForeignKey("bingo_api.src.Entities.Scratch.ScratchTicket", "ScratchPrizeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("bingo_api.src.Entities.Scratch.ScratchSellerGame", "ScratchSellerGame")
+                        .WithMany("ScratchTickets")
+                        .HasForeignKey("ScratchSellerGameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ScratchBuy");
+
+                    b.Navigation("ScratchPrize");
+
+                    b.Navigation("ScratchSellerGame");
+                });
+
             modelBuilder.Entity("bingo_api.src.Entities.PunterWithdrawal", b =>
                 {
                     b.HasOne("bingo_api.src.Entities.Punter", "Punter")
@@ -1048,6 +1350,8 @@ namespace bingo_api.Migrations
 
                     b.Navigation("Recharges");
 
+                    b.Navigation("ScratchTickets");
+
                     b.Navigation("Withdrawals");
                 });
 
@@ -1069,6 +1373,29 @@ namespace bingo_api.Migrations
                     b.Navigation("Cards");
 
                     b.Navigation("Prizes");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchBuy", b =>
+                {
+                    b.Navigation("ScratchTickets");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchGame", b =>
+                {
+                    b.Navigation("ScratchPrizes");
+
+                    b.Navigation("ScratchSellerGames");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchPrize", b =>
+                {
+                    b.Navigation("ScratchTicket")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Scratch.ScratchSellerGame", b =>
+                {
+                    b.Navigation("ScratchTickets");
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Seller", b =>

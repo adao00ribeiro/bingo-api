@@ -19,7 +19,7 @@ public class BotConfig : Entity
         PresenceRate = presenceRate;
         RoomId = roomId;
     }
-    public BotConfig( Room room)
+    public BotConfig(Room room)
     {
         Enabled = false;
         PresenceRate = 0.70;

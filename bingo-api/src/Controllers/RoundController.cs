@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
 
@@ -18,11 +19,29 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
 
 
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<RoundResponseDto>>> GetAll(int? pageNumber = null, int? pageSize = null)
+
+    public async Task<ActionResult<ReportResponseDto<RoundResponseDto, object>>> GetAll(
+        int? page = null,
+        int? size = null)
     {
-        var rounds = await roundRepository.GetAllAsync(pageNumber, pageSize, includeProperties: [r => r.Prizes]);
-        var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
-        return Ok(roundsResponse);
+        var rounds = await roundRepository.GetAllAsync(
+            page,
+            size,
+            includeProperties: [r => r.Prizes]
+        );
+        var roundDtos = rounds.Select(r => RoundResponseDto.ConvertToDto(r)).ToList();
+        var totalCount = await roundRepository.CountAsync();
+        var response = new ReportResponseDto<RoundResponseDto, object>
+        {
+            Rows = roundDtos,
+            Stats = null,
+            StartingOn = null,
+            EndingOn = null,
+            Page = page,
+            PerPage = size,
+            RowsCount = totalCount
+        };
+        return Ok(response);
     }
     [HttpGet("filter/room/{id}")]
     public async Task<ActionResult<IEnumerable<RoundResponseDto>>> FilterByRoomIdAsync(Guid id)

@@ -13,12 +13,12 @@ public record SellerResponseDto : EntityResponseDto
     public string Cpf { get; set; }
     public DateTime DateBirth { get; set; }
     public decimal Comission { get; set; }
-    public SellerSettings Settings { get; set; } 
+    public SellerSettings Settings { get; set; }
     public IEnumerable<Punter> Punters { get; set; }
     public IEnumerable<RoomSeller> Rooms { get; set; }
     public IEnumerable<Room> OwnerRooms { get; set; }
 
-    public SellerResponseDto(Guid id, decimal balance, string email, string cpf, DateTime dateBirth, decimal comission ,SellerSettings settings, DateTime CreatedAt,
+    public SellerResponseDto(Guid id, decimal balance, string email, string cpf, DateTime dateBirth, decimal comission, SellerSettings settings, DateTime CreatedAt,
         DateTime UpdatedAt)
     : base(id, CreatedAt, UpdatedAt)
     {

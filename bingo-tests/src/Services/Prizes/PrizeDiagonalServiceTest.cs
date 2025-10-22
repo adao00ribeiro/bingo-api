@@ -25,14 +25,14 @@ public class PrizeDiagonalServiceTest
         {
             CardMarkedNumbers = new int[]
             {
-                    1, 1, 0,0,0,
-                    1, 0, 1,0,1,
-                    0, 0, 1,0,0
+                    0, 0, 0,0,0,
+                    1, 1, 1,0,1,
+                    0, 0, 0,0,0
             },
             Numbers = new int[]
             {
-                    1, 2, 3,4,5 ,
-                    6, 7, 8,9,10,
+                    46, 54, 62,76,80,
+                    18, 34, 35,69,88,
                     11, 12, 13,14,15
             },
 

@@ -8,6 +8,7 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using bingo_api.src.DTOs.Response.report;
 
 namespace bingo_api.src.Controllers;
 
@@ -19,7 +20,8 @@ public class RoomController(IRoomRepository _roomRepository) : ApiControllerBase
 
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<RoomResponseDto>>> GetAll()
+    public async Task<ActionResult<ReportResponseDto<RoomResponseDto, object>>> GetAll(
+     int? page = null, int? size = null)
     {
         var entityId = User.FindFirst("entityid")?.Value;
 
@@ -32,7 +34,7 @@ public class RoomController(IRoomRepository _roomRepository) : ApiControllerBase
         if (User.IsInRole("Admin"))
         {
             // Admin pode ver todas as salas
-            rooms = await roomRepository.GetAllAsync(includeProperties: [r => r.RoomsSellers, r => r.Owner]);
+            rooms = await roomRepository.GetAllAsync(pageNumber: page, pageSize: size, includeProperties: [r => r.RoomsSellers, r => r.Owner]);
         }
         else if (User.IsInRole("Seller"))
         {
@@ -51,8 +53,26 @@ public class RoomController(IRoomRepository _roomRepository) : ApiControllerBase
         {
             return Forbid();
         }
-        //var rooms = await roomRepository.GetAllAsync(  );
-        return Ok(rooms.Select(r => RoomResponseDto.ConvertToDto(r)));
+        var roomDtos = rooms.Select(r => RoomResponseDto.ConvertToDto(r)).ToList();
+
+        // Paginação simples
+        var pageNumber = page ?? 1;
+        var pageSize = size ?? roomDtos.Count;
+        var pagedRows = roomDtos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+        var response = new ReportResponseDto<RoomResponseDto, object>
+        {
+            Rows = pagedRows,
+            Stats = null,                  // opcional, você pode criar um objeto de estatísticas se quiser
+            StartingOn = null,
+            EndingOn = null,
+            Page = pageNumber,
+            PerPage = pageSize,
+            RowsCount = roomDtos.Count
+        };
+
+        return Ok(response);
+
     }
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(RoomRequestDto request)

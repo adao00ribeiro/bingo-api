@@ -26,12 +26,12 @@ namespace bingo_api.src.Mappings
                    .HasColumnName("status")
                    .HasConversion<string>()
                    .IsRequired();
-                   /*
-                   mudar aki
-              builder.Property(r => r.Status)
-               .HasColumnName("status")
-               .IsRequired()
-               .HasDefaultValue(ERechargeStatus.PENDING);
+            /*
+            mudar aki
+       builder.Property(r => r.Status)
+        .HasColumnName("status")
+        .IsRequired()
+        .HasDefaultValue(ERechargeStatus.PENDING);
 */
             builder.Property(x => x.CreatedAt)
                    .HasColumnName("created_at")

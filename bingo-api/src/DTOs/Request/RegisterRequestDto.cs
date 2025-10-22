@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace bingo_api.src.DTOs.Request;
 
-public record RegisterRequestDto: IValidatableObject
+public record RegisterRequestDto : IValidatableObject
 {
     [Required(ErrorMessage = "O campo Nome é obrigatório.")]
     [DefaultValue("Jodo joelso")]

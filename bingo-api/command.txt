@@ -13,6 +13,5 @@ dotnet ef migrations remove --context DataContext
 
 dotnet ef database update --context DataContext
 dotnet ef database update --context IdentityDataContext
-
-
-
+//listar
+dotnet ef migrations list --context DataContext

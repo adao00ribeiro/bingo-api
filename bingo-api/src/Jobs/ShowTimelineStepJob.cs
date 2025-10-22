@@ -42,7 +42,7 @@ public class ShowTimelineStepJob(
 
         if (eventData != null)
         {
-            await this.webSocketService.SendMessageToChannel($"room_{round.RoomId}", eventData.JsonSerializerRound());
+            await this.webSocketService.SendMessageToChannelAsync($"room_{round.RoomId}", eventData.JsonSerializerRound());
         }
         else
         {
@@ -72,7 +72,7 @@ public class ShowTimelineStepJob(
                             PreviousBalance = punter.PrizeBalance, // Antes da alteração
                             CurrentBalance = punter.PrizeBalance + prizeValue, // O saldo será alterado após o registro da transação
                             Amount = prizeValue,
-                            Type = TransactionType.PrizeReceived, // Assume que Purchase é o tipo de transação para compra de cartela
+                            Type = TransactionType.BingoPrizeReceived, // Assume que Purchase é o tipo de transação para compra de cartela
                         };
                         await this._transactionHistoryRepository.AddAsync(transactionHistory);
                         punter.PrizeBalance += prizeValue;
