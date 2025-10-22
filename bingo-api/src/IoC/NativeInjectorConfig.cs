@@ -19,6 +19,9 @@ using bingo_api.src.Interceptors;
 using bingo_api.src.Interfaces.Repositories.Scratch;
 using bingo_api.src.Repositories.Scratch;
 using bingo_api.src.Extensions.Seeds;
+using bingo_api.src.Infrastructure;
+using bingo_api.src.Application.Handlers;
+using bingo_api.src.Interfaces;
 
 
 
@@ -112,6 +115,13 @@ public static class NativeInjectorConfig
         services.AddScoped<IDataSeeder, RoleSeeder>();
         services.AddScoped<IDataSeeder, ScratchGameSeeder>();
         services.AddScoped<IDataSeeder, SellerSeeder>();
+
+        services.AddScoped<EventDispatcher>();
+        services.Scan(scan => scan
+    .FromAssemblyOf<ScratchPrizeCreatedHandler>()
+    .AddClasses(classes => classes.AssignableTo(typeof(IDomainEventHandler<>)))
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
 
 
         // services.AddHealthChecks()

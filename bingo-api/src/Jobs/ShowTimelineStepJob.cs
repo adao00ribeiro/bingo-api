@@ -42,7 +42,7 @@ public class ShowTimelineStepJob(
 
         if (eventData != null)
         {
-            await this.webSocketService.SendMessageToChannel($"room_{round.RoomId}", eventData.JsonSerializerRound());
+            await this.webSocketService.SendMessageToChannelAsync($"room_{round.RoomId}", eventData.JsonSerializerRound());
         }
         else
         {

@@ -14,33 +14,43 @@ public class BalanceChangeInterceptor : SaveChangesInterceptor
     {
         _webSocketService = webSocketService;
     }
+
     public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
-       DbContextEventData eventData,
-       InterceptionResult<int> result,
-       CancellationToken cancellationToken = default)
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
     {
         var context = eventData.Context;
-        if (context == null) return await base.SavingChangesAsync(eventData, result, cancellationToken);
+        if (context == null)
+            return await base.SavingChangesAsync(eventData, result, cancellationToken);
 
+        // Pegamos todos os Punters modificados
         var entries = context.ChangeTracker.Entries<Punter>()
-            .Where(e => e.State == EntityState.Modified &&
-                        e.Property(p => p.Balance).IsModified);
+            .Where(e => e.State == EntityState.Modified);
 
         foreach (var entry in entries)
         {
-            var oldBalance = entry.Property(p => p.Balance).OriginalValue;
-            var newBalance = entry.Property(p => p.Balance).CurrentValue;
+            var punterId = entry.Entity.Id;
+            var originalBalance = entry.Property(p => p.Balance).OriginalValue;
+            var currentBalance = entry.Property(p => p.Balance).CurrentValue;
 
-            if (oldBalance != newBalance)
+            var originalPrize = entry.Property(p => p.PrizeBalance).OriginalValue;
+            var currentPrize = entry.Property(p => p.PrizeBalance).CurrentValue;
+
+            // Só envia se algum valor mudou
+            if (originalBalance != currentBalance || originalPrize != currentPrize)
             {
-                var punterId = entry.Entity.Id;
                 var message = new
                 {
-                    punterId = punterId,
-                    balance = newBalance
+                    punterId,
+                    balance = currentBalance,
+                    prizeBalance = currentPrize
                 };
 
-                await _webSocketService.SendMessageToChannel($"cash_box_{punterId}", JsonSerializer.Serialize(message));
+                await _webSocketService.SendMessageToChannelAsync(
+                    $"cash_box_{punterId}",
+                    JsonSerializer.Serialize(message)
+                );
             }
         }
 

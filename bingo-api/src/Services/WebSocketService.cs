@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -10,130 +11,156 @@ namespace bingo_api.src.Services;
 public class WebSocketService : IWebSocketService, IDisposable
 {
     private readonly ILogger<IWebSocketService> _logger;
-    private readonly Dictionary<string, List<WebSocket>> _channelSubscriptions = new();
-    private readonly ISubscriber _subscriber;
     private readonly IConnectionMultiplexer _redis;
+    private readonly ISubscriber _subscriber;
+
+    // Cada usuário possui um único WebSocket e várias salas
+    private readonly ConcurrentDictionary<string, WebSocket> _userConnections = new();
+    private readonly ConcurrentDictionary<string, HashSet<string>> _userChannels = new();
+
+    // Evita re-subscrever o mesmo canal no Redis
+    private readonly ConcurrentDictionary<string, bool> _redisSubscribed = new();
 
     public WebSocketService(ILogger<IWebSocketService> logger, IConnectionMultiplexer redis)
     {
         _logger = logger;
         _redis = redis;
-        _subscriber = _redis.GetSubscriber();
+        _subscriber = redis.GetSubscriber();
     }
 
-    public void SubscribeToChannel(string channel, WebSocket webSocket)
+    // --- Registro de conexão (um WebSocket por usuário)
+    public async Task RegisterConnectionAsync(string userId, WebSocket webSocket)
     {
-        lock (_channelSubscriptions)
+        if (_userConnections.TryGetValue(userId, out var existing))
         {
-            if (!_channelSubscriptions.ContainsKey(channel))
-            {
-                _channelSubscriptions[channel] = new List<WebSocket>();
-                _subscriber.Subscribe(channel, async (redisChannel, value) =>
-                {
-                    await BroadcastToLocalClients(channel, value!);
-                });
-            }
-            _channelSubscriptions[channel].Add(webSocket);
-        }
-        _logger.LogInformation("Client subscribed to channel {Channel}", channel);
-    }
-    public void UnsubscribeFromChannel(WebSocket webSocket)
-    {
-        lock (_channelSubscriptions)
-        {
-            foreach (var channel in _channelSubscriptions.Keys)
-            {
-                if (_channelSubscriptions[channel].Contains(webSocket))
-                {
-                    _channelSubscriptions[channel].Remove(webSocket);
-                    _logger?.LogInformation("Client unsubscribed from channel {Channel}", channel);
-                }
-            }
-        }
-    }
-    private async Task BroadcastToLocalClients(string channel, string message)
-    {
-        List<WebSocket> subscribers;
-        lock (_channelSubscriptions)
-        {
-            if (!_channelSubscriptions.ContainsKey(channel)) return;
-            subscribers = _channelSubscriptions[channel].ToList();
+            if (existing.State == WebSocketState.Open)
+                await existing.CloseAsync(WebSocketCloseStatus.NormalClosure, "Nova conexão aberta", CancellationToken.None);
+
+            _userConnections.TryRemove(userId, out _);
         }
 
-        var options = new JsonSerializerOptions
+        _userConnections[userId] = webSocket;
+        _userChannels[userId] = new HashSet<string>();
+
+        _logger.LogInformation("Usuário {UserId} conectado via WebSocket.", userId);
+    }
+
+    // --- Inscrição em um canal
+    public async Task SubscribeToChannelAsync(string userId, string channel)
+    {
+        if (!_userConnections.ContainsKey(userId))
+        {
+            _logger.LogWarning("Tentativa de inscrição em canal {Channel} sem conexão ativa ({UserId}).", channel, userId);
+            return;
+        }
+
+        _userChannels[userId].Add(channel);
+
+        if (_redisSubscribed.TryAdd(channel, true))
+        {
+            await _subscriber.SubscribeAsync(channel, async (ch, value) =>
+            {
+                await BroadcastToLocalSubscribers(channel, value!);
+            });
+        }
+
+        _logger.LogInformation("Usuário {UserId} inscrito no canal {Channel}.", userId, channel);
+    }
+
+    // --- Cancelar inscrição
+    public Task UnsubscribeFromChannelAsync(string userId, string channel)
+    {
+        if (_userChannels.TryGetValue(userId, out var channels))
+        {
+            channels.Remove(channel);
+            _logger.LogInformation("Usuário {UserId} removido do canal {Channel}.", userId, channel);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    // --- Envio para um canal (broadcast via Redis)
+    public async Task SendMessageToChannelAsync(string channel, string message)
+    {
+        await _subscriber.PublishAsync(channel, message);
+        _logger.LogInformation("Mensagem publicada no canal {Channel}: {Message}", channel, message);
+    }
+
+    // --- Broadcast local (para usuários desta instância)
+    private async Task BroadcastToLocalSubscribers(string channel, string message)
+    {
+           var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
         };
-        var json = JsonSerializer.Serialize(new SocketMessage("message", channel, message, "success"), options);
-        var serverMsg = Encoding.UTF8.GetBytes(json);
+        var json = JsonSerializer.Serialize(new SocketMessage("message", channel, message, "success"),options);
+        var bytes = Encoding.UTF8.GetBytes(json);
 
-        foreach (var subscriber in subscribers)
+        var targets = _userChannels
+            .Where(u => u.Value.Contains(channel))
+            .Select(u => u.Key);
+
+        foreach (var userId in targets)
         {
-            if (subscriber.State == WebSocketState.Open)
+            if (_userConnections.TryGetValue(userId, out var socket) && socket.State == WebSocketState.Open)
             {
-                await subscriber.SendAsync(new ArraySegment<byte>(serverMsg), WebSocketMessageType.Text, true, CancellationToken.None);
+                await socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
     }
-    public async Task SendMessageToChannel(string channel, string message)
-    {
-        // Publica para o Redis, que será distribuído para todas as instâncias
-        await _subscriber.PublishAsync(channel, message);
-    }
 
-    public async Task SendMessageAsync(WebSocket webSocket, string message)
+    // --- Enviar mensagem direta ao usuário
+    public async Task SendToUserAsync(string userId, string message)
     {
-        var options = new JsonSerializerOptions
+        if (_userConnections.TryGetValue(userId, out var socket) && socket.State == WebSocketState.Open)
+        {
+                var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true // Opcional, para formatar o JSON
+            WriteIndented = true
         };
-        var json = JsonSerializer.Serialize(new SocketMessage("message", message, "sucess"), options);
-        var serverMsg = Encoding.UTF8.GetBytes(json);
-        await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), WebSocketMessageType.Text, true, CancellationToken.None);
-        _logger.LogInformation("Message sent to Client: {Message}", message);
+            var json = JsonSerializer.Serialize(new SocketMessage("message", message, "success"),options);
+            var buffer = Encoding.UTF8.GetBytes(json);
+            await socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+        }
     }
 
-    public async Task CloseAllConnections()
+    // --- Fechar conexão específica
+    public async Task CloseConnectionAsync(string userId)
     {
-        List<WebSocket> activeConnections;
-
-        lock (_channelSubscriptions)
+        if (_userConnections.TryRemove(userId, out var socket))
         {
-            activeConnections = _channelSubscriptions.Values.SelectMany(sockets => sockets).ToList();
+            if (socket.State == WebSocketState.Open)
+                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Conexão encerrada", CancellationToken.None);
         }
 
-        foreach (var webSocket in activeConnections)
-        {
-            if (webSocket.State == WebSocketState.Open || webSocket.State == WebSocketState.CloseReceived)
-            {
-                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Server is shutting down", CancellationToken.None);
-                _logger.LogInformation("WebSocket connection closed for shutdown.");
-            }
-        }
-
-
-        lock (_channelSubscriptions)
-        {
-            _channelSubscriptions.Clear();
-        }
+        _userChannels.TryRemove(userId, out _);
+        _logger.LogInformation("Conexão encerrada para o usuário {UserId}.", userId);
     }
 
-    public IEnumerable<WebSocket> GetActiveConnections()
+    // --- Encerrar todas as conexões
+    public async Task CloseAllConnectionsAsync()
     {
-
-        lock (_channelSubscriptions)
+        var sockets = _userConnections.Values.ToList();
+        foreach (var socket in sockets)
         {
-            return _channelSubscriptions.Values.SelectMany(sockets => sockets)
-                                                .Where(socket => socket.State == WebSocketState.Open)
-                                                .ToList();
+            if (socket.State == WebSocketState.Open)
+                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Servidor finalizando", CancellationToken.None);
         }
+
+        _userConnections.Clear();
+        _userChannels.Clear();
+        _logger.LogInformation("Todas as conexões WebSocket foram encerradas.");
     }
+
+    // --- Dispose
     public void Dispose()
     {
-
-        CloseAllConnections().GetAwaiter().GetResult();
-        _logger.LogInformation("All WebSocket connections closed during Dispose.");
+        CloseAllConnectionsAsync().GetAwaiter().GetResult();
+        _logger.LogInformation("WebSocketService Dispose: conexões encerradas.");
     }
+
+ 
+
 }

@@ -11,6 +11,8 @@ namespace bingo_api.src.Services;
 public class ScratchBuyService(
         DataContext dataContext,
         IScratchBuyRepository scratchBuyRepository
+       
+
 ) : IScratchBuyService
 {
     private readonly DataContext _dataContext = dataContext;
@@ -40,14 +42,14 @@ public class ScratchBuyService(
             // 3. Validar saldo
             ValidateBalance(punter, sellerGame.ScratchGame.Price);
 
-            var cardBuyId = await this._scratchBuyRepository.AddAsync(buy);
+            var ScratchBuyId = await this._scratchBuyRepository.AddAsync(buy);
 
-            if (cardBuyId == Guid.Empty)
+            if (ScratchBuyId == Guid.Empty)
             {
                 throw new Exception("Compra nao realizada");
             }
             // 4. Gerar ticket com símbolos (sem revelar prêmio ainda)
-            var ticket = await GenerateTicket(punterId, sellerGame);
+            var ticket = await GenerateTicket(punterId, sellerGame,ScratchBuyId);
 
             // 5. Processar compra (debitar saldo)
             await ProcessPurchase(punter, sellerGame.ScratchGame.Price);
@@ -90,39 +92,31 @@ public class ScratchBuyService(
         {
             throw new InvalidOperationException("Usuário não encontrado");
         }
-
         using var transaction = await _dataContext.Database.BeginTransactionAsync();
-
         try
         {
-            // 1. Verificar se ticket TEM 3 símbolos iguais
+
             var isWinner = CheckIfWinner(ticket.Attributes.Items);
 
             if (isWinner)
             {
-                // 2. Ticket JÁ foi definido como ganhador na criação
-                // O Multiplier e PrizeWon já estão setados no ticket
-
                 if (ticket.Multiplier > 0 && ticket.PrizeWon > 0)
                 {
-                    // ✅ PAGAR O PRÊMIO
-                    var previousBalance = punter.Balance;
-                    punter.Balance += ticket.PrizeWon;
-                    punter.UpdatedAt = DateTime.UtcNow;
 
-                    // Registrar transação de prêmio
-                    await CreateTransactionHistory(
-                        ticket.Attributes.PunterId,
-                        punter,
-                        ticket.PrizeWon,
-                        TransactionType.ScratchPrizeReceived
-                    );
+                    var scratchPrize = new ScratchPrize
+                 (   
+                         "Prêmio referente ao Apostador",
+                         ticket.PrizeWon,
+                         ticket.ScratchSellerGame.ScratchGameId,
+                         ticket.Id
+                 );
 
-                    _dataContext.Punters.Update(punter);
+                    _dataContext.ScratchPrizes.Add(scratchPrize);
+                  await _dataContext.SaveChangesAsync();
+                  
                 }
             }
 
-            // 3. Marcar ticket como raspado
             ticket.Revealed = true;
             ticket.UpdatedAt = DateTime.UtcNow;
 
@@ -139,7 +133,7 @@ public class ScratchBuyService(
         }
     }
 
-    private async Task<ScratchTicket> GenerateTicket(Guid punterId, ScratchSellerGame sellerGame)
+    private async Task<ScratchTicket> GenerateTicket(Guid punterId, ScratchSellerGame sellerGame, Guid ScratchBuyId)
     {
         var symbols = sellerGame.ScratchGame.Attributes.Symbols;
         var positionsCount = 9; // Layout 3x3
@@ -167,7 +161,7 @@ public class ScratchBuyService(
                     IsWinner = isWinning
                 });
             }
-         
+
             multiplicadorFinal = multiplicadorSorteado.probability;
             premioFinal = (decimal)multiplicadorSorteado.prize;
 
@@ -204,10 +198,12 @@ public class ScratchBuyService(
             premioFinal = 0;
 
         }
+      
         return new ScratchTicket
         {
             Id = Guid.NewGuid(),
             ScratchSellerGameId = sellerGame.Id,
+            ScratchBuyId = ScratchBuyId,
             Attributes = new ScratchTicketAttributes
             {
                 PunterId = punterId,
@@ -216,6 +212,7 @@ public class ScratchBuyService(
             Revealed = false,
             Multiplier = (int)multiplicadorFinal,
             PrizeWon = premioFinal,
+
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -249,33 +246,33 @@ public class ScratchBuyService(
         return positions;
     }
 
-   private (int index, double probability, double prize) SortearMultiplicador(Random rnd, ScratchGame game)
-{
-    var probabilidades = game.Attributes.PayoutTable;
-
-    if (probabilidades == null || probabilidades.Count == 0)
-        return (-1, 0, 0); // segurança contra lista vazia
-
-    var totalWeight = probabilidades.Sum(x => x.probability);
-    if (totalWeight <= 0)
-        return (-1, 0, 0); // segurança contra soma inválida
-
-    var randomValue = rnd.NextDouble() * totalWeight;
-    double cumulativeWeight = 0.0;
-
-    for (int i = 0; i < probabilidades.Count; i++)
+    private (int index, double probability, double prize) SortearMultiplicador(Random rnd, ScratchGame game)
     {
-        cumulativeWeight += probabilidades[i].probability;
-        if (randomValue <= cumulativeWeight)
-        {
-            return (i, probabilidades[i].probability, probabilidades[i].Prize);
-        }
-    }
+        var probabilidades = game.Attributes.PayoutTable;
 
-    // fallback (caso ocorra erro de arredondamento)
-    var last = probabilidades.Last();
-    return (probabilidades.Count - 1, last.probability, last.Prize);
-}
+        if (probabilidades == null || probabilidades.Count == 0)
+            return (-1, 0, 0); // segurança contra lista vazia
+
+        var totalWeight = probabilidades.Sum(x => x.probability);
+        if (totalWeight <= 0)
+            return (-1, 0, 0); // segurança contra soma inválida
+
+        var randomValue = rnd.NextDouble() * totalWeight;
+        double cumulativeWeight = 0.0;
+
+        for (int i = 0; i < probabilidades.Count; i++)
+        {
+            cumulativeWeight += probabilidades[i].probability;
+            if (randomValue <= cumulativeWeight)
+            {
+                return (i, probabilidades[i].probability, probabilidades[i].Prize);
+            }
+        }
+
+        // fallback (caso ocorra erro de arredondamento)
+        var last = probabilidades.Last();
+        return (probabilidades.Count - 1, last.probability, last.Prize);
+    }
 
     private async Task<(decimal TotalApostado, decimal TotalPremiado)> GetGameStats(Guid gameId)
     {
@@ -299,8 +296,7 @@ public class ScratchBuyService(
 
     private async Task<bool> PodePagar(decimal valorPremio, Guid scratchGameId)
     {
-
-        var rtpDesejado = 0.70m; // 80%
+        var rtpDesejado = 0.80m; // 80%
         var totalApostado = await _dataContext.ScratchTickets
       .Where(t => t.ScratchSellerGame.ScratchGameId == scratchGameId)
       .SumAsync(t => t.ScratchSellerGame.ScratchGame.Price);
@@ -309,15 +305,13 @@ public class ScratchBuyService(
             .Where(t => t.ScratchSellerGame.ScratchGameId == scratchGameId)
             .SumAsync(t => t.PrizeWon);
 
-        if (totalApostado == 0) return true;
+        if (totalApostado == 0) return false;
 
         var rtpFuturo = (totalPremiado + valorPremio) / totalApostado;
-        Console.WriteLine("TOTAL APOSTADO " + totalApostado);
-        Console.WriteLine("TOTAL PREMIADO " + totalPremiado);
-        Console.WriteLine("RTP " + rtpFuturo);
+
         return rtpFuturo <= rtpDesejado;
     }
-  
+
     private void ValidateBalance(Punter punter, decimal ticketPrice)
     {
         if (punter.Balance < ticketPrice)
