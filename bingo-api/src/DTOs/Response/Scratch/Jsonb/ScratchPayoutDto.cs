@@ -2,7 +2,7 @@ using bingo_api.src.Extensions.Seeds;
 
 namespace bingo_api.src.DTOs.Response.Scratch.Jsonb;
 
-public record ScratchPayoutDto(double Multiplier, double Prize)
+public record ScratchPayoutDto(double Probability, double Prize)
 {
     internal static ScratchPayoutDto ConvertToDto(ScratchPayout payout)
     {

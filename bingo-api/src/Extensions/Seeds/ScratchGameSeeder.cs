@@ -35,11 +35,11 @@ namespace bingo_api.src.Extensions.Seeds
                 {
                     PayoutTable = new List<ScratchPayout>
                 {
-                    new(0.50, 0),
-                    new(0.30, 10.00),
-                    new(0.10, 25.00),
-                    new(0.05, 50.00),
-                    new(0.025, 250.00),
+                    new(0.80, 5),
+                    new(0.50, 10.00),
+                    new(0.30, 25.00),
+                    new(0.01, 50.00),
+                    new(0.05, 250.00),
                     new(0.01, 500.00),
                     new(0.007, 2_500.00),
                     new(0.004, 5_000.00),

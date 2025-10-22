@@ -11,7 +11,7 @@ namespace bingo_api.src.Services;
 public class ScratchBuyService(
         DataContext dataContext,
         IScratchBuyRepository scratchBuyRepository
-       
+
 
 ) : IScratchBuyService
 {
@@ -49,7 +49,7 @@ public class ScratchBuyService(
                 throw new Exception("Compra nao realizada");
             }
             // 4. Gerar ticket com símbolos (sem revelar prêmio ainda)
-            var ticket = await GenerateTicket(punterId, sellerGame,ScratchBuyId);
+            var ticket = await GenerateTicket(punterId, sellerGame, ScratchBuyId);
 
             // 5. Processar compra (debitar saldo)
             await ProcessPurchase(punter, sellerGame.ScratchGame.Price);
@@ -104,7 +104,7 @@ public class ScratchBuyService(
                 {
 
                     var scratchPrize = new ScratchPrize
-                 (   
+                 (
                          "Prêmio referente ao Apostador",
                          ticket.PrizeWon,
                          ticket.ScratchSellerGame.ScratchGameId,
@@ -112,8 +112,8 @@ public class ScratchBuyService(
                  );
 
                     _dataContext.ScratchPrizes.Add(scratchPrize);
-                  await _dataContext.SaveChangesAsync();
-                  
+                    await _dataContext.SaveChangesAsync();
+
                 }
             }
 
@@ -133,22 +133,25 @@ public class ScratchBuyService(
         }
     }
 
-    private async Task<ScratchTicket> GenerateTicket(Guid punterId, ScratchSellerGame sellerGame, Guid ScratchBuyId)
+    private async Task<ScratchTicket> GenerateTicket(Guid punterId, ScratchSellerGame sellerGame, Guid scratchBuyId)
     {
         var symbols = sellerGame.ScratchGame.Attributes.Symbols;
         var positionsCount = 9; // Layout 3x3
         var rnd = new Random();
         var items = new List<ScratchItem>();
+
         var multiplicadorSorteado = SortearMultiplicador(rnd, sellerGame.ScratchGame);
 
-        var podePagar = await PodePagar((decimal)multiplicadorSorteado.prize, sellerGame.ScratchGameId);
-        double multiplicadorFinal = 0;
+        // Verifica se o RTP permite pagar esse prêmio
+        var podePagar = await PodePagar((decimal)multiplicadorSorteado.Prize, sellerGame.ScratchGameId, rnd);
+
+        double probabilidadeFinal = 0;
         decimal premioFinal = 0;
-        if (podePagar && multiplicadorSorteado.probability > 0)
+
+        if (podePagar && multiplicadorSorteado.Probability > 0)
         {
             // ✅ GERAR TICKET GANHADOR - 3 símbolos iguais do multiplicador sorteado
-            var symboloGanhador = symbols[multiplicadorSorteado.index];
-
+            var simboloGanhador = symbols[multiplicadorSorteado.Index];
             var winnerPositions = GetRandomDistinctPositions(positionsCount, 3, rnd);
 
             for (int j = 0; j < positionsCount; j++)
@@ -157,18 +160,19 @@ public class ScratchBuyService(
                 items.Add(new ScratchItem
                 {
                     Position = j,
-                    Symbol = isWinning ? symboloGanhador.Symbol : WeightedRandomSymbol(symbols, rnd, symboloGanhador).Symbol,
+                    Symbol = isWinning
+                        ? simboloGanhador.Symbol
+                        : WeightedRandomSymbol(symbols, rnd, simboloGanhador).Symbol,
                     IsWinner = isWinning
                 });
             }
 
-            multiplicadorFinal = multiplicadorSorteado.probability;
-            premioFinal = (decimal)multiplicadorSorteado.prize;
-
+            probabilidadeFinal = multiplicadorSorteado.Probability;
+            premioFinal = (decimal)multiplicadorSorteado.Prize;
         }
         else
         {
-            // ❌ GERAR TICKET PERDEDOR - NÃO pode ter 3 iguais
+            // ❌ GERAR TICKET PERDEDOR - NO MÁXIMO 2 símbolos iguais
             var symbolCounts = new Dictionary<string, int>();
 
             for (int j = 0; j < positionsCount; j++)
@@ -182,7 +186,7 @@ public class ScratchBuyService(
                     selectedSymbol = WeightedRandomSymbol(symbols, rnd).Symbol;
                     symbolCounts.TryGetValue(selectedSymbol, out currentCount);
                     attempts++;
-                } while (currentCount >= 2 && attempts < 10); // Garante NO MÁXIMO 2 iguais
+                } while (currentCount >= 2 && attempts < 10); // evita 3 iguais
 
                 symbolCounts[selectedSymbol] = symbolCounts.GetValueOrDefault(selectedSymbol, 0) + 1;
 
@@ -192,31 +196,75 @@ public class ScratchBuyService(
                     Symbol = selectedSymbol,
                     IsWinner = false
                 });
-
             }
-            multiplicadorFinal = 0;
-            premioFinal = 0;
 
+            probabilidadeFinal = 0;
+            premioFinal = 0;
         }
-      
+
         return new ScratchTicket
         {
             Id = Guid.NewGuid(),
             ScratchSellerGameId = sellerGame.Id,
-            ScratchBuyId = ScratchBuyId,
+            ScratchBuyId = scratchBuyId,
             Attributes = new ScratchTicketAttributes
             {
                 PunterId = punterId,
                 Items = items,
             },
             Revealed = false,
-            Multiplier = (int)multiplicadorFinal,
+            // Salva corretamente o prêmio sorteado e sua chance
+            Multiplier = (int)premioFinal,
             PrizeWon = premioFinal,
-
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
+
+
     }
+
+    /// <summary>
+    /// Sorteia um prêmio (probabilidade e valor) a partir da payout table.
+    /// Agora as probabilidades são normalizadas para somar 1.
+    /// </summary>
+    private (int Index, double Probability, double Prize) SortearMultiplicador(Random rnd, ScratchGame game)
+    {
+        var probabilidades = game.Attributes.PayoutTable;
+        if (probabilidades == null || probabilidades.Count == 0)
+            return (-1, 0, 0);
+
+
+        // Normaliza probabilidades
+        var totalWeight = probabilidades.Sum(x => x.probability);
+        if (totalWeight <= 0)
+            return (-1, 0, 0);
+
+        var normalizadas = probabilidades
+            .Select(x => new { x.probability, x.Prize, Peso = x.probability / totalWeight })
+            .ToList();
+
+        var randomValue = rnd.NextDouble();
+        double cumulativeWeight = 0.0;
+
+        for (int i = 0; i < normalizadas.Count; i++)
+        {
+            cumulativeWeight += normalizadas[i].Peso;
+            if (randomValue <= cumulativeWeight)
+            {
+                return (i, normalizadas[i].probability, normalizadas[i].Prize);
+            }
+        }
+
+        var last = normalizadas.Last();
+        return (normalizadas.Count - 1, last.probability, last.Prize);
+
+
+    }
+
+    /// <summary>
+    /// Controla o RTP, permitindo exceções aleatórias.
+    /// Assim, o jogo mantém o payout médio sem travar.
+    /// </summary>
 
     private bool CheckIfWinner(List<ScratchItem> items)
     {
@@ -246,33 +294,6 @@ public class ScratchBuyService(
         return positions;
     }
 
-    private (int index, double probability, double prize) SortearMultiplicador(Random rnd, ScratchGame game)
-    {
-        var probabilidades = game.Attributes.PayoutTable;
-
-        if (probabilidades == null || probabilidades.Count == 0)
-            return (-1, 0, 0); // segurança contra lista vazia
-
-        var totalWeight = probabilidades.Sum(x => x.probability);
-        if (totalWeight <= 0)
-            return (-1, 0, 0); // segurança contra soma inválida
-
-        var randomValue = rnd.NextDouble() * totalWeight;
-        double cumulativeWeight = 0.0;
-
-        for (int i = 0; i < probabilidades.Count; i++)
-        {
-            cumulativeWeight += probabilidades[i].probability;
-            if (randomValue <= cumulativeWeight)
-            {
-                return (i, probabilidades[i].probability, probabilidades[i].Prize);
-            }
-        }
-
-        // fallback (caso ocorra erro de arredondamento)
-        var last = probabilidades.Last();
-        return (probabilidades.Count - 1, last.probability, last.Prize);
-    }
 
     private async Task<(decimal TotalApostado, decimal TotalPremiado)> GetGameStats(Guid gameId)
     {
@@ -293,24 +314,34 @@ public class ScratchBuyService(
 
         return (stats.TotalApostado, stats.TotalPremiado);
     }
-
-    private async Task<bool> PodePagar(decimal valorPremio, Guid scratchGameId)
+    private async Task<bool> PodePagar(decimal valorPremio, Guid scratchGameId, Random rnd)
     {
-        var rtpDesejado = 0.80m; // 80%
+        const decimal rtpDesejado = 0.80m; // 80%
         var totalApostado = await _dataContext.ScratchTickets
-      .Where(t => t.ScratchSellerGame.ScratchGameId == scratchGameId)
-      .SumAsync(t => t.ScratchSellerGame.ScratchGame.Price);
+        .Where(t => t.ScratchSellerGame.ScratchGameId == scratchGameId)
+        .SumAsync(t => t.ScratchSellerGame.ScratchGame.Price);
+
 
         var totalPremiado = await _dataContext.ScratchTickets
             .Where(t => t.ScratchSellerGame.ScratchGameId == scratchGameId)
             .SumAsync(t => t.PrizeWon);
 
-        if (totalApostado == 0) return false;
+        if (totalApostado == 0)
+            return false;
 
         var rtpFuturo = (totalPremiado + valorPremio) / totalApostado;
 
-        return rtpFuturo <= rtpDesejado;
+        // Se ultrapassar o RTP alvo, ainda dá 10% de chance de pagar
+        if (rtpFuturo > rtpDesejado)
+        {
+            return rnd.NextDouble() < 0.1;
+        }
+
+        return true;
+
+
     }
+
 
     private void ValidateBalance(Punter punter, decimal ticketPrice)
     {
