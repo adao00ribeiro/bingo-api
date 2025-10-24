@@ -13,6 +13,7 @@ public class WebSocketService : IWebSocketService, IDisposable
     private readonly ILogger<IWebSocketService> _logger;
     private readonly IConnectionMultiplexer _redis;
     private readonly ISubscriber _subscriber;
+    private Timer? _heartbeatTimer;
 
     // Cada usuário possui um único WebSocket e várias salas
     private readonly ConcurrentDictionary<string, WebSocket> _userConnections = new();
@@ -26,6 +27,9 @@ public class WebSocketService : IWebSocketService, IDisposable
         _logger = logger;
         _redis = redis;
         _subscriber = redis.GetSubscriber();
+        
+        // Inicia o heartbeat timer (ping a cada 30 segundos)
+        _heartbeatTimer = new Timer(SendHeartbeat, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
     }
 
     // --- Registro de conexão (um WebSocket por usuário)
@@ -89,12 +93,12 @@ public class WebSocketService : IWebSocketService, IDisposable
     // --- Broadcast local (para usuários desta instância)
     private async Task BroadcastToLocalSubscribers(string channel, string message)
     {
-           var options = new JsonSerializerOptions
+        var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
+            WriteIndented = false
         };
-        var json = JsonSerializer.Serialize(new SocketMessage("message", channel, message, "success"),options);
+        var json = JsonSerializer.Serialize(new SocketMessage("message", channel, message, "success"), options);
         var bytes = Encoding.UTF8.GetBytes(json);
 
         var targets = _userChannels
@@ -105,7 +109,14 @@ public class WebSocketService : IWebSocketService, IDisposable
         {
             if (_userConnections.TryGetValue(userId, out var socket) && socket.State == WebSocketState.Open)
             {
-                await socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
+                try
+                {
+                    await socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+                catch (WebSocketException ex)
+                {
+                    _logger.LogWarning(ex, "Erro ao enviar mensagem para usuário {UserId}", userId);
+                }
             }
         }
     }
@@ -115,14 +126,69 @@ public class WebSocketService : IWebSocketService, IDisposable
     {
         if (_userConnections.TryGetValue(userId, out var socket) && socket.State == WebSocketState.Open)
         {
-                var options = new JsonSerializerOptions
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+            var json = JsonSerializer.Serialize(new SocketMessage("message", message, "success"), options);
+            var buffer = Encoding.UTF8.GetBytes(json);
+            
+            try
+            {
+                await socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+            }
+            catch (WebSocketException ex)
+            {
+                _logger.LogWarning(ex, "Erro ao enviar mensagem direta para usuário {UserId}", userId);
+            }
+        }
+    }
+
+    // --- Heartbeat (Ping periódico)
+    private async void SendHeartbeat(object? state)
+    {
+        var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true
         };
-            var json = JsonSerializer.Serialize(new SocketMessage("message", message, "success"),options);
-            var buffer = Encoding.UTF8.GetBytes(json);
-            await socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+
+        var text = JsonSerializer.Serialize(new TimerEvent());
+
+        var json = JsonSerializer.Serialize(new SocketMessage("ping",text , "success"),options);
+        var heartbeatMessage = Encoding.UTF8.GetBytes(json);
+
+        var disconnectedUsers = new List<string>();
+
+        foreach (var (userId, socket) in _userConnections)
+        {
+            if (socket.State == WebSocketState.Open)
+            {
+                try
+                {
+                    await socket.SendAsync(
+                        new ArraySegment<byte>(heartbeatMessage),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None);
+                }
+                catch (WebSocketException)
+                {
+                    _logger.LogWarning("Cliente {UserId} desconectado durante heartbeat", userId);
+                    disconnectedUsers.Add(userId);
+                }
+            }
+            else
+            {
+                disconnectedUsers.Add(userId);
+            }
+        }
+
+        // Limpa conexões mortas
+        foreach (var userId in disconnectedUsers)
+        {
+            await CloseConnectionAsync(userId);
         }
     }
 
@@ -132,7 +198,16 @@ public class WebSocketService : IWebSocketService, IDisposable
         if (_userConnections.TryRemove(userId, out var socket))
         {
             if (socket.State == WebSocketState.Open)
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Conexão encerrada", CancellationToken.None);
+            {
+                try
+                {
+                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Conexão encerrada", CancellationToken.None);
+                }
+                catch (WebSocketException ex)
+                {
+                    _logger.LogWarning(ex, "Erro ao fechar conexão do usuário {UserId}", userId);
+                }
+            }
         }
 
         _userChannels.TryRemove(userId, out _);
@@ -146,7 +221,16 @@ public class WebSocketService : IWebSocketService, IDisposable
         foreach (var socket in sockets)
         {
             if (socket.State == WebSocketState.Open)
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Servidor finalizando", CancellationToken.None);
+            {
+                try
+                {
+                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Servidor finalizando", CancellationToken.None);
+                }
+                catch (WebSocketException ex)
+                {
+                    _logger.LogWarning(ex, "Erro ao fechar conexão durante shutdown");
+                }
+            }
         }
 
         _userConnections.Clear();
@@ -157,10 +241,8 @@ public class WebSocketService : IWebSocketService, IDisposable
     // --- Dispose
     public void Dispose()
     {
+        _heartbeatTimer?.Dispose();
         CloseAllConnectionsAsync().GetAwaiter().GetResult();
         _logger.LogInformation("WebSocketService Dispose: conexões encerradas.");
     }
-
- 
-
 }
