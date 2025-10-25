@@ -63,11 +63,245 @@ namespace bingo_api.src.Extensions.Seeds
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
-
             // 🍀 Trevo da Sorte
             var trevo = new ScratchGame
             {
                 Name = "Trevo da Sorte",
+                LayoutType = EScratchLayoutType.Layout3x3,
+                Price = 10.00m,
+                MaxPrize = 1_000_000m,
+                Probability = 2.8m,
+                AllowedMultipliers = new[] { 1, 2, 5, 10, 50 },
+                Attributes = new ScratchGameAttributes
+                {
+                    PayoutTable = new List<ScratchPayout>
+                    {
+                        new(1, 10.00),
+                        new(2, 20.00),
+                        new(5, 50.00),
+                        new(10, 100.00),
+                        new(50, 500.00),
+                        new(100, 1_000.00),
+                        new(500, 5_000.00),
+                        new(1_000, 10_000.00),
+                        new(10_000, 100_000.00),
+                        new(100_000, 1_000_000.00),
+                    },
+                    Symbols = new List<ScratchSymbol>
+                    {
+                        new() { Symbol = "🍀", Name = "Trevo da Sorte", PrizeValue = 10.00},
+                        new() { Symbol = "💎", Name = "Diamante", PrizeValue = 20.00 },
+                        new() { Symbol = "🔔", Name = "Sino da Fortuna", PrizeValue = 50.00 },
+                        new() { Symbol = "🍒", Name = "Cereja", PrizeValue = 100.00 },
+                        new() { Symbol = "💰", Name = "Saco de Dinheiro", PrizeValue = 500.00 },
+                        new() { Symbol = "👑", Name = "Coroa Real", PrizeValue = 1_000.00 },
+                        new() { Symbol = "🔥", Name = "Chama Dourada", PrizeValue = 5_000.00 },
+                        new() { Symbol = "🌈", Name = "Arco-Íris da Fortuna", PrizeValue = 10_000.00 },
+                        new() { Symbol = "⭐", Name = "Estrela Suprema", PrizeValue = 100_000.00 },
+                        new() { Symbol = "👼", Name = "Anjo da Sorte", PrizeValue = 1_000_000.00 },
+                    }
+                },
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            var sete = new ScratchGame
+            {
+                Name = "777",
+                LayoutType = EScratchLayoutType.Layout3x3,
+                Price = 10.00m,
+                MaxPrize = 1_000_000m,
+                Probability = 2.8m,
+                AllowedMultipliers = new[] { 1, 2, 5, 10, 50 },
+                Attributes = new ScratchGameAttributes
+                {
+                    PayoutTable = new List<ScratchPayout>
+                    {
+                        new(1, 10.00),
+                        new(2, 20.00),
+                        new(5, 50.00),
+                        new(10, 100.00),
+                        new(50, 500.00),
+                        new(100, 1_000.00),
+                        new(500, 5_000.00),
+                        new(1_000, 10_000.00),
+                        new(10_000, 100_000.00),
+                        new(100_000, 1_000_000.00),
+                    },
+                    Symbols = new List<ScratchSymbol>
+                    {
+                        new() { Symbol = "🍀", Name = "Trevo da Sorte", PrizeValue = 10.00},
+                        new() { Symbol = "💎", Name = "Diamante", PrizeValue = 20.00 },
+                        new() { Symbol = "🔔", Name = "Sino da Fortuna", PrizeValue = 50.00 },
+                        new() { Symbol = "🍒", Name = "Cereja", PrizeValue = 100.00 },
+                        new() { Symbol = "💰", Name = "Saco de Dinheiro", PrizeValue = 500.00 },
+                        new() { Symbol = "👑", Name = "Coroa Real", PrizeValue = 1_000.00 },
+                        new() { Symbol = "🔥", Name = "Chama Dourada", PrizeValue = 5_000.00 },
+                        new() { Symbol = "🌈", Name = "Arco-Íris da Fortuna", PrizeValue = 10_000.00 },
+                        new() { Symbol = "⭐", Name = "Estrela Suprema", PrizeValue = 100_000.00 },
+                        new() { Symbol = "👼", Name = "Anjo da Sorte", PrizeValue = 1_000_000.00 },
+                    }
+                },
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            var ouro = new ScratchGame{
+                Name = "Ouro",
+                LayoutType = EScratchLayoutType.Layout3x3,
+                Price = 10.00m,
+                MaxPrize = 1_000_000m,
+                Probability = 2.8m,
+                AllowedMultipliers = new[] { 1, 2, 5, 10, 50 },
+                Attributes = new ScratchGameAttributes
+                {
+                    PayoutTable = new List<ScratchPayout>
+                    {
+                        new(1, 10.00),
+                        new(2, 20.00),
+                        new(5, 50.00),
+                        new(10, 100.00),
+                        new(50, 500.00),
+                        new(100, 1_000.00),
+                        new(500, 5_000.00),
+                        new(1_000, 10_000.00),
+                        new(10_000, 100_000.00),
+                        new(100_000, 1_000_000.00),
+                    },
+                    Symbols = new List<ScratchSymbol>
+                    {
+                        new() { Symbol = "🍀", Name = "Trevo da Sorte", PrizeValue = 10.00},
+                        new() { Symbol = "💎", Name = "Diamante", PrizeValue = 20.00 },
+                        new() { Symbol = "🔔", Name = "Sino da Fortuna", PrizeValue = 50.00 },
+                        new() { Symbol = "🍒", Name = "Cereja", PrizeValue = 100.00 },
+                        new() { Symbol = "💰", Name = "Saco de Dinheiro", PrizeValue = 500.00 },
+                        new() { Symbol = "👑", Name = "Coroa Real", PrizeValue = 1_000.00 },
+                        new() { Symbol = "🔥", Name = "Chama Dourada", PrizeValue = 5_000.00 },
+                        new() { Symbol = "🌈", Name = "Arco-Íris da Fortuna", PrizeValue = 10_000.00 },
+                        new() { Symbol = "⭐", Name = "Estrela Suprema", PrizeValue = 100_000.00 },
+                        new() { Symbol = "👼", Name = "Anjo da Sorte", PrizeValue = 1_000_000.00 },
+                    }
+                },
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            var cofrinho = new ScratchGame{
+                Name = "Cofrinho",
+                LayoutType = EScratchLayoutType.Layout3x3,
+                Price = 10.00m,
+                MaxPrize = 1_000_000m,
+                Probability = 2.8m,
+                AllowedMultipliers = new[] { 1, 2, 5, 10, 50 },
+                Attributes = new ScratchGameAttributes
+                {
+                    PayoutTable = new List<ScratchPayout>
+                    {
+                        new(1, 10.00),
+                        new(2, 20.00),
+                        new(5, 50.00),
+                        new(10, 100.00),
+                        new(50, 500.00),
+                        new(100, 1_000.00),
+                        new(500, 5_000.00),
+                        new(1_000, 10_000.00),
+                        new(10_000, 100_000.00),
+                        new(100_000, 1_000_000.00),
+                    },
+                    Symbols = new List<ScratchSymbol>
+                    {
+                        new() { Symbol = "🍀", Name = "Trevo da Sorte", PrizeValue = 10.00},
+                        new() { Symbol = "💎", Name = "Diamante", PrizeValue = 20.00 },
+                        new() { Symbol = "🔔", Name = "Sino da Fortuna", PrizeValue = 50.00 },
+                        new() { Symbol = "🍒", Name = "Cereja", PrizeValue = 100.00 },
+                        new() { Symbol = "💰", Name = "Saco de Dinheiro", PrizeValue = 500.00 },
+                        new() { Symbol = "👑", Name = "Coroa Real", PrizeValue = 1_000.00 },
+                        new() { Symbol = "🔥", Name = "Chama Dourada", PrizeValue = 5_000.00 },
+                        new() { Symbol = "🌈", Name = "Arco-Íris da Fortuna", PrizeValue = 10_000.00 },
+                        new() { Symbol = "⭐", Name = "Estrela Suprema", PrizeValue = 100_000.00 },
+                        new() { Symbol = "👼", Name = "Anjo da Sorte", PrizeValue = 1_000_000.00 },
+                    }
+                },
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            var frutinha = new ScratchGame{
+                Name = "Frutinha",
+                LayoutType = EScratchLayoutType.Layout3x3,
+                Price = 10.00m,
+                MaxPrize = 1_000_000m,
+                Probability = 2.8m,
+                AllowedMultipliers = new[] { 1, 2, 5, 10, 50 },
+                Attributes = new ScratchGameAttributes
+                {
+                    PayoutTable = new List<ScratchPayout>
+                    {
+                        new(1, 10.00),
+                        new(2, 20.00),
+                        new(5, 50.00),
+                        new(10, 100.00),
+                        new(50, 500.00),
+                        new(100, 1_000.00),
+                        new(500, 5_000.00),
+                        new(1_000, 10_000.00),
+                        new(10_000, 100_000.00),
+                        new(100_000, 1_000_000.00),
+                    },
+                    Symbols = new List<ScratchSymbol>
+                    {
+                        new() { Symbol = "🍀", Name = "Trevo da Sorte", PrizeValue = 10.00},
+                        new() { Symbol = "💎", Name = "Diamante", PrizeValue = 20.00 },
+                        new() { Symbol = "🔔", Name = "Sino da Fortuna", PrizeValue = 50.00 },
+                        new() { Symbol = "🍒", Name = "Cereja", PrizeValue = 100.00 },
+                        new() { Symbol = "💰", Name = "Saco de Dinheiro", PrizeValue = 500.00 },
+                        new() { Symbol = "👑", Name = "Coroa Real", PrizeValue = 1_000.00 },
+                        new() { Symbol = "🔥", Name = "Chama Dourada", PrizeValue = 5_000.00 },
+                        new() { Symbol = "🌈", Name = "Arco-Íris da Fortuna", PrizeValue = 10_000.00 },
+                        new() { Symbol = "⭐", Name = "Estrela Suprema", PrizeValue = 100_000.00 },
+                        new() { Symbol = "👼", Name = "Anjo da Sorte", PrizeValue = 1_000_000.00 },
+                    }
+                },
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            var cryptomoeda = new ScratchGame{
+                Name = "Cryptomoeda",
+                LayoutType = EScratchLayoutType.Layout3x3,
+                Price = 10.00m,
+                MaxPrize = 1_000_000m,
+                Probability = 2.8m,
+                AllowedMultipliers = new[] { 1, 2, 5, 10, 50 },
+                Attributes = new ScratchGameAttributes
+                {
+                    PayoutTable = new List<ScratchPayout>
+                    {
+                        new(1, 10.00),
+                        new(2, 20.00),
+                        new(5, 50.00),
+                        new(10, 100.00),
+                        new(50, 500.00),
+                        new(100, 1_000.00),
+                        new(500, 5_000.00),
+                        new(1_000, 10_000.00),
+                        new(10_000, 100_000.00),
+                        new(100_000, 1_000_000.00),
+                    },
+                    Symbols = new List<ScratchSymbol>
+                    {
+                        new() { Symbol = "🍀", Name = "Trevo da Sorte", PrizeValue = 10.00},
+                        new() { Symbol = "💎", Name = "Diamante", PrizeValue = 20.00 },
+                        new() { Symbol = "🔔", Name = "Sino da Fortuna", PrizeValue = 50.00 },
+                        new() { Symbol = "🍒", Name = "Cereja", PrizeValue = 100.00 },
+                        new() { Symbol = "💰", Name = "Saco de Dinheiro", PrizeValue = 500.00 },
+                        new() { Symbol = "👑", Name = "Coroa Real", PrizeValue = 1_000.00 },
+                        new() { Symbol = "🔥", Name = "Chama Dourada", PrizeValue = 5_000.00 },
+                        new() { Symbol = "🌈", Name = "Arco-Íris da Fortuna", PrizeValue = 10_000.00 },
+                        new() { Symbol = "⭐", Name = "Estrela Suprema", PrizeValue = 100_000.00 },
+                        new() { Symbol = "👼", Name = "Anjo da Sorte", PrizeValue = 1_000_000.00 },
+                    }
+                },
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            var milionarioinstantaneo =new ScratchGame{
+                Name = "MilionarioInstantaneo",
                 LayoutType = EScratchLayoutType.Layout3x3,
                 Price = 10.00m,
                 MaxPrize = 1_000_000m,

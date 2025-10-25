@@ -1,35 +1,40 @@
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.Json;
 using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.src.Controllers;
 
-    [ApiController]
-    [Route("ws")]
-    public class WebSocketController : ControllerBase
-    {
-        private readonly IWebSocketService _wsService;
+[ApiController]
+[Route("ws")]
+public class WebSocketController : ControllerBase
+{
+    private readonly IWebSocketService _wsService;
+    private readonly ILogger<WebSocketController> _logger;
 
-        public WebSocketController(IWebSocketService wsService)
+    public WebSocketController(IWebSocketService wsService, ILogger<WebSocketController> logger)
+    {
+        _wsService = wsService;
+        _logger = logger;
+    }
+
+    [HttpGet("{userId}")]
+    public async Task Get(string userId)
+    {
+        if (!HttpContext.WebSockets.IsWebSocketRequest)
         {
-            _wsService = wsService;
+            HttpContext.Response.StatusCode = 400;
+            return;
         }
 
-        [HttpGet("{userId}")]
-        public async Task Get(string userId)
+        var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+        await _wsService.RegisterConnectionAsync(userId, socket);
+
+        var buffer = new byte[1024 * 4];
+
+        try
         {
-            if (!HttpContext.WebSockets.IsWebSocketRequest)
-            {
-                HttpContext.Response.StatusCode = 400;
-                return;
-            }
-
-            var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-            await _wsService.RegisterConnectionAsync(userId, socket);
-
-            var buffer = new byte[1024 * 4];
-
             while (socket.State == WebSocketState.Open)
             {
                 var result = await socket.ReceiveAsync(buffer, CancellationToken.None);
@@ -42,10 +47,10 @@ namespace bingo_api.src.Controllers;
 
                 if (result.MessageType == WebSocketMessageType.Text)
                 {
-                var msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    var msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
                     try
                     {
-                        var data = System.Text.Json.JsonSerializer.Deserialize<SocketCommand>(msg);
+                        var data = JsonSerializer.Deserialize<SocketCommand>(msg);
 
                         if (data is not null)
                         {
@@ -53,9 +58,11 @@ namespace bingo_api.src.Controllers;
                             {
                                 case "subscribe":
                                     await _wsService.SubscribeToChannelAsync(userId, data.channel!);
+                                    await _wsService.SendMessageToChannelAsync(userId, $"Subscribed to {data.channel}");
                                     break;
                                 case "unsubscribe":
                                     await _wsService.UnsubscribeFromChannelAsync(userId, data.channel!);
+                                    await _wsService.SendMessageToChannelAsync(userId, $"Unsubscribed from {data.channel}");
                                     break;
                                 case "message":
                                     await _wsService.SendMessageToChannelAsync(data.channel!, data.message!);
@@ -65,12 +72,20 @@ namespace bingo_api.src.Controllers;
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Erro processando mensagem WS: {ex.Message}");
+                        _logger.LogError(ex, "Erro processando mensagem WS do usuário {UserId}", userId);
                     }
                 }
             }
         }
-
-        private record SocketCommand(string? command, string? channel, string? message);
+        catch (WebSocketException ex)
+        {
+            _logger.LogError(ex, "WebSocket error para usuário {UserId}", userId);
+        }
+        finally
+        {
+            await _wsService.CloseConnectionAsync(userId);
+        }
     }
 
+    private record SocketCommand(string? command, string? channel, string? message);
+}
