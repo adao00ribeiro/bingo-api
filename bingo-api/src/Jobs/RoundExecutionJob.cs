@@ -79,7 +79,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 context.Rounds.Entry(tempRound).State = EntityState.Modified;
                 await context.SaveChangesAsync();
                 message.Finished = true;
-                await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                await this.webSocketService.SendMessageToChannelAsync($"room_{tempRound.RoomId}", message.JsonSerializerRound());
                 timeline.Add(new TimelineEvent { eventData = message.Clone() });
                 return;
             }
