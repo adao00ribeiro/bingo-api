@@ -13,7 +13,7 @@ namespace bingo_api.src.Controllers.Scratch;
 
 [Authorize]
 [ApiVersion("1.0")]
-public class ScratchTicketController(IScratchTicketRepository scratchTicketRepository,IScratchBuyService scratchBuyService) : ApiControllerBase
+public class ScratchTicketController(IScratchTicketRepository scratchTicketRepository, IScratchBuyService scratchBuyService) : ApiControllerBase
 {
     private readonly IScratchTicketRepository _scratchTicketRepository = scratchTicketRepository;
     private readonly IScratchBuyService _scratchBuyService = scratchBuyService;
@@ -29,7 +29,7 @@ public class ScratchTicketController(IScratchTicketRepository scratchTicketRepos
     public async Task<ActionResult<ScratchTicketResponseDto>> BuyTicket(ScratchBuyRequestDto dto)
     {
         var entityIdStr = User.FindFirst("entityid")?.Value;
-        var ticket = await this._scratchBuyService.Buy(Guid.Parse(entityIdStr),ScratchBuyRequestDto.ConvertToEntity(dto));
+        var ticket = await this._scratchBuyService.Buy(Guid.Parse(entityIdStr), ScratchBuyRequestDto.ConvertToEntity(dto));
         return Ok(ScratchTicketResponseDto.ConvertToDto(ticket));
     }
 

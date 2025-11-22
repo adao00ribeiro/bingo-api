@@ -37,12 +37,12 @@ public class PunterRepository : RepositoryBase<Punter>, IPunterRepository
 
     public async Task<Punter> GetByIdAsync(Guid id)
     {
-          var punter = await Context.Punters
-             .Include(p => p.Seller)
-                 .ThenInclude(s => s.OwnerRooms)
-             .Include(p => p.Seller)
-                 .ThenInclude(s => s.PaymentMethods)
-            .FirstOrDefaultAsync(punter => punter.Id == id);
+        var punter = await Context.Punters
+           .Include(p => p.Seller)
+               .ThenInclude(s => s.OwnerRooms)
+           .Include(p => p.Seller)
+               .ThenInclude(s => s.PaymentMethods)
+          .FirstOrDefaultAsync(punter => punter.Id == id);
 
         return punter;
     }

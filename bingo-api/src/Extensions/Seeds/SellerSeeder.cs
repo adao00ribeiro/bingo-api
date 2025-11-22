@@ -64,10 +64,10 @@ public class SellerSeeder : IDataSeeder
         {
             throw new Exception("Falha ao criar o usuário Identity para o Seller.");
         }
-       var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Admin);
-            if (!roleResult.Succeeded)
-            {
-                throw new Exception("Falha ao adicionar o Role ao usuário Seller.");
-            }
+        var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Admin);
+        if (!roleResult.Succeeded)
+        {
+            throw new Exception("Falha ao adicionar o Role ao usuário Seller.");
+        }
     }
 }

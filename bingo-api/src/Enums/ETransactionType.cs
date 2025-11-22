@@ -6,5 +6,5 @@ public enum TransactionType
     CardPurchased,
     ScratchPurchased,
     Reward,
-    ScratchPrizeReceived            
+    ScratchPrizeReceived
 }

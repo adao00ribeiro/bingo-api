@@ -45,7 +45,7 @@ public class ScratchSellerGameController(
                 throw new Exception("Usuário não encontrado");
             }
             totalCount = await _scratchSellerGameRepository.CountAsync(punter.SellerId);
-            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size,filter: r => r.SellerId == punter.SellerId,
+            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, filter: r => r.SellerId == punter.SellerId,
                     includeProperties: [x => x.ScratchGame]
                 );
         }
@@ -94,7 +94,7 @@ public class ScratchSellerGameController(
         {
             return NotFound();
         }
-            
+
         return Ok(ScratchSellerGameResponseDto.ConvertToDto(scratchSellerGame));
     }
 }

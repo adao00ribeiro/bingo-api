@@ -12,7 +12,7 @@ namespace bingo_api.src.Context;
 public class DataContext : DbContext
 {
 
-     private readonly EventDispatcher _dispatcher;
+    private readonly EventDispatcher _dispatcher;
     public DbSet<Seller> Sellers { get; set; }
     public DbSet<Punter> Punters { get; set; }
     public DbSet<Room> Rooms { get; set; }
@@ -34,7 +34,7 @@ public class DataContext : DbContext
     public DbSet<Withdrawal> Withdrawals { get; set; }
     public DataContext(DbContextOptions<DataContext> options, EventDispatcher dispatcher) : base(options)
     {
-         _dispatcher = dispatcher;
+        _dispatcher = dispatcher;
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -75,18 +75,18 @@ public class DataContext : DbContext
     .ToListAsync();*/
     }
     public async Task<int> SaveChangesWithoutEventsAsync(CancellationToken cancellationToken = default)
-{
-    return await base.SaveChangesAsync(cancellationToken);
-}
+    {
+        return await base.SaveChangesAsync(cancellationToken);
+    }
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entities = ChangeTracker.Entries<Entity>()
         .Where(e => e.Entity.DomainEvents.Any())
         .Select(e => e.Entity)
         .ToList();
-            
+
         var result = await base.SaveChangesAsync(cancellationToken);
-           // 🔔 Após salvar, processa eventos de domínio
+        // 🔔 Após salvar, processa eventos de domínio
 
         if (entities.Any())
             await _dispatcher.DispatchEventsAsync(entities);

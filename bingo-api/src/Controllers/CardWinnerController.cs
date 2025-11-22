@@ -19,7 +19,7 @@ public class CardWinnerController(ICardWinnerRepository cardWinnerRepository) : 
 
     [Authorize(Roles = $"{Roles.Admin},{Roles.Punter}")]
     [HttpGet()]
-     public async Task<ActionResult<ReportResponseDto<CardWinnerResponseDto, object>>> GetAll(int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<CardWinnerResponseDto, object>>> GetAll(int? page = null, int? size = null)
     {
 
         var entityId = User.FindFirst("entityid")?.Value;
@@ -43,7 +43,7 @@ public class CardWinnerController(ICardWinnerRepository cardWinnerRepository) : 
         {
             return Forbid(); // Bloqueia caso o usuário não seja admin nem punter
         }
-       var cardWinnerDtos = cardWinners.Select(r => CardWinnerResponseDto.ConvertToDto(r)).ToList();
+        var cardWinnerDtos = cardWinners.Select(r => CardWinnerResponseDto.ConvertToDto(r)).ToList();
 
         // Paginação simples
         var pageNumber = page ?? 1;

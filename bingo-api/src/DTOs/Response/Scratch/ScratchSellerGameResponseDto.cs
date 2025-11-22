@@ -11,12 +11,12 @@ public record ScratchSellerGameResponseDto
     public ScratchGameResponseDto? ScratchGame { get; set; }
     internal static ScratchSellerGameResponseDto ConvertToDto(ScratchSellerGame entity)
     {
-         return new ScratchSellerGameResponseDto
+        return new ScratchSellerGameResponseDto
         {
             Id = entity.Id,
             SellerId = entity.SellerId,
             ScratchGameId = entity.ScratchGameId,
-            Seller = entity.Seller is null   ? null  : SellerResponseDto.ConvertToDto(entity.Seller),
+            Seller = entity.Seller is null ? null : SellerResponseDto.ConvertToDto(entity.Seller),
             ScratchGame = entity.ScratchGame is null ? null : ScratchGameResponseDto.ConvertToDto(entity.ScratchGame)
         };
     }
