@@ -36,6 +36,27 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             var context = scope.ServiceProvider.GetRequiredService<DataContext>();
             _logger.LogInformation("Iniciando Job2 - Processamento do Round {RoundId}", roundId);
 
+            Round? tempRound = await context.Rounds
+  .Include(r => r.Cards)
+  .ThenInclude(c => c.Punter)
+  .Include(r => r.Prizes)
+  .Include(r => r.Room)
+  .ThenInclude(room => room.Accumulated)
+   .AsNoTracking()
+  .FirstOrDefaultAsync(r => r.Id == roundId);
+
+            var timeline = new List<TimelineEvent>();
+
+            if (tempRound is null)
+            {
+                _logger.LogWarning("Rodada {RoundId} não encontrada.", roundId);
+                return;
+            }
+            if (tempRound.Finished != null)
+            {
+                _logger.LogWarning("Rodada {RoundId} já foi finalizada.", roundId);
+                return;
+            }
             var result = await this.InsertBotRoundService.Execute(roundId);
 
             if (result.IsSuccess)
@@ -50,28 +71,6 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                     Console.WriteLine(result.Data); // Pode conter mensagem adicional de erro
                 }
             }
-
-            Round? tempRound = await context.Rounds
-            .Include(r => r.Cards)
-            .ThenInclude(c => c.Punter)
-            .Include(r => r.Prizes)
-            .Include(r => r.Room)
-            .ThenInclude(room => room.Accumulated)
-             .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.Id == roundId);
-
-            var timeline = new List<TimelineEvent>();
-
-            if (tempRound is null)
-            {
-                _logger.LogWarning("Rodada {RoundId} não encontrada.", roundId);
-                return;
-            }
-            if (tempRound.Finished != null)
-            {
-                _logger.LogWarning("Rodada {RoundId} já foi finalizada.", roundId);
-                return;
-            }
             var message = new RoundMessage(tempRound.Id);
 
             if (tempRound.CardSaleCount == 0)
@@ -80,13 +79,13 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 context.Rounds.Entry(tempRound).State = EntityState.Modified;
                 await context.SaveChangesAsync();
                 message.Finished = true;
-                //  await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
+                await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
                 timeline.Add(new TimelineEvent { eventData = message.Clone() });
                 return;
             }
 
             var drawnNumbers = new HashSet<int>();
-            remainingNumbers = [.. Enumerable.Range(1, tempRound.MaxBalls)];
+            remainingNumbers = [.. Enumerable.Range(1, tempRound.MaxBalls).OrderBy(x => Guid.NewGuid())];
 
             var prizes = tempRound.Prizes;
             var allAwardsDrawn = false;
@@ -113,21 +112,21 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             var prizeServices = prizes
     .Select(p => PrizeServiceFactory.CreateService(p))
     .ToList();
-            while (remainingNumbers.Any() && !allAwardsDrawn)
+
+            foreach (var number in remainingNumbers)
             {
-                var number = GenerateRandomNumber();
+                if (allAwardsDrawn)
+                    continue;
                 drawnNumbers.Add(number);
                 tempRound.Numbers = drawnNumbers.ToArray();
                 var sleep_round = tempRound.TimeBetweenBalls;
                 var TimeBetweenBalls = tempRound.TimeBetweenBalls;
-                foreach (var card in cards)
-                {
-                    card.CheckNumberOnTheCard(number);
-                }
+
+                var markedCards = cards.Where(card => card.CheckNumberOnTheCard(number)).ToList();
 
                 foreach (var prizeService in prizeServices)
                 {
-                    prizeService.Execute(cards, tempRound.CardRows, tempRound.CardColumns);
+                    prizeService.Execute(markedCards, tempRound.CardRows, tempRound.CardColumns);
                 }
 
                 var current_prize_result = (PrizeResult)null;
@@ -229,7 +228,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             throw;
         }
     }
-
+    /*
     private int GenerateRandomNumber()
     {
         if (remainingNumbers.Count == 0)
@@ -245,6 +244,6 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
 
         _logger.LogWarning($"Number drawn: {number}");
         return number;
-    }
+    }*/
 
 }
