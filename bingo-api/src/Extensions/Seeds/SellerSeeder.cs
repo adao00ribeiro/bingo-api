@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using bingo_api.src.Constants;
 using bingo_api.src.Context;
 using bingo_api.src.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -50,5 +47,27 @@ public class SellerSeeder : IDataSeeder
 
         await _paymentSeeder.SeedForSellerAsync(seller.Id);
         await _roomSeeder.SeedForSellerAsync(seller.Id);
+
+        var identityUser = new User
+        {
+            Id = sellerId.ToString(),
+            EntityId = sellerAdded.Entity.Id,
+            EntityType = nameof(Seller),
+            UserName = sellerEmail,
+            Email = sellerEmail,
+            EmailConfirmed = true,
+            PhoneNumber = "11111111111"
+        };
+
+        var result = _userManager.CreateAsync(identityUser, "Admin@123").Result;
+        if (!result.Succeeded)
+        {
+            throw new Exception("Falha ao criar o usuário Identity para o Seller.");
+        }
+       var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Admin);
+            if (!roleResult.Succeeded)
+            {
+                throw new Exception("Falha ao adicionar o Role ao usuário Seller.");
+            }
     }
 }
