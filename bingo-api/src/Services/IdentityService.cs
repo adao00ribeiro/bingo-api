@@ -262,7 +262,7 @@ public class IdentityService : IIdentityService
         var encodedToken = System.Web.HttpUtility.UrlEncode(resetToken);
 
         var resetLink = $"{_configuration["ConnectionStrings:HostUrl"]}reset-password?email={user.Email}&token={encodedToken}";
-        
+
         if (punter.Seller.Settings.EmailConfig == null)
         {
             await _notifier.SendMessageAsync($"⚠️ Configuracao STMP Null para Vendedor {punter.SellerId} ");

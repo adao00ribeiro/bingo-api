@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using bingo_api.src.Entities;
 using bingo_api.src.Repositories.Shared;
+using bingo_api.src.DTOs.Response.report;
+using System.Linq.Expressions;
 
 namespace bingo_api.src.Controllers;
 
@@ -21,11 +23,34 @@ public class SellerController(ISellerRepository _sellerRepository) : ApiControll
     private readonly ISellerRepository sellerRepository = _sellerRepository;
 
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<SellerResponseDto>>> GetAll()
+
+    public async Task<ActionResult<ReportResponseDto<SellerResponseDto, object>>> GetAll(
+        int? page = null,
+        int? size = null,
+         bool? enabledScratch = null
+        )
     {
-        var sellers = await sellerRepository.GetAllAsync();
-        var sellersResponse = sellers.Select(seller => SellerResponseDto.ConvertToDto(seller));
-        return Ok(sellersResponse);
+        Expression<Func<Seller, bool>>? filter = null;
+
+        if (enabledScratch.HasValue)
+        {
+            filter = s => s.Settings != null && s.Settings.EnabledScratch == enabledScratch.Value;
+        }
+        var sellers = await sellerRepository.GetAllAsync(pageNumber: page, pageSize: size, filter: filter);
+        var sellerDtos = sellers.Select(s => SellerResponseDto.ConvertToDto(s)).ToList();
+        var totalCount = await sellerRepository.CountAsync();
+        var response = new ReportResponseDto<SellerResponseDto, object>
+        {
+            Rows = sellerDtos,
+            Stats = null,
+            StartingOn = null,
+            EndingOn = null,
+            Page = page,
+            PerPage = size,
+            RowsCount = totalCount
+        };
+
+        return Ok(response);
     }
 
     [HttpGet("id/{id}")]
@@ -88,7 +113,7 @@ public class SellerController(ISellerRepository _sellerRepository) : ApiControll
         return Ok();
     }
     [HttpPatch("{id}")]
-    public async Task<IActionResult> Patch(Guid id , [FromBody] SellerPatchRequestDto request)
+    public async Task<IActionResult> Patch(Guid id, [FromBody] SellerPatchRequestDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

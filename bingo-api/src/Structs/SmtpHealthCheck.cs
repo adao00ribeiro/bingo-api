@@ -17,7 +17,7 @@ public class SmtpHealthCheck : IHealthCheck
         try
         {
             using var client = new SmtpClient();
-                // 🔹 Ignora validação de certificado apenas no HealthCheck
+            // 🔹 Ignora validação de certificado apenas no HealthCheck
             client.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
             {
                 return true; // ✅ aceita certificado mesmo que CRL/OCSP falhe

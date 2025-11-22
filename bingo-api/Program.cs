@@ -90,7 +90,7 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var dataInitializer = scope.ServiceProvider.GetRequiredService<DataInitializer>();
-    await dataInitializer.Seed();
+    await dataInitializer.SeedAsync();
 }
 app.UseWebSockets();
 app.UseHsts();

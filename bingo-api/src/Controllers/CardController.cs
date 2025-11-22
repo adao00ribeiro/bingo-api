@@ -6,7 +6,9 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
+
 [Authorize]
 
 [ApiVersion("1.0")]
@@ -36,7 +38,7 @@ public class CardController(ICardRepository _cardRepository, IPunterRepository _
         return Ok(cardsResponse);
     }
     [HttpGet("round/{roundId}")]
-    public async Task<ActionResult<PagedResponseDto<CardResponseDto>>> GetAllByRoundId(Guid roundId, int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<CardResponseDto, object>>> GetAllByRoundId(Guid roundId, int? page = null, int? size = null)
     {
         var identity = User.Identity as ClaimsIdentity;
         var userEmail = identity?.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
@@ -51,13 +53,25 @@ public class CardController(ICardRepository _cardRepository, IPunterRepository _
             return BadRequest();
         }
         var cards = await cardRepository.GetAllByRoundId(punter.Id, roundId, page, size, includeProperties: c => c.Round);
-        int totalCount = cards.Count();
-        var cardsResponse = cards.Select(c => CardResponseDto.ConvertToDto(c));
-        return Ok(new PagedResponseDto<CardResponseDto>
+        var cardDtos = cards.Select(r => CardResponseDto.ConvertToDto(r)).ToList();
+
+        // Paginação simples
+        var pageNumber = page ?? 1;
+        var pageSize = size ?? cardDtos.Count;
+        var pagedRows = cardDtos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+        var response = new ReportResponseDto<CardResponseDto, object>
         {
-            Items = cardsResponse,
-            TotalCount = totalCount
-        });
+            Rows = pagedRows,
+            Stats = null,                  // opcional, você pode criar um objeto de estatísticas se quiser
+            StartingOn = null,
+            EndingOn = null,
+            Page = pageNumber,
+            PerPage = pageSize,
+            RowsCount = cardDtos.Count
+        };
+
+        return Ok(response);
     }
 
     [HttpGet("id/{id}")]

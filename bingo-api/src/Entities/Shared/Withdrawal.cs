@@ -6,5 +6,5 @@ public abstract class Withdrawal : Entity
 {
     public decimal Amount { get; set; }
     public EWithdrawalStatus Status { get; set; }
-  
+
 }

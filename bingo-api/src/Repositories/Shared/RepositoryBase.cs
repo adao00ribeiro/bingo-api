@@ -129,5 +129,5 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
     public void Dispose() =>
         Context.Dispose();
 
-   
+
 }

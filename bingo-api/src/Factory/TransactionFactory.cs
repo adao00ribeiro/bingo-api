@@ -11,8 +11,10 @@ public class TransactionFactory
         {
             TransactionType.Deposit => new DepositTransaction(),
             TransactionType.CardPurchased => new PurchaseTransaction(),
-            TransactionType.PrizeReceived => new PrizeReceivedTransaction(),
+            TransactionType.ScratchPurchased => new PurchaseTransaction(),
+            TransactionType.BingoPrizeReceived => new PrizeReceivedTransaction(),
             TransactionType.Withdrawal => new PrizeWithdrawTransaction(),
+            TransactionType.ScratchPrizeReceived => new PrizeReceivedTransaction(),   
             _ => throw new ArgumentException("Tipo de transação inválido.")
         };
     }

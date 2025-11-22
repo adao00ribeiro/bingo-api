@@ -1,129 +1,117 @@
-using bingo_api.src.Constants;
-using bingo_api.src.Context;
-using bingo_api.src.Entities;
-using bingo_api.src.Interfaces.Repositories;
-using Microsoft.AspNetCore.Identity;
+using bingo_api.src.Extensions.Seeds;
+
 
 namespace bingo_api.src.Extensions;
 
 public class DataInitializer
 {
 
-    private readonly DataContext _context;
-    private readonly UserManager<User> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IBotConfigRepository _botConfigRepository;
-    public DataInitializer(
-       DataContext context,
-       UserManager<User> userManager,
-       RoleManager<IdentityRole> roleManager,
-       IBotConfigRepository botConfigRepository)
+    private readonly IEnumerable<IDataSeeder> _seeders;
+
+    public DataInitializer(IEnumerable<IDataSeeder> seeders)
     {
-        _context = context;
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _botConfigRepository = botConfigRepository;
+        _seeders = seeders;
     }
-    public async Task Seed()
+
+    public async Task SeedAsync()
     {
-
-        var roles = new[] { Roles.Admin, Roles.Seller, Roles.Punter };
-
-        foreach (var role in roles)
+        foreach (var seeder in _seeders)
         {
-            var roleExist = await _roleManager.RoleExistsAsync(role);
-            if (!roleExist)
-            {
-                await _roleManager.CreateAsync(new IdentityRole(role));
-            }
-        }
-
-
-        var sellerId = Guid.Parse("b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06");
-        var sellerEmail = "default@seller.com";
-
-        if (!_context.Sellers.Any(s => s.Id == sellerId))
-        {
-            // Cria um Seller de desenvolvimento
-            var seller = new Seller
-            {
-                Balance = 0,
-                Email = sellerEmail,
-                Cpf = "11111111111",
-                DateBirth = DateTime.UtcNow,
-                Comission = 0,
-                IndicateRewardValue = 20
-            };
-            seller.SetIdGuid(sellerId);
-            // Adiciona o Seller ao contexto
-            var sellerAdded = _context.Sellers.Add(seller);
-            if (!_context.PaymentMethods.Any(pm => pm.SellerId == seller.Id))
-            {
-                var pixManualMethod = new PaymentMethod
-                (
-                   "PIX Manual",
-                   Enums.EPaymentMethodType.PIXMANUAL,
-                   "",
-                   "https://exemplo.com/qrcode.png",
-                   "Escaneie o QR Code e envie o comprovante para o suporte.",
-                    true,
-                    seller.Id
-                );
-                var pushPayMethod = new PaymentMethod
-                (
-                    "PushPay",
-                    Enums.EPaymentMethodType.PUSHPAY,
-                   "SEU_TOKEN_PADRAO_SE_FOR_APLICÁVEL",
-                    "",
-                    "",
-                    false, // Apenas Pix está ativo por padrão
-                    seller.Id
-                );
-                _context.PaymentMethods.Add(pushPayMethod);
-                _context.PaymentMethods.Add(pixManualMethod);
-            }
-            var identityUser = new User
-            {
-                Id = sellerId.ToString(),
-                EntityId = sellerAdded.Entity.Id,
-                EntityType = nameof(Seller),
-                UserName = sellerEmail,
-                Email = sellerEmail,
-                EmailConfirmed = true,
-                PhoneNumber = "11111111111"
-            };
-
-            var result = _userManager.CreateAsync(identityUser, "Admin@123").Result;
-            if (!result.Succeeded)
-            {
-                throw new Exception("Falha ao criar o usuário Identity para o Seller.");
-            }
-            var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Admin);
-            if (!roleResult.Succeeded)
-            {
-                throw new Exception("Falha ao adicionar o Role ao usuário Seller.");
-            }
-
-            // Cria uma Room associada ao Seller
-            var room = new Room("Sala de Desenvolvimento", sellerId);
-
-            room.Accumulated = new Accumulated
-            {
-                Activated = true,
-                MinimumValue = 50,
-                MaximumValue = 5000,
-                CurrentValue = 100,
-                MaximumNumberOfBalls = 45,
-                CumulativePercentage = 2.5m,
-                IncrementBallCumulative = true,
-                RoomId = room.Id
-            };
-
-            _context.Rooms.Add(room);
-            _context.SaveChanges(); // Salva a Room no banco de dados
-
-            await this._botConfigRepository.CreateWithPuntersAsync(new BotConfig(room));
-
+            await seeder.SeedAsync();
         }
     }
+    /*
+    private static List<ScratchTicket> GenerateTickets(ScratchGame game, int count)
+    {
+        var tickets = new List<ScratchTicket>();
+        var symbols = game.Attributes.Symbols;
+        var totalWeight = symbols.Sum(s => s.Weight);
+        var positionsCount = 9; // para layout 3x3
+        var rnd = new Random();
+
+        int winnersToGenerate = (int)(count * 0.3); // 30% ganhadores
+        int losersToGenerate = count - winnersToGenerate;
+
+        for (int i = 0; i < count; i++)
+        {
+            var isWinner = i < winnersToGenerate;
+            var items = new List<ScratchItem>();
+
+            if (isWinner)
+            {
+                // Símbolo vencedor
+                var symbol = WeightedRandomSymbol(symbols, totalWeight, rnd);
+
+                // Posições com símbolo vencedor
+                var winnerPositions = GetRandomDistinctPositions(positionsCount, 3, rnd);
+
+                for (int j = 0; j < positionsCount; j++)
+                {
+                    var isWinning = winnerPositions.Contains(j);
+                    items.Add(new ScratchItem
+                    {
+                        Name = symbol.Name,
+                        Position = j,
+                        Symbol = isWinning ? symbol.Symbol : WeightedRandomSymbol(symbols, totalWeight, rnd).Symbol,
+                        IsWinner = isWinning
+                    });
+                }
+            }
+            else
+            {
+                // Geração perdedora: evita 3 iguais
+                var symbolCounts = new Dictionary<string, int>();
+
+                for (int j = 0; j < positionsCount; j++)
+                {
+                    string selectedSymbol;
+                    int attempts = 0;
+                    int currentCount = 0;
+
+                    do
+                    {
+                        selectedSymbol = WeightedRandomSymbol(symbols, totalWeight, rnd).Symbol;
+                        symbolCounts.TryGetValue(selectedSymbol, out currentCount);
+                        attempts++;
+                    } while (currentCount >= 2 && attempts < 10);
+
+                    symbolCounts[selectedSymbol] = symbolCounts.GetValueOrDefault(selectedSymbol, 0) + 1;
+
+                    items.Add(new ScratchItem
+                    {
+                        Position = j,
+                        Symbol = selectedSymbol,
+                        IsWinner = false
+                    });
+                }
+
+            }
+
+            tickets.Add(new ScratchTicket
+            {
+                ScratchGameId = game.Id,
+                Multiplier = 1,
+                PrizeWon = 0,
+                Revealed = false,
+                Attributes = new ScratchTicketAttributes
+                {
+                    PunterId = Guid.Empty, // Pode ser atualizado depois com o ID correto
+                    Items = items
+                },
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+
+        return tickets;
+    }
+*/
+
+    private static HashSet<int> GetRandomDistinctPositions(int max, int count, Random rnd)
+    {
+        var result = new HashSet<int>();
+        while (result.Count < count)
+            result.Add(rnd.Next(0, max));
+        return result;
+    }
+
 }
