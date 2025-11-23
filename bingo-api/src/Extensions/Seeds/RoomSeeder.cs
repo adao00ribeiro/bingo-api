@@ -19,7 +19,7 @@ public class RoomSeeder
         _botConfigRepository = botConfigRepository;
     }
 
-    public async Task SeedForSellerAsync(Guid sellerId)
+    public async Task SeedAsync(Guid sellerId)
     {
         var room = new Room("Sala de Desenvolvimento", sellerId)
         {
