@@ -1,5 +1,3 @@
-using System.Security.Claims;
-using bingo_api.src.Constants;
 using bingo_api.src.Controllers.Shared;
 using bingo_api.src.DTOs.Request;
 using bingo_api.src.DTOs.Response;
@@ -8,6 +6,7 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using Microsoft.EntityFrameworkCore;
 using bingo_api.src.DTOs.Response.report;
 
 namespace bingo_api.src.Controllers;
@@ -34,19 +33,24 @@ public class RoomController(IRoomRepository _roomRepository) : ApiControllerBase
         if (User.IsInRole("Admin"))
         {
             // Admin pode ver todas as salas
-            rooms = await roomRepository.GetAllAsync(pageNumber: page, pageSize: size, includeProperties: [r => r.RoomsSellers, r => r.Owner]);
+            rooms = await roomRepository.GetAllAsync(pageNumber: page, pageSize: size, includeProperties: q => q.Include(x => x.RoomsSellers).Include(x => x.Owner));
         }
         else if (User.IsInRole("Seller"))
         {
-            rooms = await roomRepository.GetAllAsync(filter: r => r.OwnerId == Guid.Parse(entityId), includeProperties: [r => r.RoomsSellers, r => r.Owner]);
+            rooms = await roomRepository.GetAllAsync(filter: r => r.OwnerId == Guid.Parse(entityId), includeProperties: q => q.Include(x => x.RoomsSellers).Include(x => x.Owner));
         }
         else if (User.IsInRole("Punter"))
         {
             // Punter pode ver apenas as salas dos Sellers associados a ele
-            rooms = await roomRepository.GetAllAsync(includeProperties: [
-                r => r.RoomsSellers.Any(rs => rs.Seller.Punters.Any(p => p.Id == Guid.Parse(entityId))),
-                r => r.RoomsSellers,
-                r => r.Owner]
+            rooms = await roomRepository.GetAllAsync(includeProperties: q => q.Where(r => r.RoomsSellers
+            .Any(rs => rs.Seller.Punters
+            .Any(p => p.Id == Guid.Parse(entityId)
+            )
+        ))
+        .Include(r => r.RoomsSellers)
+            .ThenInclude(rs => rs.Seller)
+                .ThenInclude(s => s.Punters)
+        .Include(r => r.Owner)
             );
         }
         else

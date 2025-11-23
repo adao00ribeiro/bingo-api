@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
@@ -24,11 +25,7 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         int? page = null,
         int? size = null)
     {
-        var rounds = await roundRepository.GetAllAsync(
-            page,
-            size,
-            includeProperties: [r => r.Prizes]
-        );
+        var rounds = await roundRepository.GetAllAsync(page, size, includeProperties: q => q.Include(x => x.Prizes));
         var roundDtos = rounds.Select(r => RoundResponseDto.ConvertToDto(r)).ToList();
         var totalCount = await roundRepository.CountAsync();
         var response = new ReportResponseDto<RoundResponseDto, object>

@@ -16,6 +16,10 @@ using bingo_api.src.Interfaces.Jobs;
 using Npgsql;
 using bingo_api.src.Adapter;
 using bingo_api.src.Interceptors;
+using bingo_api.src.Interfaces.blockchain;
+using bingo_api.src.Factory;
+using bingo_api.src.Repositories.Blockchain;
+using bingo_api.src.Services.Blockchain;
 using bingo_api.src.Interfaces.Repositories.Scratch;
 using bingo_api.src.Repositories.Scratch;
 using bingo_api.src.Extensions.Seeds;
@@ -68,6 +72,7 @@ public static class NativeInjectorConfig
         services.AddSingleton<IWebSocketService, WebSocketService>();
 
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")));
+        services.AddSingleton<BlockchainServiceFactory>();
         //repository
         services.AddScoped<JwtSecurityExtensionEvents>();
         services.AddScoped<IIdentityService, IdentityService>();
@@ -85,6 +90,13 @@ public static class NativeInjectorConfig
         services.AddScoped<IBotConfigRepository, BotConfigRepository>();
         services.AddScoped<IAccumulatedRepository, AccumulatedRepository>();
         services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
+        services.AddScoped<INetworkRepository, NetworkRepository>();
+        services.AddScoped<ITokenRepository, TokenRepository>();
+        services.AddScoped<ITokenAddressRepository, TokenAddressRepository>();
+        services.AddScoped<ITokenAddressRepository, TokenAddressRepository>();
+
+
+        services.AddScoped<BlockchainServiceFactory>();
         services.AddScoped<IScratchGameRepository, ScratchGameRepository>();
         services.AddScoped<IScratchSellerGameRepository, ScratchSellerGameRepository>();
         services.AddScoped<IScratchTicketRepository, ScratchTicketRepository>();
@@ -94,17 +106,20 @@ public static class NativeInjectorConfig
         services.AddScoped<IRoundFetcherJob, RoundFetcherJob>();
         services.AddScoped<IRoundExecutionJob, RoundExecutionJob>();
         services.AddScoped<IShowTimelineStepJob, ShowTimelineStepJob>();
+        services.AddScoped<DepositWatcher>();
 
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();
         services.AddScoped<IScratchBuyService, ScratchBuyService>();
         services.AddScoped<IPaymentProvider, PixManualAdapter>();
+        services.AddScoped<IPaymentProvider, CryptoAdapter>();
+        services.AddScoped<IPaymentProvider, PushPayAdapter>();
         services.AddHttpClient<PushPayAdapter>();
         services.AddHttpClient<TelegamNotifierService>();
-        services.AddScoped<IPaymentProvider, PushPayAdapter>();
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IWithdrawalService, WithdrawalService>();
+        services.AddScoped<IBlockchainConfigService, BlockchainConfigService>();
 
         services.AddSingleton<IEmailSenderService, MailKitEmailSenderService>();
 
@@ -115,6 +130,7 @@ public static class NativeInjectorConfig
         services.AddScoped<IDataSeeder, RoleSeeder>();
         services.AddScoped<IDataSeeder, ScratchGameSeeder>();
         services.AddScoped<IDataSeeder, SellerSeeder>();
+        services.AddScoped<IDataSeeder, BlockchainSeeder>();
 
         services.AddScoped<EventDispatcher>();
         services.Scan(scan => scan
@@ -127,6 +143,7 @@ public static class NativeInjectorConfig
         // services.AddHealthChecks()
         //   .AddCheck("smtp_primary", new SmtpHealthCheck(configuration.GetSection("Email:PrimarySmtp").Get<SmtpSettings>()));
 
+        services.AddHostedService<DepositWatcher>();
 
     }
 

@@ -39,6 +39,7 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 }
                 // Atualiza o status para COMPLETED
                 recharge.Status = ERechargeStatus.COMPLETED;
+                recharge.ConfirmedAt = DateTime.UtcNow;
                 await Context.SaveChangesAsync();
 
                 var punter = await Context.Punters.FindAsync(recharge.PunterId);

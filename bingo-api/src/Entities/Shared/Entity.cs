@@ -7,7 +7,7 @@ public abstract class Entity
     public Guid Id { get; set; } = Guid.NewGuid();
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
+    public DateTime? DiscardedAt { get; set; } = null;
     private readonly List<IDomainEvent> _domainEvents = new();
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     protected Entity()
@@ -19,14 +19,20 @@ public abstract class Entity
     }
     public void SetIdGuid(Guid guid)
     {
-
         this.Id = guid;
     }
     protected void AddDomainEvent(IDomainEvent domainEvent)
     {
         _domainEvents.Add(domainEvent);
     }
-
+        public void Discard()
+    {
+        DiscardedAt = DateTime.UtcNow;
+    }
+    public bool IsDiscarded()
+    {
+        return DiscardedAt != null;
+    }
     public void ClearDomainEvents() => _domainEvents.Clear();
 
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using bingo_api.src.Constants;
 using bingo_api.src.Entities;
+using Microsoft.EntityFrameworkCore;
 using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
@@ -30,14 +31,14 @@ public class RechargeController(IRechargeRepository _rechargeRepository, ISeller
         {
             // Se for Admin, retorna todas as recargas
             totalCount = await rechargeRepository.CountAsync();
-            recharges = await rechargeRepository.GetAllAsync(page, size, includeProperties: r => r.Punter);
+            recharges = await rechargeRepository.GetAllAsync(page, size, includeProperties: r => r.Include(x => x.Punter));
         }
         else if (User.IsInRole(Roles.Punter) && Guid.TryParse(entityId, out _))
         {
             totalCount = await rechargeRepository.CountAsync(Guid.Parse(entityId));
             recharges = await rechargeRepository.GetAllAsync(page, size,
                 filter: r => r.PunterId == Guid.Parse(entityId),
-                includeProperties: r => r.Punter);
+                includeProperties: r => r.Include(x => x.Punter));
         }
         else
         {

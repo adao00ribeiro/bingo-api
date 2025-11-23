@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using bingo_api.src.Entities;
 using bingo_api.src.Constants;
+using Microsoft.EntityFrameworkCore;
 using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
@@ -37,7 +38,7 @@ public class CardWinnerController(ICardWinnerRepository cardWinnerRepository) : 
             totalCount = await _cardWinnerRepository.CountAsync(Guid.Parse(entityId));
             cardWinners = await _cardWinnerRepository.GetAllAsync(page, size,
                 filter: r => r.Card.PunterId == Guid.Parse(entityId),
-                includeProperties: [cw => cw.Prize.Round, cd => cd.Card]);
+                includeProperties:q => q.Include(x => x.Prize).ThenInclude(x=>x.Round).Include(x => x.Card));
         }
         else
         {

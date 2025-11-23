@@ -10,6 +10,7 @@ using Asp.Versioning;
 using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Repositories.Shared;
 using bingo_api.src.Entities;
+using Microsoft.EntityFrameworkCore;
 using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
@@ -27,8 +28,7 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
         int? page = null,
         int? size = null)
     {
-        var punters = await this.punterRepository.GetAllAsync(pageNumber: page, pageSize: size, filter: x => x.IsBot == false, includeProperties: x => x.Seller);
-
+        var punters = await this.punterRepository.GetAllAsync(pageNumber: page, pageSize: size,filter: x => x.IsBot == false, includeProperties: x => x.Include(x=> x.Seller));
         var punterDtOS = punters.Select(p => PunterResponseDto.ConvertToDto(p)).ToList();
         var totalCount = await punterRepository.CountAsync();
 
