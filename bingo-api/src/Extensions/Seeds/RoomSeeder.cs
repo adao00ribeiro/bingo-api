@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using bingo_api.src.Context;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Extensions.Seeds;
 
@@ -21,7 +18,21 @@ public class RoomSeeder
 
     public async Task SeedAsync(Guid sellerId)
     {
-        var room = new Room("Sala de Desenvolvimento", sellerId)
+        const string defaultRoomName = "Sala de Desenvolvimento";
+        // ------------------------------------------------------------
+        // 1. Verifica se a sala já existe
+        // ------------------------------------------------------------
+        var existingRoom = await _context.Rooms
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.OwnerId == sellerId && r.Name == defaultRoomName);
+
+        if (existingRoom != null)
+            return; // idempotência garantida
+
+        // ------------------------------------------------------------
+        // 2. Criar a nova sala
+        // ------------------------------------------------------------
+        var room = new Room(defaultRoomName, sellerId)
         {
             Accumulated = new Accumulated
             {
@@ -38,6 +49,9 @@ public class RoomSeeder
         _context.Rooms.Add(room);
         await _context.SaveChangesAsync();
 
+        // ------------------------------------------------------------
+        // 3. Criar BotConfig apenas após a sala ser criada
+        // ------------------------------------------------------------
         await _botConfigRepository.CreateWithPuntersAsync(new BotConfig(room));
     }
 }
