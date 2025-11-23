@@ -2,8 +2,8 @@ using Asp.Versioning;
 using bingo_api.src.Constants;
 using bingo_api.src.Controllers.Shared;
 using bingo_api.src.DTOs.Request.Blockchain;
-using bingo_api.src.DTOs.Response;
 using bingo_api.src.DTOs.Response.Blockchain;
+using bingo_api.src.DTOs.Response.report;
 using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Interfaces.blockchain;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +18,7 @@ public class TokenController(ITokenRepository tokenRepository) : ApiControllerBa
     private readonly ITokenRepository _tokenRepository = tokenRepository;
 
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<TokenResponseDto>>> GetAll(int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<TokenResponseDto,object>>> GetAll(int? page = null, int? size = null)
     {
 
         var entityId = User.FindFirst("entityid")?.Value;
@@ -27,13 +27,25 @@ public class TokenController(ITokenRepository tokenRepository) : ApiControllerBa
         totalCount = await _tokenRepository.CountAsync();
         tokens = await _tokenRepository.GetAllAsync(page, size);
 
-        var tokenResponse = tokens.Select(TokenResponseDto.ConvertToDto);
+        var tokenResponse = tokens.Select(TokenResponseDto.ConvertToDto).ToList();
 
-        return Ok(new PagedResponseDto<TokenResponseDto>
+          // Paginação simples
+        var pageNumber = page ?? 1;
+        var pageSize = size ?? tokenResponse.Count;
+        var pagedRows = tokenResponse.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+        var response = new ReportResponseDto<TokenResponseDto, object>
         {
-            Items = tokenResponse,
-            TotalCount = totalCount
-        });
+            Rows = pagedRows,
+            Stats = null,                  
+            StartingOn = null,
+            EndingOn = null,
+            Page = pageNumber,
+            PerPage = pageSize,
+            RowsCount = tokenResponse.Count
+        };
+
+        return Ok(response);
     }
 
     [Authorize(Roles = Roles.Admin)]

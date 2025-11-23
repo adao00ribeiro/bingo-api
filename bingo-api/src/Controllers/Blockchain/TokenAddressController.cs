@@ -4,6 +4,7 @@ using bingo_api.src.Controllers.Shared;
 using bingo_api.src.DTOs.Request.Blockchain;
 using bingo_api.src.DTOs.Response;
 using bingo_api.src.DTOs.Response.Blockchain;
+using bingo_api.src.DTOs.Response.report;
 using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Interfaces.blockchain;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,7 @@ public class TokenAddressController(ITokenAddressRepository tokenAddressReposito
 
 
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<TokenAddressResponseDto>>> GetAll(int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<TokenAddressResponseDto,object>>> GetAll(int? page = null, int? size = null)
     {
 
         var entityId = User.FindFirst("entityid")?.Value;
@@ -32,13 +33,25 @@ public class TokenAddressController(ITokenAddressRepository tokenAddressReposito
         tokenAddress = await _tokenAddressRepository.GetAllAsync(page, size ,includeProperties:q => q.Include(x => x.Network)
           .Include(x => x.Token) );
 
-        var networkResponse = tokenAddress.Select(t => TokenAddressResponseDto.ConvertToDto(t));
+        var networkResponse = tokenAddress.Select(t => TokenAddressResponseDto.ConvertToDto(t)).ToList();
 
-        return Ok(new PagedResponseDto<TokenAddressResponseDto>
+         // Paginação simples
+        var pageNumber = page ?? 1;
+        var pageSize = size ?? networkResponse.Count;
+        var pagedRows = networkResponse.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+        var response = new ReportResponseDto<TokenAddressResponseDto, object>
         {
-            Items = networkResponse,
-            TotalCount = totalCount
-        });
+            Rows = pagedRows,
+            Stats = null,                  
+            StartingOn = null,
+            EndingOn = null,
+            Page = pageNumber,
+            PerPage = pageSize,
+            RowsCount = networkResponse.Count
+        };
+
+        return Ok(response);
     }
 
     [Authorize(Roles = Roles.Admin)]
