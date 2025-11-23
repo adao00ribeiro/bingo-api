@@ -130,6 +130,7 @@ public static class NativeInjectorConfig
         services.AddScoped<IDataSeeder, RoleSeeder>();
         services.AddScoped<IDataSeeder, ScratchGameSeeder>();
         services.AddScoped<IDataSeeder, SellerSeeder>();
+        services.AddScoped<IDataSeeder, BlockchainSeeder>();
 
         services.AddScoped<EventDispatcher>();
         services.Scan(scan => scan
