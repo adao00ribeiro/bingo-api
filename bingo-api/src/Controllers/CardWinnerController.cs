@@ -8,6 +8,7 @@ using Asp.Versioning;
 using bingo_api.src.Entities;
 using bingo_api.src.Constants;
 using Microsoft.EntityFrameworkCore;
+using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
 [Authorize]
@@ -19,7 +20,7 @@ public class CardWinnerController(ICardWinnerRepository cardWinnerRepository) : 
 
     [Authorize(Roles = $"{Roles.Admin},{Roles.Punter}")]
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<CardWinnerResponseDto>>> GetAll(int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<CardWinnerResponseDto, object>>> GetAll(int? page = null, int? size = null)
     {
 
         var entityId = User.FindFirst("entityid")?.Value;
@@ -43,13 +44,25 @@ public class CardWinnerController(ICardWinnerRepository cardWinnerRepository) : 
         {
             return Forbid(); // Bloqueia caso o usuário não seja admin nem punter
         }
-        var cardWinnerResponse = cardWinners.Select(CardWinnerResponseDto.ConvertToDto);
+        var cardWinnerDtos = cardWinners.Select(r => CardWinnerResponseDto.ConvertToDto(r)).ToList();
 
-        return Ok(new PagedResponseDto<CardWinnerResponseDto>
+        // Paginação simples
+        var pageNumber = page ?? 1;
+        var pageSize = size ?? cardWinnerDtos.Count;
+        var pagedRows = cardWinnerDtos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+        var response = new ReportResponseDto<CardWinnerResponseDto, object>
         {
-            Items = cardWinnerResponse,
-            TotalCount = totalCount
-        });
+            Rows = pagedRows,
+            Stats = null,                  // opcional, você pode criar um objeto de estatísticas se quiser
+            StartingOn = null,
+            EndingOn = null,
+            Page = pageNumber,
+            PerPage = pageSize,
+            RowsCount = cardWinnerDtos.Count
+        };
+
+        return Ok(response);
     }
     [HttpPost]
     public async Task<ActionResult<Guid>> Create(CardWinnerRequestDto request)

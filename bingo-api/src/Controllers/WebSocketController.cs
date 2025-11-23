@@ -1,166 +1,91 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using bingo_api.src.Controllers.Shared;
 using bingo_api.src.Interfaces.Repositories;
-using bingo_api.src.Structs;
 using Microsoft.AspNetCore.Mvc;
-using Asp.Versioning;
+
 namespace bingo_api.src.Controllers;
 
-
-[ApiVersion("1.0")]
-public class WebSocketController : ApiControllerBase, IDisposable
+[ApiController]
+[Route("ws")]
+public class WebSocketController : ControllerBase
 {
+    private readonly IWebSocketService _wsService;
     private readonly ILogger<WebSocketController> _logger;
-    private readonly IWebSocketService _webSocketService;
-    private const int BufferSize = 64 * 1024;
-    private Timer _heartbeatTimer;
-    public WebSocketController(ILogger<WebSocketController> logger, IWebSocketService webSocketService)
+
+    public WebSocketController(IWebSocketService wsService, ILogger<WebSocketController> logger)
     {
+        _wsService = wsService;
         _logger = logger;
-        _webSocketService = webSocketService;
-
-        _heartbeatTimer = new Timer(SendHeartbeat, null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
-    }
-    [HttpGet("/ws")]
-    public async Task Get()
-    {
-        if (HttpContext.WebSockets.IsWebSocketRequest)
-        {
-            using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-            _logger.Log(LogLevel.Information, "WebSocket connection established");
-            await HandleWebSocketConnection(webSocket);
-        }
-        else
-        {
-            HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-        }
     }
 
-    private async Task HandleWebSocketConnection(WebSocket webSocket)
+    [HttpGet("{userId}")]
+    public async Task Get(string userId)
     {
-        var buffer = new byte[BufferSize];
+        if (!HttpContext.WebSockets.IsWebSocketRequest)
+        {
+            HttpContext.Response.StatusCode = 400;
+            return;
+        }
+
+        var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+        await _wsService.RegisterConnectionAsync(userId, socket);
+
+        var buffer = new byte[1024 * 4];
 
         try
         {
-            WebSocketReceiveResult result;
-            do
+            while (socket.State == WebSocketState.Open)
             {
-                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                var result = await socket.ReceiveAsync(buffer, CancellationToken.None);
 
-                if (result.MessageType == WebSocketMessageType.Text && !result.CloseStatus.HasValue)
+                if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    _logger.LogInformation("Message received from Client: {Message}", message);
-
-                    await ProcessMessageAsync(message, webSocket);
+                    await _wsService.CloseConnectionAsync(userId);
+                    break;
                 }
 
-            } while (!result.CloseStatus.HasValue);
+                if (result.MessageType == WebSocketMessageType.Text)
+                {
+                    var msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    try
+                    {
+                        var data = JsonSerializer.Deserialize<SocketCommand>(msg);
 
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-            _logger.LogInformation("WebSocket connection closed");
+                        if (data is not null)
+                        {
+                            switch (data.command?.ToLowerInvariant())
+                            {
+                                case "subscribe":
+                                    await _wsService.SubscribeToChannelAsync(userId, data.channel!);
+                                    await _wsService.SendMessageToChannelAsync(userId, $"Subscribed to {data.channel}");
+                                    break;
+                                case "unsubscribe":
+                                    await _wsService.UnsubscribeFromChannelAsync(userId, data.channel!);
+                                    await _wsService.SendMessageToChannelAsync(userId, $"Unsubscribed from {data.channel}");
+                                    break;
+                                case "message":
+                                    await _wsService.SendMessageToChannelAsync(data.channel!, data.message!);
+                                    break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Erro processando mensagem WS do usuário {UserId}", userId);
+                    }
+                }
+            }
         }
-        catch (WebSocketException e)
+        catch (WebSocketException ex)
         {
-            _logger.LogError(e, "WebSocket error occurred");
+            _logger.LogError(ex, "WebSocket error para usuário {UserId}", userId);
         }
         finally
         {
-            await CloseConnectionAsync(webSocket);
+            await _wsService.CloseConnectionAsync(userId);
         }
     }
 
-    private async Task ProcessMessageAsync(string message, WebSocket webSocket)
-    {
-        try
-        {
-            var jsonDocument = JsonDocument.Parse(message);
-            var root = jsonDocument.RootElement;
-
-            if (root.TryGetProperty("command", out var commandProperty) &&
-                root.TryGetProperty("channel", out var channelProperty))
-            {
-                var command = commandProperty.GetString();
-                var channel = channelProperty.GetString();
-
-                switch (command)
-                {
-                    case "subscribe" when channel != null:
-                        _webSocketService.SubscribeToChannel(channel, webSocket);
-                        await _webSocketService.SendMessageAsync(webSocket, $"Subscribed to {channel}");
-                        break;
-                    case "message" when root.TryGetProperty("message", out var contentProperty):
-                        var channelMessage = contentProperty.GetString();
-                        if (channelMessage != null)
-                        {
-                            await _webSocketService.SendMessageToChannel(channel, channelMessage);
-                            //  await _webSocketService.SendMessageAsync(webSocket, "Message sent to channel");
-                        }
-                        break;
-                    default:
-                        _logger.LogWarning("Invalid command or missing channel in message.");
-                        await _webSocketService.SendMessageAsync(webSocket, $"Invalid command: {command}");
-                        break;
-                }
-            }
-            else
-            {
-                _logger.LogWarning("Invalid JSON message format. Required fields 'command' and 'channel' are missing.");
-                await _webSocketService.SendMessageAsync(webSocket, "Error parsing MessagePack data");
-            }
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogError(ex, "Error parsing JSON message.");
-            await _webSocketService.SendMessageAsync(webSocket, "Server error");
-        }
-    }
-
-    private async Task CloseConnectionAsync(WebSocket webSocket)
-    {
-        _webSocketService.UnsubscribeFromChannel(webSocket);
-        if (webSocket.State == WebSocketState.Open || webSocket.State == WebSocketState.CloseReceived)
-        {
-            await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed", CancellationToken.None);
-        }
-        _logger.LogInformation("WebSocket connection closed (finally block)");
-    }
-    private async void SendHeartbeat(object state)
-    {
-        var activeConnections = _webSocketService.GetActiveConnections();
-        foreach (var webSocket in activeConnections)
-        {
-            if (webSocket.State == WebSocketState.Open)
-            {
-                try
-                {
-                    var options = new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                        WriteIndented = true // Opcional, para formatar o JSON
-                    };
-
-                    var text = JsonSerializer.Serialize(new TimerEvent());
-                    var json = JsonSerializer.Serialize(new SocketMessage("ping", text, "success"), options);
-                    var heartbeatMessage = Encoding.UTF8.GetBytes(json);
-                    await webSocket.SendAsync(new ArraySegment<byte>(heartbeatMessage), WebSocketMessageType.Text, true, CancellationToken.None);
-                }
-                catch (WebSocketException)
-                {
-                    _logger.LogWarning("Client disconnected due to inactivity.");
-                    await CloseConnectionAsync(webSocket);
-                }
-            }
-        }
-    }
-
-
-    public void Dispose()
-    {
-        _heartbeatTimer?.Dispose();
-        // _webSocketService.CloseAllConnections(); 
-        _logger.LogInformation("Disposed WebSocketController and closed all connections.");
-    }
+    private record SocketCommand(string? command, string? channel, string? message);
 }

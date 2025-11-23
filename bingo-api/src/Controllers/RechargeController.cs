@@ -8,6 +8,7 @@ using Asp.Versioning;
 using bingo_api.src.Constants;
 using bingo_api.src.Entities;
 using Microsoft.EntityFrameworkCore;
+using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
 
@@ -20,7 +21,7 @@ public class RechargeController(IRechargeRepository _rechargeRepository, ISeller
 
     [Authorize(Roles = $"{Roles.Admin},{Roles.Punter}")]
     [HttpGet()]
-    public async Task<ActionResult<PagedResponseDto<RechargeResponseDto>>> GetAll(int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<RechargeResponseDto, object>>> GetAll(int? page = null, int? size = null)
     {
         var entityId = User.FindFirst("entityid")?.Value;
         int totalCount;
@@ -44,13 +45,22 @@ public class RechargeController(IRechargeRepository _rechargeRepository, ISeller
             Console.WriteLine("bloqueado");
             return Forbid(); // Bloqueia caso o usuário não seja admin nem punter
         }
-        var rechargesResponse = recharges.Select(RechargeResponseDto.ConvertToDto);
-
-        return Ok(new PagedResponseDto<RechargeResponseDto>
+        var rechargesDtos = recharges.Select(RechargeResponseDto.ConvertToDto).ToList();
+        var pageNumber = page ?? 1;
+        var pageSize = size ?? rechargesDtos.Count;
+        var pagedRows = rechargesDtos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        var response = new ReportResponseDto<RechargeResponseDto, object>
         {
-            Items = rechargesResponse,
-            TotalCount = totalCount
-        });
+            Rows = pagedRows,
+            Stats = null,                  // opcional, você pode criar um objeto de estatísticas se quiser
+            StartingOn = null,
+            EndingOn = null,
+            Page = pageNumber,
+            PerPage = pageSize,
+            RowsCount = rechargesDtos.Count
+        };
+
+        return Ok(response);
     }
 
     [HttpPost]

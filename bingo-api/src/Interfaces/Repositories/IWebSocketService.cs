@@ -8,10 +8,9 @@ namespace bingo_api.src.Interfaces.Repositories;
 
 public interface IWebSocketService
 {
-    void SubscribeToChannel(string channel, WebSocket webSocket);
-    Task SendMessageToChannel(string channel, string message);
-    void UnsubscribeFromChannel(WebSocket webSocket);
-    Task SendMessageAsync(WebSocket webSocket, string message);
-    Task CloseAllConnections();
-    IEnumerable<WebSocket> GetActiveConnections();
+    Task RegisterConnectionAsync(string userId, WebSocket socket);
+    Task SubscribeToChannelAsync(string userId, string channel);
+    Task UnsubscribeFromChannelAsync(string userId, string channel);
+    Task SendMessageToChannelAsync(string channel, string message);
+    Task CloseConnectionAsync(string userId);
 }

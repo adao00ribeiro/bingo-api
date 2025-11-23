@@ -14,12 +14,12 @@ public class PunterRepository : RepositoryBase<Punter>, IPunterRepository
 
     public async Task<Punter> GetByCpfAsync(string cpf)
     {
-          var punter = await Context.Punters
-             .Include(p => p.Seller)
-                 .ThenInclude(s => s.OwnerRooms)
-             .Include(p => p.Seller)
-                 .ThenInclude(s => s.PaymentMethods) 
-            .FirstOrDefaultAsync(punter => punter.Cpf == cpf);
+        var punter = await Context.Punters
+           .Include(p => p.Seller)
+               .ThenInclude(s => s.OwnerRooms)
+           .Include(p => p.Seller)
+               .ThenInclude(s => s.PaymentMethods)
+          .FirstOrDefaultAsync(punter => punter.Cpf == cpf);
         return punter;
     }
 
@@ -29,7 +29,7 @@ public class PunterRepository : RepositoryBase<Punter>, IPunterRepository
              .Include(p => p.Seller)
                  .ThenInclude(s => s.OwnerRooms)
              .Include(p => p.Seller)
-                 .ThenInclude(s => s.PaymentMethods) 
+                 .ThenInclude(s => s.PaymentMethods)
             .FirstOrDefaultAsync(punter => punter.Email == email);
 
         return punter;
@@ -37,7 +37,14 @@ public class PunterRepository : RepositoryBase<Punter>, IPunterRepository
 
     public async Task<Punter> GetByIdAsync(Guid id)
     {
-        return await Context.Punters.FirstOrDefaultAsync(punter => punter.Id == id);
+        var punter = await Context.Punters
+           .Include(p => p.Seller)
+               .ThenInclude(s => s.OwnerRooms)
+           .Include(p => p.Seller)
+               .ThenInclude(s => s.PaymentMethods)
+          .FirstOrDefaultAsync(punter => punter.Id == id);
+
+        return punter;
     }
 
     public async Task<Punter> GetPunterByTag(String indicateTag)

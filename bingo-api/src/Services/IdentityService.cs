@@ -9,6 +9,7 @@ using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace bingo_api.src.Services;
@@ -21,11 +22,20 @@ public class IdentityService : IIdentityService
     private readonly JwtOptions _jwtOptions;
     private readonly ISellerRepository _sellerRepository;
     private readonly IPunterRepository _punterRepository;
+    private readonly IEmailSenderService _emailSender;
+    private readonly IConfiguration _configuration;
+    private readonly TelegamNotifierService _notifier;
+
+
     public IdentityService(DataContext dataContext, SignInManager<User> signInManager,
                            UserManager<User> userManager,
                            IOptions<JwtOptions> jwtOptions,
                            ISellerRepository sellerRepository,
-                           IPunterRepository punterRepository
+                           IPunterRepository punterRepository,
+                           IEmailSenderService emailSender,
+                                IConfiguration configuration,
+                            TelegamNotifierService notifier
+
                            )
     {
         _dataContext = dataContext;
@@ -34,10 +44,13 @@ public class IdentityService : IIdentityService
         _jwtOptions = jwtOptions.Value;
         _sellerRepository = sellerRepository;
         _punterRepository = punterRepository;
+        _emailSender = emailSender;
+        _configuration = configuration;
+        _notifier = notifier;
 
     }
 
-    public async Task<RegisterResponseDto> CadastrarPunter(User identityUser, Punter punter)
+    public async Task<ResultResponseDto> CadastrarPunter(User identityUser, Punter punter)
     {
         await using var transaction = await this._dataContext.Database.BeginTransactionAsync();
 
@@ -89,7 +102,7 @@ public class IdentityService : IIdentityService
 
 
             await transaction.CommitAsync();
-            return new RegisterResponseDto(true);
+            return new ResultResponseDto(true);
         }
         catch (Exception ex)
         {
@@ -99,7 +112,7 @@ public class IdentityService : IIdentityService
 
     }
 
-    public async Task<RegisterResponseDto> CadastrarSeller(User identityUser, Seller seller)
+    public async Task<ResultResponseDto> CadastrarSeller(User identityUser, Seller seller)
     {
         await using var transaction = await this._dataContext.Database.BeginTransactionAsync();
         try
@@ -119,7 +132,7 @@ public class IdentityService : IIdentityService
             var roleResult = await _userManager.AddToRoleAsync(identityUser, Roles.Seller);
 
 
-            var response = new RegisterResponseDto(createResult.Succeeded);
+            var response = new ResultResponseDto(createResult.Succeeded);
 
 
             if (!createResult.Succeeded && createResult.Errors.Any())
@@ -138,7 +151,7 @@ public class IdentityService : IIdentityService
         }
         catch (Exception ex)
         {
-            var usuarioCadastroResponse = new RegisterResponseDto(false);
+            var usuarioCadastroResponse = new ResultResponseDto(false);
             usuarioCadastroResponse.AdicionarErros(new List<string> { ex.Message });
             return usuarioCadastroResponse;
         }
@@ -233,6 +246,49 @@ public class IdentityService : IIdentityService
         );
     }
 
+    public async Task<bool> ForgotPasswordAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        var punter = await _punterRepository.GetByEmailAsync(email);
+
+        // Retorno genérico por segurança
+        if (user == null && punter == null)
+            return false;
+
+        // Gerar token de reset
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        var encodedToken = System.Web.HttpUtility.UrlEncode(resetToken);
+
+        var resetLink = $"{_configuration["ConnectionStrings:HostUrl"]}reset-password?email={user.Email}&token={encodedToken}";
+
+        if (punter.Seller.Settings.EmailConfig == null)
+        {
+            await _notifier.SendMessageAsync($"⚠️ Configuracao STMP Null para Vendedor {punter.SellerId} ");
+            return false;
+        }
+        // Enviar e-mail com fallback SMTP
+        await _emailSender.SendEmailAsync(user.Email, "Recuperação de senha",
+            $"Olá!<br>Clique aqui para redefinir sua senha: <a href='{resetLink}'>Redefinir senha</a>", punter.Seller.Settings.EmailConfig);
+
+        return true;
+    }
+    public async Task<ResultResponseDto> ResetPasswordAsync(ResetPasswordRequestDto request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null)
+            return new ResultResponseDto(false, "Usuário não encontrado.");
+
+
+        var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+        if (result.Succeeded)
+            return new ResultResponseDto(true, "Senha redefinida com sucesso.");
+        var res = new ResultResponseDto(false);
+        res.AdicionarErros(result.Errors.Select(e => e.Description));
+        return res;
+    }
     private string GerarToken(IEnumerable<Claim> claims, DateTime dataExpiracao)
     {
         var audiences = _jwtOptions.Audience

@@ -20,6 +20,13 @@ using bingo_api.src.Interfaces.blockchain;
 using bingo_api.src.Factory;
 using bingo_api.src.Repositories.Blockchain;
 using bingo_api.src.Services.Blockchain;
+using bingo_api.src.Interfaces.Repositories.Scratch;
+using bingo_api.src.Repositories.Scratch;
+using bingo_api.src.Extensions.Seeds;
+using bingo_api.src.Infrastructure;
+using bingo_api.src.Application.Handlers;
+using bingo_api.src.Interfaces;
+
 
 
 namespace bingo_api.src.IoC;
@@ -79,6 +86,7 @@ public static class NativeInjectorConfig
         services.AddScoped<ISellerRepository, SellerRepository>();
         services.AddScoped<IRoundRepository, RoundRepository>();
         services.AddScoped<ICardBuyRepository, CardBuyRepository>();
+        services.AddScoped<IScratchBuyRepository, ScratchBuyRepository>();
         services.AddScoped<IBotConfigRepository, BotConfigRepository>();
         services.AddScoped<IAccumulatedRepository, AccumulatedRepository>();
         services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
@@ -89,6 +97,9 @@ public static class NativeInjectorConfig
 
 
         services.AddScoped<BlockchainServiceFactory>();
+        services.AddScoped<IScratchGameRepository, ScratchGameRepository>();
+        services.AddScoped<IScratchSellerGameRepository, ScratchSellerGameRepository>();
+        services.AddScoped<IScratchTicketRepository, ScratchTicketRepository>();
         services.AddScoped<InsertBotRoundService>();
 
         //jobs
@@ -99,6 +110,7 @@ public static class NativeInjectorConfig
 
         //services
         services.AddScoped<ICardBuyService, CardBuyService>();
+        services.AddScoped<IScratchBuyService, ScratchBuyService>();
         services.AddScoped<IPaymentProvider, PixManualAdapter>();
         services.AddScoped<IPaymentProvider, CryptoAdapter>();
         services.AddScoped<IPaymentProvider, PushPayAdapter>();
@@ -108,6 +120,27 @@ public static class NativeInjectorConfig
         services.AddScoped<IReportService, ReportService>();
         services.AddScoped<IWithdrawalService, WithdrawalService>();
         services.AddScoped<IBlockchainConfigService, BlockchainConfigService>();
+
+        services.AddSingleton<IEmailSenderService, MailKitEmailSenderService>();
+
+
+        services.AddScoped<PaymentMethodSeeder>();
+        services.AddScoped<RoomSeeder>();
+
+        services.AddScoped<IDataSeeder, RoleSeeder>();
+        services.AddScoped<IDataSeeder, ScratchGameSeeder>();
+        services.AddScoped<IDataSeeder, SellerSeeder>();
+
+        services.AddScoped<EventDispatcher>();
+        services.Scan(scan => scan
+    .FromAssemblyOf<ScratchPrizeCreatedHandler>()
+    .AddClasses(classes => classes.AssignableTo(typeof(IDomainEventHandler<>)))
+    .AsImplementedInterfaces()
+    .WithScopedLifetime());
+
+
+        // services.AddHealthChecks()
+        //   .AddCheck("smtp_primary", new SmtpHealthCheck(configuration.GetSection("Email:PrimarySmtp").Get<SmtpSettings>()));
 
         services.AddHostedService<DepositWatcher>();
 

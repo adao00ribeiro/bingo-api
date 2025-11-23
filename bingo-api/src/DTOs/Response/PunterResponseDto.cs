@@ -2,7 +2,6 @@
 using System.Text.Json.Serialization;
 using bingo_api.src.DTOs.Shared;
 using bingo_api.src.Entities;
-using Microsoft.AspNetCore.Identity;
 namespace bingo_api.src.DTOs.Response;
 
 public record PunterResponseDto : EntityResponseDto

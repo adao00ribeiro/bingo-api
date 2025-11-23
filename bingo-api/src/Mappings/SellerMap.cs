@@ -51,8 +51,13 @@ public class SellerMap : IEntityTypeConfiguration<Seller>
                .IsRequired();
 
         builder.Property(x => x.DateBirth)
-               .HasColumnName("date_birth")
-               .IsRequired();
+                     .HasColumnName("date_birth")
+                     .IsRequired();
+
+        builder.Property(s => s.Settings)
+             .HasColumnName("settings")
+             .HasColumnType("jsonb")
+             .HasDefaultValueSql("'{}'::jsonb");
 
         builder.HasMany(s => s.OwnerRooms)
                .WithOne(r => r.Owner)

@@ -13,8 +13,8 @@ public class PaymentMethod : Entity
     public bool Active { get; set; } = true;
     public Guid SellerId { get; set; }
     public Seller Seller { get; set; }
-    
-      public PaymentMethod(string name, EPaymentMethodType type, string? token, string? qrCodeUrl, string? instructions, bool active, Guid sellerId)
+
+    public PaymentMethod(string name, EPaymentMethodType type, string? token, string? qrCodeUrl, string? instructions, bool active, Guid sellerId)
     {
         Name = name;
         Type = type;

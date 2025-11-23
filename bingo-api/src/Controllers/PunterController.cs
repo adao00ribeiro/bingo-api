@@ -11,6 +11,7 @@ using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Repositories.Shared;
 using bingo_api.src.Entities;
 using Microsoft.EntityFrameworkCore;
+using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
 [Authorize]
@@ -23,10 +24,26 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
     private readonly IConfiguration configuration = _configuration;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PunterResponseDto>>> GetAll()
+    public async Task<ActionResult<ReportResponseDto<PunterResponseDto, object>>> GetAll(
+        int? page = null,
+        int? size = null)
     {
-        var punters = await this.punterRepository.GetAllAsync(filter: x => x.IsBot == false, includeProperties: x => x.Include(x=> x.Seller));
-        return Ok(punters.Select(p => PunterResponseDto.ConvertToDto(p)));
+        var punters = await this.punterRepository.GetAllAsync(pageNumber: page, pageSize: size,filter: x => x.IsBot == false, includeProperties: x => x.Include(x=> x.Seller));
+        var punterDtOS = punters.Select(p => PunterResponseDto.ConvertToDto(p)).ToList();
+        var totalCount = await punterRepository.CountAsync();
+
+        var response = new ReportResponseDto<PunterResponseDto, object>
+        {
+            Rows = punterDtOS,
+            Stats = null,
+            StartingOn = null,
+            EndingOn = null,
+            Page = page,
+            PerPage = size,
+            RowsCount = totalCount
+        };
+
+        return Ok(response);
     }
     [HttpGet("me")]
     public async Task<ActionResult<PunterResponseDto>> GetMe()
@@ -69,48 +86,48 @@ public class PunterController(IPunterRepository _punterRepository, IIdentityServ
         throw new NotImplementedException();
     }
     [HttpPatch]
-public async Task<IActionResult> Patch([FromBody] PunterPatchRequestDto request)
-{
-    if (!ModelState.IsValid)
-        return BadRequest(ModelState);
-
-    var entityId = User.FindFirst("entityid")?.Value;
-    if (string.IsNullOrWhiteSpace(entityId))
-        return Unauthorized("Identificador de entidade não encontrado.");
-
-    var punterId = Guid.Parse(entityId);
-    var punter = await punterRepository.GetByIdAsync(punterId);
-    if (punter is null)
-        return NotFound("Punter não encontrado.");
-
-    var user = await identityService.GetByEmailAsync(punter.Email);
-    if (user is null)
-        return NotFound("Usuário associado não encontrado.");
-
-    // Converte DTO em dicionário de propriedades para atualização parcial
-    var updates = request.GetType()
-        .GetProperties()
-        .Where(p => p.GetValue(request) != null)
-        .ToDictionary(
-            prop => prop.Name,
-            prop => prop.GetValue(request)
-        );
-
-    // Atualiza punter via método parcial
-    if (punterRepository is RepositoryBase<Punter> baseRepo)
+    public async Task<IActionResult> Patch([FromBody] PunterPatchRequestDto request)
     {
-        await baseRepo.UpdatePartialAsync(punterId, updates);
-    }
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-    // Atualiza apenas telefone do Identity
-    if (request.Phone != null)
-    {
-        user.PhoneNumber = request.Phone;
-        await identityService.UpdateUser(user);
-    }
+        var entityId = User.FindFirst("entityid")?.Value;
+        if (string.IsNullOrWhiteSpace(entityId))
+            return Unauthorized("Identificador de entidade não encontrado.");
 
-    return Ok();
-}
+        var punterId = Guid.Parse(entityId);
+        var punter = await punterRepository.GetByIdAsync(punterId);
+        if (punter is null)
+            return NotFound("Punter não encontrado.");
+
+        var user = await identityService.GetByEmailAsync(punter.Email);
+        if (user is null)
+            return NotFound("Usuário associado não encontrado.");
+
+        // Converte DTO em dicionário de propriedades para atualização parcial
+        var updates = request.GetType()
+            .GetProperties()
+            .Where(p => p.GetValue(request) != null)
+            .ToDictionary(
+                prop => prop.Name,
+                prop => prop.GetValue(request)
+            );
+
+        // Atualiza punter via método parcial
+        if (punterRepository is RepositoryBase<Punter> baseRepo)
+        {
+            await baseRepo.UpdatePartialAsync(punterId, updates);
+        }
+
+        // Atualiza apenas telefone do Identity
+        if (request.Phone != null)
+        {
+            user.PhoneNumber = request.Phone;
+            await identityService.UpdateUser(user);
+        }
+
+        return Ok();
+    }
 
     [HttpDelete("{id}")]
     public Task<ActionResult> Delete(Guid id)

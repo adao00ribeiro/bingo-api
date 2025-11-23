@@ -8,9 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using bingo_api.src.DTOs.Response;
 using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Factory;
-using bingo_api.src.DTOs.Request.Blockchain;
-
-using bingo_api.src.Interfaces.blockchain;
 using bingo_api.src.Entities;
 namespace bingo_api.src.Controllers;
 

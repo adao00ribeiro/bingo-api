@@ -20,7 +20,7 @@ public class Card : Entity
     public int Score { get; set; } = 0;
     [NotMapped]
     public int[] CardMarkedNumbers { get; set; }
-    public void CheckNumberOnTheCard(int number)
+    public bool CheckNumberOnTheCard(int number)
     {
         if (CardMarkedNumbers == null)
         {
@@ -33,7 +33,9 @@ public class Card : Entity
         {
             CardMarkedNumbers[index] = 1;
             Score += 1;
+            return true;
         }
+        return false;
     }
 
 }
