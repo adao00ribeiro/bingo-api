@@ -16,6 +16,6 @@ public record RechargeRequestDto
     public string ImagemQrcode { get; set; }
     internal static Recharge ConvertToEntity(RechargeRequestDto dto)
     {
-        return new Recharge(dto.Value, dto.Amount, ERechargeStatus.PENDING, dto.PunterId);
+        return new Recharge(dto.Value, dto.Amount, EPaymentStatus.PENDING, dto.PunterId);
     }
 }

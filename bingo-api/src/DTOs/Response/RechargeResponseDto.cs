@@ -12,7 +12,7 @@ namespace bingo_api.src.DTOs.Response;
 public record RechargeResponseDto : EntityResponseDto
 {
     public decimal Value { get; set; }
-    public ERechargeStatus Status { get; set; } = ERechargeStatus.PENDING;
+    public EPaymentStatus Status { get; set; } = EPaymentStatus.PENDING;
     public string Qrcode { get; set; }
     public string ImagemQrcode { get; set; }
     public Guid PunterId { get; set; }
@@ -21,7 +21,7 @@ public record RechargeResponseDto : EntityResponseDto
     public RechargeResponseDto(
         Guid id,
         decimal value,
-        ERechargeStatus status,
+        EPaymentStatus status,
         string qrcode,
         string imagemQrcode,
         Guid punterId,

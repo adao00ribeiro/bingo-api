@@ -16,7 +16,7 @@ public class Recharge : Entity
     public DateTime? ConfirmedAt { get; set; } // date/time it was confirmed
     public decimal Value { get; set; }
     public decimal Amount { get; set; }
-    public ERechargeStatus Status { get; set; } = ERechargeStatus.COMPLETED;
+    public EPaymentStatus Status { get; set; } = EPaymentStatus.PENDING;
     public string Qrcode { get; set; }
     public string ImagemQrcode { get; set; }
     public Guid PunterId { get; set; }
@@ -24,7 +24,7 @@ public class Recharge : Entity
     public bool IsConfirmed => ConfirmedAt.HasValue; // calculated property
 
 
-    public Recharge(decimal value, decimal amount , ERechargeStatus status, Guid punterId)
+    public Recharge(decimal value, decimal amount , EPaymentStatus status, Guid punterId)
     {
         this.Value = value;
         this.Amount = amount;
@@ -39,7 +39,7 @@ public class Recharge : Entity
 
         this.Id = qrCodeResponse.Id;
         this.Value = qrCodeResponse.Value / 100;
-        this.Status = ERechargeStatus.PENDING;
+        this.Status = EPaymentStatus.PENDING;
         this.Qrcode = qrCodeResponse.QrCode;
         this.ImagemQrcode = qrCodeResponse.QrCodeBase64;
         this.PunterId = punterId;

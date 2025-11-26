@@ -8,7 +8,7 @@ public class CryptoAdapter : IPaymentProvider
 {
     public Task<Recharge> CreateRechargeAsync(decimal value,decimal amount, Punter punter, PaymentMethod method, string? network = null, string? Token = null , string? destinationAddress = null , string? txHash = null )
     {
-        var recharge = new Recharge( value, amount ,  ERechargeStatus.PENDING,punter.Id)
+        var recharge = new Recharge( value, amount ,  EPaymentStatus.PENDING,punter.Id)
         {
                 DestinationAddress = destinationAddress,
                 TxHash = txHash,

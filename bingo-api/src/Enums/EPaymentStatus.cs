@@ -1,8 +1,9 @@
 namespace bingo_api.src.Enums;
 
-public enum EWithdrawalStatus
+public enum EPaymentStatus
 {
     PENDING,
-    APPROVED,
+    SUCCESS,
+    FAILED,
     REJECTED
 }

@@ -94,6 +94,8 @@ public static class NativeInjectorConfig
         services.AddScoped<ITokenRepository, TokenRepository>();
         services.AddScoped<ITokenAddressRepository, TokenAddressRepository>();
         services.AddScoped<ITokenAddressRepository, TokenAddressRepository>();
+        services.AddScoped<IWithdrawalRepository, WithdrawalRepository>();
+
 
 
         services.AddScoped<BlockchainServiceFactory>();

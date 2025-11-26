@@ -32,7 +32,7 @@ public class RechargeMap : IEntityTypeConfiguration<Recharge>
               builder.Property(r => r.Status)
                      .HasColumnName("status")
                      .IsRequired()
-                     .HasDefaultValue(ERechargeStatus.PENDING);
+                     .HasDefaultValue(EPaymentStatus.PENDING);
 
               builder.Property(r => r.Qrcode)
                      .HasColumnName("qrcode")
