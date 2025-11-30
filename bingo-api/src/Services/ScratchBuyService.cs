@@ -235,12 +235,12 @@ public class ScratchBuyService(
 
 
         // Normaliza probabilidades
-        var totalWeight = probabilidades.Sum(x => x.probability);
+        var totalWeight = probabilidades.Sum(x => x.Probability);
         if (totalWeight <= 0)
             return (-1, 0, 0);
 
         var normalizadas = probabilidades
-            .Select(x => new { x.probability, x.Prize, Peso = x.probability / totalWeight })
+            .Select(x => new { x.Probability, x.Prize, Peso = x.Probability / totalWeight })
             .ToList();
 
         var randomValue = rnd.NextDouble();
@@ -251,12 +251,12 @@ public class ScratchBuyService(
             cumulativeWeight += normalizadas[i].Peso;
             if (randomValue <= cumulativeWeight)
             {
-                return (i, normalizadas[i].probability, normalizadas[i].Prize);
+                return (i, normalizadas[i].Probability, normalizadas[i].Prize);
             }
         }
 
         var last = normalizadas.Last();
-        return (normalizadas.Count - 1, last.probability, last.Prize);
+        return (normalizadas.Count - 1, last.Probability, last.Prize);
 
 
     }
@@ -336,10 +336,7 @@ public class ScratchBuyService(
         {
             return rnd.NextDouble() < 0.1;
         }
-
         return true;
-
-
     }
 
 

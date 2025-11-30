@@ -11,10 +11,8 @@ public abstract class PrizeBaseService(Prize _prize)
     public void Execute(IEnumerable<Card> cards, int row, int col)
     {
         if (prize.HasWinners()) return;
-        this.prize.TopCards.Clear();
-        var topCards = cards.OrderByDescending(card => card.Score).Take(20).ToList();
-        var resultCards = topCards.Where(card => CheckWinner(card, row, col)).ToList();
-
+    
+        var resultCards = cards.Where(card => CheckWinner(card, row, col)).ToList();
 
         if (resultCards.Count > 0)
         {

@@ -3,7 +3,7 @@ using bingo_api.src.Interfaces.Repositories.Shared;
 
 namespace bingo_api.src.Interfaces.Repositories.Scratch;
 
-public interface IScratchPrizeRepository: IRepositoryBase<ScratchPrize>
+public interface IScratchPrizeRepository : IRepositoryBase<ScratchPrize>
 {
 
 }

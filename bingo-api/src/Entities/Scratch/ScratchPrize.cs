@@ -22,6 +22,6 @@ public class ScratchPrize : Entity
 
         AddDomainEvent(new ScratchPrizeCreatedEvent(this));
     }
-   
+
 }
 public record ScratchPrizeCreatedDomainEvent(ScratchPrize Prize) : IDomainEvent;

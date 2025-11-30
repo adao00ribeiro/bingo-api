@@ -10,6 +10,6 @@ public record ScratchSellerGameRequestDto
 
     internal static ScratchSellerGame ConvertToEntity(ScratchSellerGameRequestDto request)
     {
-         return new ScratchSellerGame(request.SellerId , request.ScratchGameId);
+        return new ScratchSellerGame(request.SellerId, request.ScratchGameId);
     }
 }

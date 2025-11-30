@@ -5,7 +5,7 @@ namespace bingo_api.src.Interfaces.Services;
 
 public interface IScratchBuyService
 {
-      Task<ScratchTicket> Buy(Guid punterId, ScratchBuy buy);
+    Task<ScratchTicket> Buy(Guid punterId, ScratchBuy buy);
 
     Task<ScratchTicket?> RevealTicket(Guid ticketId);
 }

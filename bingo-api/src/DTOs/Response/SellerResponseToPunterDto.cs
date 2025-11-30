@@ -12,7 +12,7 @@ public record SellerResponseToPunterDto
 
     public SellerSettings Settings { get; set; }
 
-    public SellerResponseToPunterDto(Guid id, string email, IEnumerable<RoomResponseDto> rooms , SellerSettings settings)
+    public SellerResponseToPunterDto(Guid id, string email, IEnumerable<RoomResponseDto> rooms, SellerSettings settings)
     {
         Id = id;
         Email = email;

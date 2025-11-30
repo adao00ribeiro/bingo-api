@@ -4,5 +4,6 @@ public enum EPaymentMethodType
 {
     PIXMANUAL = 0,
     PUSHPAY = 1,
+    CRYPTO = 2
 
 }

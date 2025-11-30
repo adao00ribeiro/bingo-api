@@ -9,6 +9,7 @@ using bingo_api.src.Interfaces.Repositories;
 using bingo_api.src.Interfaces.Repositories.Scratch;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Controllers.Scratch;
 
@@ -35,7 +36,7 @@ public class ScratchSellerGameController(
         {
             // Se for Admin, retorna todas as recargas
             totalCount = await _scratchSellerGameRepository.CountAsync();
-            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, includeProperties: [x => x.ScratchGame]);
+            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, includeProperties:x => x.Include(x => x.ScratchGame));
         }
         else if (User.IsInRole(Roles.Punter) && Guid.TryParse(entityId, out _))
         {
@@ -45,8 +46,8 @@ public class ScratchSellerGameController(
                 throw new Exception("Usuário não encontrado");
             }
             totalCount = await _scratchSellerGameRepository.CountAsync(punter.SellerId);
-            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size,filter: r => r.SellerId == punter.SellerId,
-                    includeProperties: [x => x.ScratchGame]
+            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, filter: r => r.SellerId == punter.SellerId,
+                    includeProperties: x => x.Include(x => x.ScratchGame)
                 );
         }
         else
@@ -94,7 +95,7 @@ public class ScratchSellerGameController(
         {
             return NotFound();
         }
-            
+
         return Ok(ScratchSellerGameResponseDto.ConvertToDto(scratchSellerGame));
     }
 }

@@ -33,12 +33,13 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
                 {
                     throw new Exception("Recharge nao encontrado.");
                 }
-                if (recharge.Status == ERechargeStatus.COMPLETED)
+                if (recharge.Status == EPaymentStatus.SUCCESS)
                 {
                     throw new Exception("Esta recarga já foi concluída anteriormente.");
                 }
                 // Atualiza o status para COMPLETED
-                recharge.Status = ERechargeStatus.COMPLETED;
+                recharge.Status = EPaymentStatus.SUCCESS;
+                recharge.ConfirmedAt = DateTime.UtcNow;
                 await Context.SaveChangesAsync();
 
                 var punter = await Context.Punters.FindAsync(recharge.PunterId);

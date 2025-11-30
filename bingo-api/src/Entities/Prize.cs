@@ -61,24 +61,37 @@ public class Prize : Entity
 
     public void SetTopFive(Card card, int hits, List<int> missingNumbers)
     {
-
-        var existingCardIndex = TopCards.FindIndex(obj => obj.Card.Id == card.Id);
-
-        if (existingCardIndex >= 0)
+        var newEntry = new TopCardInfo
         {
-            // Atualiza o `hits` e `missingNumbers` do cartão existente
-            TopCards[existingCardIndex].Hits = hits;
-            TopCards[existingCardIndex].MissingNumbers = missingNumbers;
-        }
-        else
-        {
-            TopCards.Add(new TopCardInfo
-            {
-                Card = CardResponseDto.ConvertToSocketDto(card),
-                MissingNumbers = missingNumbers,
-                Hits = hits
-            });
-        }
+            Card = CardResponseDto.ConvertToSocketDto(card),
+            MissingNumbers = missingNumbers,
+            Hits = hits,
+            CreatedAt = DateTime.Now
+        };
+        // Remove entradas com o mesmo cartão e missingNumbers igual
+        TopCards.RemoveAll(item =>
+            item.Card.Id == card.Id && !missingNumbers.Except(item.MissingNumbers).Any());
+
+        TopCards.Add(newEntry);
+
+        var ordered = TopCards
+            .OrderBy(item => item.Hits)
+            .ThenByDescending(item => item.CreatedAt.Ticks)
+            .ToList();
+
+        // Agrupa por cartão e limita a 3 entradas únicas por missingNumbers
+        var limited = ordered
+            .GroupBy(item => item.Card)
+            .SelectMany(group => group
+                .GroupBy(i => string.Join(",", i.MissingNumbers))
+                .Select(g => g.First())
+                .Take(3))
+            .ToList();
+
+        TopCards = [.. limited
+       .OrderBy(item => item.Hits)
+       .ThenByDescending(item => item.CreatedAt.Ticks)
+       .Take(20)];
     }
 
     public void AddAccumulated(decimal accumulatedValue)

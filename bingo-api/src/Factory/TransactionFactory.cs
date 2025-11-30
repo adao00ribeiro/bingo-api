@@ -14,7 +14,7 @@ public class TransactionFactory
             TransactionType.ScratchPurchased => new PurchaseTransaction(),
             TransactionType.BingoPrizeReceived => new PrizeReceivedTransaction(),
             TransactionType.Withdrawal => new PrizeWithdrawTransaction(),
-            TransactionType.ScratchPrizeReceived => new PrizeReceivedTransaction(),   
+            TransactionType.ScratchPrizeReceived => new PrizeReceivedTransaction(),
             _ => throw new ArgumentException("Tipo de transação inválido.")
         };
     }

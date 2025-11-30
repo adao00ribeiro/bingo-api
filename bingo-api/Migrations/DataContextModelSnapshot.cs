@@ -50,6 +50,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("current_value");
 
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IncrementBallCumulative")
                         .HasColumnType("boolean")
                         .HasColumnName("increment_ball_cumulative");
@@ -84,6 +87,157 @@ namespace bingo_api.Migrations
                     b.ToTable("accumulateds", (string)null);
                 });
 
+            modelBuilder.Entity("bingo_api.src.Entities.Blockchain.Network", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("ChainId")
+                        .HasColumnType("integer")
+                        .HasColumnName("chain_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("discarded_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("RpcUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("rpc_url");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("blockchain_networks", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Blockchain.Token", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("Decimals")
+                        .HasColumnType("integer")
+                        .HasColumnName("decimals");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("discarded_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<bool>("IsNative")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_native");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("symbol");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("blockchain_tokens", (string)null);
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Blockchain.TokenAddress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ContractAddress")
+                        .IsRequired()
+                        .HasMaxLength(42)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(42)")
+                        .HasColumnName("contract_address");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("discarded_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("NetworkId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("network_id");
+
+                    b.Property<Guid>("TokenId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("token_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NetworkId");
+
+                    b.HasIndex("TokenId", "NetworkId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_blockchain_token_addresses_token_network");
+
+                    b.ToTable("blockchain_token_addresses", (string)null);
+                });
+
             modelBuilder.Entity("bingo_api.src.Entities.BotConfig", b =>
                 {
                     b.Property<Guid>("Id")
@@ -96,6 +250,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("Enabled")
                         .HasColumnType("boolean")
@@ -143,6 +300,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -194,6 +354,9 @@ namespace bingo_api.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("PunterId")
                         .HasColumnType("uuid")
                         .HasColumnName("punter_id");
@@ -233,6 +396,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("PrizeId")
                         .HasColumnType("uuid")
@@ -275,6 +441,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Instructions")
                         .HasMaxLength(500)
@@ -335,6 +504,9 @@ namespace bingo_api.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("RoundId")
                         .HasColumnType("uuid")
                         .HasColumnName("round_id");
@@ -387,6 +559,9 @@ namespace bingo_api.Migrations
                     b.Property<DateTime>("DateBirth")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_birth");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -456,11 +631,29 @@ namespace bingo_api.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric(18, 8)")
+                        .HasColumnName("amount");
+
+                    b.Property<DateTime?>("ConfirmedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("confirmed_at");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("DestinationAddress")
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("destination_address");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("discarded_at");
 
                     b.Property<string>("ImagemQrcode")
                         .IsRequired()
@@ -468,6 +661,12 @@ namespace bingo_api.Migrations
                         .IsUnicode(false)
                         .HasColumnType("text")
                         .HasColumnName("imagem_qrcode");
+
+                    b.Property<string>("Network")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("network");
 
                     b.Property<Guid>("PunterId")
                         .HasColumnType("uuid")
@@ -485,6 +684,18 @@ namespace bingo_api.Migrations
                         .HasColumnType("integer")
                         .HasDefaultValue(0)
                         .HasColumnName("status");
+
+                    b.Property<string>("Token")
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("token");
+
+                    b.Property<string>("TxHash")
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("tx_hash");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -515,6 +726,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -559,6 +773,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("RoomId")
                         .HasColumnType("uuid")
@@ -613,6 +830,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("Finished")
                         .HasColumnType("timestamp with time zone")
@@ -673,6 +893,9 @@ namespace bingo_api.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("PunterId")
                         .HasColumnType("uuid")
                         .HasColumnName("punter_id");
@@ -717,6 +940,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("LayoutType")
                         .HasMaxLength(10)
@@ -776,6 +1002,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("description");
 
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("ScratchGameId")
                         .HasColumnType("uuid")
                         .HasColumnName("scratch_game_id");
@@ -808,6 +1037,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("ScratchGameId")
                         .HasColumnType("uuid")
@@ -849,6 +1081,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Multiplier")
                         .ValueGeneratedOnAdd()
@@ -935,6 +1170,9 @@ namespace bingo_api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_birth");
 
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -980,15 +1218,24 @@ namespace bingo_api.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("amount");
 
+                    b.Property<DateTime?>("ConfirmedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("confirmed_at");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text")
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("discarded_at");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
                         .HasColumnName("status");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -1032,6 +1279,9 @@ namespace bingo_api.Migrations
                     b.Property<decimal>("CurrentBalance")
                         .HasColumnType("decimal(15,2)")
                         .HasColumnName("current_balance");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("EntityId")
                         .HasColumnType("uuid")
@@ -1097,6 +1347,27 @@ namespace bingo_api.Migrations
                         .HasConstraintName("fk_accumulated_room_id");
 
                     b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Blockchain.TokenAddress", b =>
+                {
+                    b.HasOne("bingo_api.src.Entities.Blockchain.Network", "Network")
+                        .WithMany("TokenAddresses")
+                        .HasForeignKey("NetworkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_blockchain_token_addresses_network_id");
+
+                    b.HasOne("bingo_api.src.Entities.Blockchain.Token", "Token")
+                        .WithMany("TokenAddresses")
+                        .HasForeignKey("TokenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_blockchain_token_addresses_token_id");
+
+                    b.Navigation("Network");
+
+                    b.Navigation("Token");
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.BotConfig", b =>
@@ -1327,6 +1598,16 @@ namespace bingo_api.Migrations
                         .IsRequired();
 
                     b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Blockchain.Network", b =>
+                {
+                    b.Navigation("TokenAddresses");
+                });
+
+            modelBuilder.Entity("bingo_api.src.Entities.Blockchain.Token", b =>
+                {
+                    b.Navigation("TokenAddresses");
                 });
 
             modelBuilder.Entity("bingo_api.src.Entities.Card", b =>

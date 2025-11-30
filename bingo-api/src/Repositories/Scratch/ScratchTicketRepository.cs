@@ -11,5 +11,5 @@ public class ScratchTicketRepository : RepositoryBase<ScratchTicket>, IScratchTi
     public ScratchTicketRepository(DataContext dataContext) : base(dataContext)
     {
     }
-    
+
 }

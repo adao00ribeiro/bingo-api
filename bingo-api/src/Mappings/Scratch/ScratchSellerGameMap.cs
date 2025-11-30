@@ -12,7 +12,7 @@ public class ScratchSellerGameMap : IEntityTypeConfiguration<ScratchSellerGame>
 
         // Chave primária
         builder.HasKey(x => x.Id);
-      
+
         builder.HasIndex(x => new { x.SellerId, x.ScratchGameId })
                .IsUnique();
         // ID do vendedor

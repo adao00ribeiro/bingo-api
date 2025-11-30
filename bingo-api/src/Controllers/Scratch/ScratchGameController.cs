@@ -12,43 +12,43 @@ namespace bingo_api.src.Controllers.Scratch;
 [ApiVersion("1.0")]
 public class ScratchGameController(IScratchGameRepository scratchGameRepository) : ApiControllerBase
 {
-  private readonly IScratchGameRepository _scratchGameRepository = scratchGameRepository;
+    private readonly IScratchGameRepository _scratchGameRepository = scratchGameRepository;
 
-  [HttpGet]
-  public async Task<ActionResult<ReportResponseDto<ScratchGameResponseDto, object>>> GetAll(
-   int? page = null, int? size = null)
-  {
-    var games = await this._scratchGameRepository.GetAllAsync();
-    var scratchGameDtos = games.Select(p => ScratchGameResponseDto.ConvertToDto(p)).ToList();
-
-    var pageNumber = page ?? 1;
-    var pageSize = size ?? scratchGameDtos.Count;
-    var pagedRows = scratchGameDtos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-
-    var response = new ReportResponseDto<ScratchGameResponseDto, object>
+    [HttpGet]
+    public async Task<ActionResult<ReportResponseDto<ScratchGameResponseDto, object>>> GetAll(
+     int? page = null, int? size = null)
     {
-      Rows = pagedRows,
-      Stats = null,
-      StartingOn = null,
-      EndingOn = null,
-      Page = pageNumber,
-      PerPage = pageSize,
-      RowsCount = scratchGameDtos.Count
-    };
+        var games = await this._scratchGameRepository.GetAllAsync();
+        var scratchGameDtos = games.Select(p => ScratchGameResponseDto.ConvertToDto(p)).ToList();
 
-    return Ok(response);
-  }
+        var pageNumber = page ?? 1;
+        var pageSize = size ?? scratchGameDtos.Count;
+        var pagedRows = scratchGameDtos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
 
-  [HttpGet("id/{id}")]
-  public async Task<ActionResult<ScratchGameResponseDto>> GetById(Guid id)
-  {
-    var scratchGame = await _scratchGameRepository.GetByIdAsync(id);
-    if (scratchGame is null)
-    {
-      return NotFound();
+        var response = new ReportResponseDto<ScratchGameResponseDto, object>
+        {
+            Rows = pagedRows,
+            Stats = null,
+            StartingOn = null,
+            EndingOn = null,
+            Page = pageNumber,
+            PerPage = pageSize,
+            RowsCount = scratchGameDtos.Count
+        };
+
+        return Ok(response);
     }
 
-    var scratchGameResponse = ScratchGameResponseDto.ConvertToDto(scratchGame);
-    return Ok(scratchGameResponse);
-  }
+    [HttpGet("id/{id}")]
+    public async Task<ActionResult<ScratchGameResponseDto>> GetById(Guid id)
+    {
+        var scratchGame = await _scratchGameRepository.GetByIdAsync(id);
+        if (scratchGame is null)
+        {
+            return NotFound();
+        }
+
+        var scratchGameResponse = ScratchGameResponseDto.ConvertToDto(scratchGame);
+        return Ok(scratchGameResponse);
+    }
 }

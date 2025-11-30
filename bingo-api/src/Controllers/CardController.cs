@@ -6,6 +6,7 @@ using bingo_api.src.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using Microsoft.EntityFrameworkCore;
 using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
@@ -52,9 +53,9 @@ public class CardController(ICardRepository _cardRepository, IPunterRepository _
         {
             return BadRequest();
         }
-        var cards = await cardRepository.GetAllByRoundId(punter.Id, roundId, page, size, includeProperties: c => c.Round);
+        var cards = await cardRepository.GetAllByRoundId(punter.Id, roundId, page, size, includeProperties: c => c.Include(x=> x.Round));
+        int totalCount = cards.Count();
         var cardDtos = cards.Select(r => CardResponseDto.ConvertToDto(r)).ToList();
-
         // Paginação simples
         var pageNumber = page ?? 1;
         var pageSize = size ?? cardDtos.Count;

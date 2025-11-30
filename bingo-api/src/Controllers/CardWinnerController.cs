@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using bingo_api.src.Entities;
 using bingo_api.src.Constants;
+using Microsoft.EntityFrameworkCore;
 using bingo_api.src.DTOs.Response.report;
 namespace bingo_api.src.Controllers;
 
@@ -19,7 +20,7 @@ public class CardWinnerController(ICardWinnerRepository cardWinnerRepository) : 
 
     [Authorize(Roles = $"{Roles.Admin},{Roles.Punter}")]
     [HttpGet()]
-     public async Task<ActionResult<ReportResponseDto<CardWinnerResponseDto, object>>> GetAll(int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<CardWinnerResponseDto, object>>> GetAll(int? page = null, int? size = null)
     {
 
         var entityId = User.FindFirst("entityid")?.Value;
@@ -37,13 +38,13 @@ public class CardWinnerController(ICardWinnerRepository cardWinnerRepository) : 
             totalCount = await _cardWinnerRepository.CountAsync(Guid.Parse(entityId));
             cardWinners = await _cardWinnerRepository.GetAllAsync(page, size,
                 filter: r => r.Card.PunterId == Guid.Parse(entityId),
-                includeProperties: [cw => cw.Prize.Round, cd => cd.Card]);
+                includeProperties:q => q.Include(x => x.Prize).ThenInclude(x=>x.Round).Include(x => x.Card));
         }
         else
         {
             return Forbid(); // Bloqueia caso o usuário não seja admin nem punter
         }
-       var cardWinnerDtos = cardWinners.Select(r => CardWinnerResponseDto.ConvertToDto(r)).ToList();
+        var cardWinnerDtos = cardWinners.Select(r => CardWinnerResponseDto.ConvertToDto(r)).ToList();
 
         // Paginação simples
         var pageNumber = page ?? 1;

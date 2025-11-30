@@ -9,4 +9,10 @@ public record ReportResponseDto<TRow, TStats>()
     public int? Page { get; set; }                         // opcional
     public int? PerPage { get; set; }                      // opcional
     public int RowsCount { get; set; }                     // obrigatório
+
+    public static implicit operator ReportResponseDto<TRow, TStats>(ReportResponseDto<object, object> v)
+    {
+        throw new NotImplementedException();
+    }
+
 }

@@ -5,7 +5,7 @@ using bingo_api.src.Repositories.Shared;
 
 namespace bingo_api.src.Repositories.Scratch;
 
-public class ScratchBuyRepository: RepositoryBase<ScratchBuy>, IScratchBuyRepository
+public class ScratchBuyRepository : RepositoryBase<ScratchBuy>, IScratchBuyRepository
 {
     public ScratchBuyRepository(DataContext dataContext) : base(dataContext)
     {

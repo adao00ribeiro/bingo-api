@@ -8,11 +8,14 @@ public static class HangfireJobsExtension
     {
         var recurringJobManager = app.ApplicationServices
          .GetRequiredService<IRecurringJobManager>();
+
+
         recurringJobManager.AddOrUpdate<RoundFetcherJob>(
                "process-rounds-job",
                job => job.Execute(),
                "*/10 * * * *"
            );
+
 
         return app;
     }

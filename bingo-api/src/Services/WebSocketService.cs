@@ -27,7 +27,7 @@ public class WebSocketService : IWebSocketService, IDisposable
         _logger = logger;
         _redis = redis;
         _subscriber = redis.GetSubscriber();
-        
+
         // Inicia o heartbeat timer (ping a cada 30 segundos)
         _heartbeatTimer = new Timer(SendHeartbeat, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
     }
@@ -133,7 +133,7 @@ public class WebSocketService : IWebSocketService, IDisposable
             };
             var json = JsonSerializer.Serialize(new SocketMessage("message", message, "success"), options);
             var buffer = Encoding.UTF8.GetBytes(json);
-            
+
             try
             {
                 await socket.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
@@ -156,7 +156,7 @@ public class WebSocketService : IWebSocketService, IDisposable
 
         var text = JsonSerializer.Serialize(new TimerEvent());
 
-        var json = JsonSerializer.Serialize(new SocketMessage("ping",text , "success"),options);
+        var json = JsonSerializer.Serialize(new SocketMessage("ping", text, "success"), options);
         var heartbeatMessage = Encoding.UTF8.GetBytes(json);
 
         var disconnectedUsers = new List<string>();

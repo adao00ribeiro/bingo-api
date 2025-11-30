@@ -2,6 +2,7 @@
 using System.Reflection;
 
 using bingo_api.src.Entities;
+using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Entities.Shared;
 using bingo_api.src.Infrastructure;
@@ -12,7 +13,7 @@ namespace bingo_api.src.Context;
 public class DataContext : DbContext
 {
 
-     private readonly EventDispatcher _dispatcher;
+    private readonly EventDispatcher _dispatcher;
     public DbSet<Seller> Sellers { get; set; }
     public DbSet<Punter> Punters { get; set; }
     public DbSet<Room> Rooms { get; set; }
@@ -32,9 +33,13 @@ public class DataContext : DbContext
     public DbSet<ScratchTicket> ScratchTickets { get; set; }
     public DbSet<ScratchPrize> ScratchPrizes { get; set; }
     public DbSet<Withdrawal> Withdrawals { get; set; }
+    public DbSet<Network> BlockchainNetworks { get; set; }
+    public DbSet<Token> BlockchainTokens { get; set; }
+    public DbSet<TokenAddress> BlockchainTokenAddresss { get; set; }
+    public DataContext(DbContextOptions<DataContext> options) : base(options) { }
     public DataContext(DbContextOptions<DataContext> options, EventDispatcher dispatcher) : base(options)
     {
-         _dispatcher = dispatcher;
+        _dispatcher = dispatcher;
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -49,24 +54,30 @@ public class DataContext : DbContext
 
         modelBuilder.ApplyAllConfigurationsFromCurrentAssembly("bingo_api.src.Mappings");
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        modelBuilder.Entity<Withdrawal>()
-               .HasDiscriminator<string>("withdrawal_type")
-               .HasValue<PunterWithdrawal>("Punter")
-               .HasValue<SellerWithdrawal>("Seller");
+    
 
-        modelBuilder.Entity<PunterWithdrawal>()
-            .HasOne(pw => pw.Punter)
-            .WithMany(p => p.Withdrawals)
-            .HasForeignKey(pw => pw.PunterId);
-
-        modelBuilder.Entity<SellerWithdrawal>()
-            .HasOne(sw => sw.Seller)
-            .WithMany(s => s.Withdrawals)
-            .HasForeignKey(sw => sw.SellerId);
-
-
+    foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+    {
+        foreach (var property in entityType.GetProperties())
+        {
+            if (property.ClrType == typeof(DateTime))
+            {
+                property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+                    v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(), // antes de salvar -> garante UTC
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc)            // ao ler do banco -> marca como UTC
+                ));
+            }
+            else if (property.ClrType == typeof(DateTime?))
+            {
+                property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime?, DateTime?>(
+                    v => v.HasValue ? (v.Value.Kind == DateTimeKind.Utc ? v : v.Value.ToUniversalTime()) : v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v
+                ));
+            }
+        }
+    }
         base.OnModelCreating(modelBuilder);
-
+    
         /*
         var allWithdrawals = await _context.Withdrawals.ToListAsync(); // Inclui ambos
         Buscar só de Seller:
@@ -75,18 +86,18 @@ public class DataContext : DbContext
     .ToListAsync();*/
     }
     public async Task<int> SaveChangesWithoutEventsAsync(CancellationToken cancellationToken = default)
-{
-    return await base.SaveChangesAsync(cancellationToken);
-}
+    {
+        return await base.SaveChangesAsync(cancellationToken);
+    }
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entities = ChangeTracker.Entries<Entity>()
         .Where(e => e.Entity.DomainEvents.Any())
         .Select(e => e.Entity)
         .ToList();
-            
+
         var result = await base.SaveChangesAsync(cancellationToken);
-           // 🔔 Após salvar, processa eventos de domínio
+        // 🔔 Após salvar, processa eventos de domínio
 
         if (entities.Any())
             await _dispatcher.DispatchEventsAsync(entities);
