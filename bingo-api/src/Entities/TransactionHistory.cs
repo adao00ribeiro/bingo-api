@@ -15,13 +15,13 @@ public class TransactionHistory : Entity
 
     public TransactionHistory() { }
 
-    public TransactionHistory(Guid entityId, string entityType, decimal previousBalance, decimal amount, TransactionType type)
+    public TransactionHistory(Guid entityId, string entityType, decimal previousBalance,decimal currentBalance, decimal amount, TransactionType type)
     {
         EntityId = entityId;
         EntityType = entityType;
         PreviousBalance = previousBalance;
         Amount = amount;
-        CurrentBalance = previousBalance + amount;
+        CurrentBalance = currentBalance;
         Type = type;
     }
 }
