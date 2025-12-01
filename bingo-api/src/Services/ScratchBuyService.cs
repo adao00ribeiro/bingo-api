@@ -48,16 +48,15 @@ public class ScratchBuyService(
             {
                 throw new Exception("Compra nao realizada");
             }
-            // 4. Gerar ticket com símbolos (sem revelar prêmio ainda)
+         
             var ticket = await GenerateTicket(punterId, sellerGame, ScratchBuyId);
 
-            // 5. Processar compra (debitar saldo)
-            await ProcessPurchase(punter, sellerGame.ScratchGame.Price);
-
-            // 6. Registrar transação
+     
             await CreateTransactionHistory(punterId, punter, sellerGame.ScratchGame.Price, TransactionType.ScratchPurchased);
 
-            // 7. Salvar ticket gerado
+            await ProcessPurchase(punter, sellerGame.ScratchGame.Price);
+
+       
             await _dataContext.ScratchTickets.AddAsync(ticket);
             await _dataContext.SaveChangesAsync();
             await transaction.CommitAsync();
