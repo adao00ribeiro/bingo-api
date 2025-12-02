@@ -51,8 +51,7 @@ public class ScratchBuyService(
          
             var ticket = await GenerateTicket(punterId, sellerGame, ScratchBuyId);
 
-     
-            await CreateTransactionHistory(punterId, punter, sellerGame.ScratchGame.Price, TransactionType.ScratchPurchased);
+            await CreateTransactionHistory(punterId, punter, sellerGame.ScratchGame.Price);
 
             await ProcessPurchase(punter, sellerGame.ScratchGame.Price);
 
@@ -353,21 +352,19 @@ public class ScratchBuyService(
         _dataContext.Punters.Update(punter);
     }
 
-    private async Task CreateTransactionHistory(Guid punterId, Punter punter, decimal amount, TransactionType type)
+    private async Task CreateTransactionHistory(Guid punterId, Punter punter, decimal amount)
     {
         var transactionHistory = new TransactionHistory
         {
             EntityType = "Punter",
             EntityId = punterId,
-            PreviousBalance = type == TransactionType.ScratchPurchased
-                ? punter.Balance - amount
-                : punter.Balance + amount,
-            CurrentBalance = punter.Balance,
+            PreviousBalance =punter.Balance,
+            CurrentBalance = punter.Balance - amount,
             Amount = amount,
-            Type = type,
+            Type = TransactionType.ScratchPurchased,
             CreatedAt = DateTime.UtcNow
         };
-
+       
         await _dataContext.TransactionHistories.AddAsync(transactionHistory);
     }
 }

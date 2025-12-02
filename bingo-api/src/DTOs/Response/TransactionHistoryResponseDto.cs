@@ -21,7 +21,6 @@ public record TransactionHistoryResponseDto : EntityResponseDto
         PreviousBalance = previousBalance;
         Amount = amount;
         CurrentBalance = currentBalance;
-        CurrentBalance = previousBalance + amount;
         Type = type;
     }
 
