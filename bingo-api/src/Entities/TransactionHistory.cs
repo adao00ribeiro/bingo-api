@@ -20,8 +20,8 @@ public class TransactionHistory : Entity
         EntityId = entityId;
         EntityType = entityType;
         PreviousBalance = previousBalance;
-        Amount = amount;
         CurrentBalance = currentBalance;
+        Amount = amount;
         Type = type;
     }
 }
