@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using bingo_api.src.DTOs.Response.report;
+using bingo_api.src.Entities;
 namespace bingo_api.src.Controllers;
 
 
@@ -37,6 +38,49 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
             Page = page,
             PerPage = size,
             RowsCount = totalCount
+        };
+        return Ok(response);
+    }
+    [HttpGet("next")]
+    public async Task<ActionResult<ReportResponseDto<RoundResponseDto, object>>> GetNextRounds(
+      int? page = null,
+      int? size = null)
+    {
+        var entityId = User.FindFirst("entityid")?.Value;
+
+        var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        if (string.IsNullOrEmpty(entityId) || string.IsNullOrEmpty(userRole))
+        {
+            return Unauthorized("Usuário não autenticado.");
+        }
+        IEnumerable<Round> rounds = new List<Round>();
+        if (User.IsInRole("Punter"))
+        {
+
+            var punter = await punterRepository.GetByIdAsync(Guid.Parse(entityId));
+
+            if (punter is null)
+            {
+                return Forbid();
+            }
+            // Punter pode ver apenas as salas dos Sellers associados a ele
+            rounds = await roundRepository.GetNextRoundsAsync(page, size, punter.SellerId);
+        }
+        else
+        {
+            return Forbid();
+        }
+
+        var roundDtos = rounds.Select(r => RoundResponseDto.ConvertToDto(r)).ToList();
+        var response = new ReportResponseDto<RoundResponseDto, object>
+        {
+            Rows = roundDtos,
+            Stats = null,
+            StartingOn = null,
+            EndingOn = null,
+            Page = page,
+            PerPage = size,
+            RowsCount = roundDtos.Count
         };
         return Ok(response);
     }

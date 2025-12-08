@@ -15,7 +15,31 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     public RoundRepository(DataContext dataContext) : base(dataContext)
     {
     }
+    public async Task<IEnumerable<Round>> GetNextRoundsAsync(int? page, int? size, Guid sellerId)
+    {
+        var roundIds = await Context.Rounds
+    .Where(r =>
+        r.Started > DateTime.UtcNow &&
+        r.Finished == null &&
+        (
+            r.Room.OwnerId == sellerId ||
+            r.Room.RoomsSellers.Any(rs => rs.SellerId == sellerId)
+        )
+    )
+    .GroupBy(r => r.RoomId)
+    .Select(g => g.OrderBy(r => r.Started).Select(r => r.Id).First())
+    .ToListAsync();
 
+        return  await Context.Rounds
+    .Where(r => roundIds.Contains(r.Id))
+    .Include(r => r.Room)
+    .ThenInclude(r => r.RoomsSellers)
+    .Include(r => r.Room)
+    .ThenInclude(room => room.Accumulated)
+    .Include(r => r.Prizes)
+    .OrderBy(r => r.Started)
+    .ToListAsync();
+    }
     public async Task<IEnumerable<Round>> FilterByRoomIdAsync(Guid roomId, Guid punterId)
     {
         DateTime currentDateTime = DateTime.UtcNow;
@@ -141,4 +165,7 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
         Context.Cards.RemoveRange(cardsToRemove);
         await Context.SaveChangesAsync();
     }
+
+
+
 }
