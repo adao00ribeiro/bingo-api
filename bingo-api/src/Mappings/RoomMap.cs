@@ -58,5 +58,11 @@ public class RoomMap : IEntityTypeConfiguration<Room>
                .HasForeignKey<BotConfig>(a => a.RoomId)
                .HasConstraintName("fk_bot_config_room_id")
                .IsRequired();
+
+        builder.HasOne(x => x.MediaAttachment)
+            .WithOne()
+            .HasForeignKey<MediaAttachment>(x => x.EntityId)
+            .HasPrincipalKey<Room>(x => x.Id)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

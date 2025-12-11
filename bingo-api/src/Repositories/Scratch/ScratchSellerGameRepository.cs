@@ -11,7 +11,7 @@ public class ScratchSellerGameRepository : RepositoryBase<ScratchSellerGame>, IS
     public ScratchSellerGameRepository(DataContext dataContext) : base(dataContext)
     {
     }
-    public override async Task<ScratchSellerGame?> GetByIdAsync(Guid id)
+    public override async Task<ScratchSellerGame?> GetByIdAsync(Guid id, Func<IQueryable<ScratchSellerGame>, IQueryable<ScratchSellerGame>>? includeProperties = null)
     {
         var sellerGame = await base.GetByIdAsync(id);
         sellerGame.ScratchGame = await this.Context.ScratchGames.FirstAsync(x => x.Id == sellerGame.ScratchGameId);

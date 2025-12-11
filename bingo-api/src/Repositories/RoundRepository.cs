@@ -36,6 +36,8 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     .ThenInclude(r => r.RoomsSellers)
     .Include(r => r.Room)
     .ThenInclude(room => room.Accumulated)
+    .Include(r => r.Room)
+    .ThenInclude(room => room.MediaAttachment)
     .Include(r => r.Prizes)
     .OrderBy(r => r.Started)
     .ToListAsync();

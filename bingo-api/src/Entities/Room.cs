@@ -11,7 +11,7 @@ public class Room : Entity
     public IEnumerable<Round>? Rounds { get; set; }
     public Accumulated Accumulated { get; set; }
     public BotConfig BotConfig { get; set; }
-
+    public MediaAttachment MediaAttachment { get; set; } 
     public Room()
     {
 

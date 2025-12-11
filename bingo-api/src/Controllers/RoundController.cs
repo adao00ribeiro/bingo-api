@@ -9,15 +9,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using bingo_api.src.DTOs.Response.report;
 using bingo_api.src.Entities;
+using bingo_api.src.Services;
 namespace bingo_api.src.Controllers;
 
 
 [Authorize]
 [ApiVersion("1.0")]
-public class RoundController(IRoundRepository _roundRepository, IPunterRepository _punterRepository) : ApiControllerBase
+public class RoundController(IRoundRepository _roundRepository, IPunterRepository _punterRepository, MinioFileService _minioFileService) : ApiControllerBase
 {
     private readonly IRoundRepository roundRepository = _roundRepository;
     private readonly IPunterRepository punterRepository = _punterRepository;
+    private readonly MinioFileService minioFileService = _minioFileService;
 
 
     [HttpGet()]
@@ -70,6 +72,7 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         {
             return Forbid();
         }
+        
 
         var roundDtos = rounds.Select(r => RoundResponseDto.ConvertToDto(r)).ToList();
         var response = new ReportResponseDto<RoundResponseDto, object>

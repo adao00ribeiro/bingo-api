@@ -12,7 +12,17 @@ public record RoomResponseDto
     public AccumulatedResponseDto? Accumulated { get; set; }
     public SellerResponseDto? Owner { get; set; }
     public IEnumerable<RoomSellerResponseDto>? RoomSellers { get; set; }
-    public RoomResponseDto(Guid id, string name, Guid ownerId, SellerResponseDto? owner, IEnumerable<RoomSellerResponseDto> roomSellers, AccumulatedResponseDto accumulated)
+    public MediaAttachmentResponseDto? MediaAttachment { get; set; }
+
+    public RoomResponseDto(
+        Guid id, 
+        string name,
+        Guid ownerId, 
+        SellerResponseDto? owner, 
+        IEnumerable<RoomSellerResponseDto> roomSellers, 
+        AccumulatedResponseDto accumulated,
+        MediaAttachmentResponseDto? mediaAttachment
+        )
     {
         Id = id;
         Name = name;
@@ -20,19 +30,23 @@ public record RoomResponseDto
         Owner = owner;
         RoomSellers = roomSellers;
         Accumulated = accumulated;
+        MediaAttachment = mediaAttachment;
     }
     internal static RoomResponseDto ConvertToDto(Room room)
     {
         var roomSellerResponse = room.RoomsSellers?.Select(r => RoomSellerResponseDto.ConvertToDto(r)) ?? Enumerable.Empty<RoomSellerResponseDto>();
         var ownerResponse = room.Owner != null ? SellerResponseDto.ConvertToDto(room.Owner) : null;
         var accumulatedResponse = room.Accumulated != null ? AccumulatedResponseDto.ConvertToDto(room.Accumulated) : null;
+        var mediaResponse = MediaAttachmentResponseDto.ConvertToDto(room.MediaAttachment);
+       
         return new RoomResponseDto(
             room.Id,
             room.Name,
             room.OwnerId,
             ownerResponse,
             roomSellerResponse,
-            accumulatedResponse
+            accumulatedResponse,
+            mediaResponse
         );
     }
     internal static RoomResponseDto ConvertToSocketDto(Room room)
@@ -45,6 +59,7 @@ public record RoomResponseDto
             room.OwnerId,
             ownerResponse,
             roomSellerResponse,
+            null,
             null
         );
     }

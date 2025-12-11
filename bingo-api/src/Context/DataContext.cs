@@ -36,12 +36,13 @@ public class DataContext : DbContext
     public DbSet<Network> BlockchainNetworks { get; set; }
     public DbSet<Token> BlockchainTokens { get; set; }
     public DbSet<TokenAddress> BlockchainTokenAddresss { get; set; }
+    public DbSet<MediaAttachment> MediaAttachments { get; set; }
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
     public DataContext(DbContextOptions<DataContext> options, EventDispatcher dispatcher) : base(options)
     {
         _dispatcher = dispatcher;
     }
-
+        
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder.Properties<string>()
