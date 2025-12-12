@@ -27,6 +27,18 @@ ENV TelegramBot__Token=${TelegramBot__Token}
 ARG TelegramBot__ChatId=${TelegramBot__ChatId}
 ENV TelegramBot__ChatId=${TelegramBot__ChatId}
 
+ARG MinioSettings__Endpoint
+ARG MinioSettings__AccessKey
+ARG MinioSettings__SecretKey
+ARG MinioSettings__UseSSL
+ARG MinioSettings__DefaultBucketName
+
+ENV MinioSettings__Endpoint=${MinioSettings__Endpoint}
+ENV MinioSettings__AccessKey=${MinioSettings__AccessKey}
+ENV MinioSettings__SecretKey=${MinioSettings__SecretKey}
+ENV MinioSettings__UseSSL=${MinioSettings__UseSSL}
+ENV MinioSettings__DefaultBucketName=${MinioSettings__DefaultBucketName}
+
 WORKDIR /app/api
 
 COPY *.sln ./
