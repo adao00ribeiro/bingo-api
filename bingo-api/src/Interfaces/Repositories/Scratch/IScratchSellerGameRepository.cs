@@ -6,5 +6,5 @@ namespace bingo_api.src.Interfaces.Repositories.Scratch;
 public interface IScratchSellerGameRepository : IRepositoryBase<ScratchSellerGame>
 {
     Task<int> CountAsync(Guid ownerId);
-    Task<ScratchSellerGame?> GetByIdAsync(Guid id);
+
 }

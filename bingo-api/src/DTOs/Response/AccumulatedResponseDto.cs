@@ -27,7 +27,7 @@ public class AccumulatedResponseDto
         IncrementBallCumulative = incrementBallCumulative;
         RoomId = roomId;
     }
-    internal static object? ConvertToDto(Accumulated accumulated)
+    internal static AccumulatedResponseDto ConvertToDto(Accumulated accumulated)
     {
         return new AccumulatedResponseDto(
             accumulated.Id,

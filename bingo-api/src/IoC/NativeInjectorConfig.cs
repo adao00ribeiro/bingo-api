@@ -26,6 +26,9 @@ using bingo_api.src.Extensions.Seeds;
 using bingo_api.src.Infrastructure;
 using bingo_api.src.Application.Handlers;
 using bingo_api.src.Interfaces;
+using bingo_api.src.Configurations;
+using Minio;
+using Microsoft.Extensions.Options;
 
 
 
@@ -42,12 +45,13 @@ public static class NativeInjectorConfig
           {
               var interceptor = provider.GetRequiredService<BalanceChangeInterceptor>();
               options.UseNpgsql(dataSource);
-              options.AddInterceptors(interceptor);
+              options.AddInterceptors([interceptor]);
           }
         );
         services.AddDbContext<IdentityDataContext>(options =>
           options.UseNpgsql(configuration.GetConnectionString("DatabasePostgreSQL"))
       );
+        services.Configure<MinioSettings>(configuration.GetSection("MinioSettings"));
 
         services.AddDefaultIdentity<User>()
                           .AddRoles<IdentityRole>()
@@ -73,9 +77,21 @@ public static class NativeInjectorConfig
 
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")));
         services.AddSingleton<BlockchainServiceFactory>();
+        services.AddSingleton<IMinioClient>(sp =>
+{
+    var settings = sp.GetRequiredService<IOptions<MinioSettings>>().Value;
+
+    return new MinioClient()
+        .WithEndpoint(settings.Endpoint)
+        .WithCredentials(settings.AccessKey, settings.SecretKey)
+        .WithSSL(settings.UseSSL)
+        .Build();
+});
+
         //repository
         services.AddScoped<JwtSecurityExtensionEvents>();
         services.AddScoped<IIdentityService, IdentityService>();
+        services.AddScoped<IMediaAttachmentService, MediaAttachmentService>();
         services.AddScoped<ICardRepository, CardRepository>();
         services.AddScoped<ICardWinnerRepository, CardWinnerRepository>();
         services.AddScoped<IPrizeRepository, PrizeRepository>();
@@ -95,7 +111,8 @@ public static class NativeInjectorConfig
         services.AddScoped<ITokenAddressRepository, TokenAddressRepository>();
         services.AddScoped<ITokenAddressRepository, TokenAddressRepository>();
         services.AddScoped<IWithdrawalRepository, WithdrawalRepository>();
-
+        services.AddScoped<IMediaAttachmentRepository, MediaAttachmentRepository>();
+        services.AddScoped<MinioFileService>();
 
 
         services.AddScoped<BlockchainServiceFactory>();

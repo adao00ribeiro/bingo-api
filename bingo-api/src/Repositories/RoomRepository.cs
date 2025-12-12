@@ -9,7 +9,6 @@ public class RoomRepository : RepositoryBase<Room>, IRoomRepository
     public RoomRepository(DataContext dataContext) : base(dataContext)
     {
     }
-
     public override async Task<Guid> AddAsync(Room objeto)
     {
         Accumulated acumulated = new();
