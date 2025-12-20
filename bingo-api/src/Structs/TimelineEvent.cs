@@ -9,4 +9,5 @@ public class TimelineEvent
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? Delay { get; set; }
+
 }

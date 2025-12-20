@@ -13,18 +13,16 @@ using Microsoft.EntityFrameworkCore;
 namespace bingo_api.src.Jobs;
 
 public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
- IServiceScopeFactory scopeFactory,
- IWebSocketService _webSocketService,
+
+ DataContext _context,
  InsertBotRoundService _insertBotRoundServiceWinnerRepository,
  TelegamNotifierService _notifier
 
  ) : IRoundExecutionJob
 {
-    IServiceScopeFactory _scopeFactory = scopeFactory;
+    DataContext context = _context;
     private readonly ILogger<IRoundExecutionJob> _logger = logger;
-    private readonly IWebSocketService webSocketService = _webSocketService;
     private readonly InsertBotRoundService InsertBotRoundService = _insertBotRoundServiceWinnerRepository;
-
     private readonly TelegamNotifierService notifier = _notifier;
     private List<int> remainingNumbers = new List<int>();
 
@@ -32,18 +30,15 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
     {
         try
         {
-            using var scope = _scopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<DataContext>();
             _logger.LogInformation("Iniciando Job2 - Processamento do Round {RoundId}", roundId);
 
-            Round? tempRound = await context.Rounds
-  .Include(r => r.Cards)
-  .ThenInclude(c => c.Punter)
-  .Include(r => r.Prizes)
-  .Include(r => r.Room)
-  .ThenInclude(room => room.Accumulated)
-   .AsNoTracking()
-  .FirstOrDefaultAsync(r => r.Id == roundId);
+            Round? tempRound = await context.Rounds.Include(r => r.Cards)
+            .ThenInclude(c => c.Punter)
+            .Include(r => r.Prizes)
+            .Include(r => r.Room)
+            .ThenInclude(room => room.Accumulated)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == roundId);
 
             var timeline = new List<TimelineEvent>();
 
@@ -79,8 +74,6 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 context.Rounds.Entry(tempRound).State = EntityState.Modified;
                 await context.SaveChangesAsync();
                 message.Finished = true;
-                await this.webSocketService.SendMessageToChannelAsync($"room_{tempRound.RoomId}", message.JsonSerializerRound());
-                timeline.Add(new TimelineEvent { eventData = message.Clone() });
                 return;
             }
 
@@ -107,8 +100,8 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             //   await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
 
             // await Task.Delay(8000);
-            timeline.Add(new TimelineEvent { eventData = message.Clone() });
-            timeline.Add(new TimelineEvent { Delay = 8 * 1000 });
+            timeline.Add(new TimelineEvent { eventData = message.Clone(), Delay = 8  });
+
             var prizeServices = prizes
     .Select(p => PrizeServiceFactory.CreateService(p))
     .ToList();
@@ -118,8 +111,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 if (allAwardsDrawn)
                     continue;
                 drawnNumbers.Add(number);
-                tempRound.Numbers = drawnNumbers.ToArray();
-                var sleep_round = tempRound.TimeBetweenBalls;
+                tempRound.Numbers = [.. drawnNumbers];
                 var TimeBetweenBalls = tempRound.TimeBetweenBalls;
 
                 var markedCards = cards.Where(card => card.CheckNumberOnTheCard(number)).ToList();
@@ -134,7 +126,6 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 {
                     if (p.RefreshWinner)
                     {
-                        TimeBetweenBalls = 16; // Se isso precisar ser dinâmico, considere passar como parâmetro ou definir lógica específica
                         current_prize_result = p.GetObject();
                         p.SetRefresWinner(false);
                     }
@@ -170,22 +161,18 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
 
                 //await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
 
-                timeline.Add(new TimelineEvent { eventData = message.Clone() });
+                timeline.Add(new TimelineEvent { eventData = message.Clone(), Delay = TimeBetweenBalls });
 
                 // _logger.LogWarning("Enviado para o websocket");
                 if (current_prize_result is not null)
                 {
                     message.CurrentPrizeResult = current_prize_result;
-                    //  await Task.Delay(3 * 1000);
-                    //  await this.webSocketService.SendMessageToChannel($"room_{tempRound.RoomId}", message.JsonSerializerRound());
-                    timeline.Add(new TimelineEvent { Delay = 3 * 1000 });
-                    timeline.Add(new TimelineEvent { eventData = message.Clone() });
+
+                    timeline.Add(new TimelineEvent { eventData = message.Clone(), Delay = 16  });
                 }
 
                 allAwardsDrawn = prizes.All(prize => prize.HasWinners());
 
-                //await Task.Delay(TimeBetweenBalls * 1000);
-                timeline.Add(new TimelineEvent { Delay = TimeBetweenBalls * 1000 });
             }
 
             if (bingoAccumulated.Activated)
@@ -212,14 +199,60 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             }
             message.Finished = true;
             message.CurrentPrizeResult = null;
-            timeline.Add(new TimelineEvent { eventData = message.Clone() });
 
-            tempRound.Timeline = timeline;
+            timeline.Add(new TimelineEvent { eventData = message.Clone(), Delay = 10 });
+
+            // calcula total de minutos (igual ao Rails)
+            var totalMinutes = timeline
+                .Where(t => t.Delay.HasValue)
+                .Sum(t => t.Delay.Value) / 60.0;
+
+            var currentTime = DateTime.UtcNow;
+
+            timeline[0].eventData.TotalMinutes = totalMinutes;
+            timeline[0].eventData.StartedWeb = currentTime;
+
+            // monta timeline hash (timestamp ISO => evento)
+            var timelineDict = new Dictionary<string, TimelineEvent>();
+
+            for (int i = 0; i < timeline.Count; i++)
+            {
+                // time_between_balls
+                currentTime = currentTime.AddSeconds(tempRound.TimeBetweenBalls);
+
+                // último evento recebe +10s
+                if (i == timeline.Count - 1)
+                    currentTime = currentTime.AddSeconds(10);
+
+                if (i != 0)
+                {
+                    timeline[i].eventData.StartedWeb = null;
+                }
+
+                var key = currentTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+
+                timelineDict[key] = timeline[i];
+            }
+            tempRound.Timeline = timelineDict;
             context.Rounds.Entry(tempRound).State = EntityState.Modified;
             await context.SaveChangesAsync();
 
-            BackgroundJob.Enqueue<ShowTimelineStepJob>(job => job.Execute(roundId, 0));
+            // pega a terceira chave a partir do fim
+            var sortedKeys = timelineDict.Keys.OrderBy(k => k).ToList();
+            var targetKey = sortedKeys[^3];
 
+            var timeTarget = DateTime.Parse(
+           targetKey,
+           null,
+           System.Globalization.DateTimeStyles.AssumeUniversal
+       );
+
+            var timeTargetOffset = new DateTimeOffset(timeTarget);
+
+            BackgroundJob.Schedule<ShowTimelineStepJob>(
+              job => job.Execute(roundId),
+               timeTargetOffset
+          );
         }
         catch (Exception ex)
         {
@@ -228,22 +261,6 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
             throw;
         }
     }
-    /*
-    private int GenerateRandomNumber()
-    {
-        if (remainingNumbers.Count == 0)
-        {
-            throw new InvalidOperationException("No numbers left to draw.");
-        }
 
-        Random random = new Random();
-        int index = random.Next(remainingNumbers.Count);
-        int number = remainingNumbers[index];
-
-        remainingNumbers.RemoveAt(index);
-
-        _logger.LogWarning($"Number drawn: {number}");
-        return number;
-    }*/
 
 }

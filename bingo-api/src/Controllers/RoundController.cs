@@ -15,11 +15,10 @@ namespace bingo_api.src.Controllers;
 
 [Authorize]
 [ApiVersion("1.0")]
-public class RoundController(IRoundRepository _roundRepository, IPunterRepository _punterRepository, MinioFileService _minioFileService) : ApiControllerBase
+public class RoundController(IRoundRepository _roundRepository, IPunterRepository _punterRepository) : ApiControllerBase
 {
     private readonly IRoundRepository roundRepository = _roundRepository;
     private readonly IPunterRepository punterRepository = _punterRepository;
-    private readonly MinioFileService minioFileService = _minioFileService;
 
 
     [HttpGet()]
@@ -43,6 +42,34 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         };
         return Ok(response);
     }
+
+    [HttpGet("room/{roomId}")]
+    public async Task<IActionResult> GetRoundsWithTimelineAsync(Guid roomId)
+    {
+        var entityId = User.FindFirst("entityid")?.Value;
+
+        var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        if (string.IsNullOrEmpty(entityId) || string.IsNullOrEmpty(userRole))
+        {
+            return Unauthorized("Usuário não autenticado.");
+        }
+        if (!User.IsInRole("Punter"))
+        {
+            return Forbid();
+        }
+
+        var punter = await punterRepository.GetByIdAsync(Guid.Parse(entityId));
+
+        if (punter is null)
+        {
+            return Forbid();
+        }
+        var round = await roundRepository.GetRoundsWithTimelineAsync(roomId, punter.Id);
+
+        var roundDto = RoundResponseDto.ConvertToDtoWithTimeline(round);
+        return Ok(roundDto);
+    }
+
     [HttpGet("next")]
     public async Task<ActionResult<ReportResponseDto<RoundResponseDto, object>>> GetNextRounds(
       int? page = null,
@@ -72,7 +99,7 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         {
             return Forbid();
         }
-        
+
 
         var roundDtos = rounds.Select(r => RoundResponseDto.ConvertToDto(r)).ToList();
         var response = new ReportResponseDto<RoundResponseDto, object>
@@ -87,8 +114,8 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         };
         return Ok(response);
     }
-    [HttpGet("filter/room/{id}")]
-    public async Task<ActionResult<IEnumerable<RoundResponseDto>>> FilterByRoomIdAsync(Guid id)
+    [HttpGet("filter/room")]
+    public async Task<ActionResult<IEnumerable<RoundResponseDto>>> FilterByRoomIdAsync([FromQuery] List<Guid> roomIds)
     {
         var identity = User.Identity as ClaimsIdentity;
         var userEmail = identity?.FindFirst(ClaimTypes.Email)?.Value;
@@ -97,7 +124,10 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         {
             return Unauthorized(new { message = "Usuário não autenticado." });
         }
-
+        if (roomIds == null || roomIds.Count == 0)
+        {
+            return BadRequest(new { message = "Informe ao menos um roomId." });
+        }
         var punter = await this.punterRepository.GetByEmailAsync(userEmail);
 
         if (punter is null)
@@ -105,7 +135,7 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
             return NotFound();
         }
 
-        var rounds = await roundRepository.FilterByRoomIdAsync(id, punter.Id);
+        var rounds = await roundRepository.FilterByRoomIdAsync(roomIds, punter.Id);
 
         var roundsResponse = rounds.Select(r => RoundResponseDto.ConvertToDto(r));
         return Ok(roundsResponse);
@@ -136,7 +166,6 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
         round.Prizes = await roundRepository.GetPrizes(id);
         return Ok(RoundResponseDto.ConvertToDto(round));
     }
-
     [HttpPut]
     public async Task<ActionResult> Update(RoundRequestDto request)
     {

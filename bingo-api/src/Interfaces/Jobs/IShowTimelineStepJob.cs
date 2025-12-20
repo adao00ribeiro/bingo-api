@@ -7,5 +7,5 @@ namespace bingo_api.src.Interfaces.Jobs;
 
 public interface IShowTimelineStepJob
 {
-    Task Execute(Guid roundId, int index);
+    Task Execute(Guid roundId);
 }
