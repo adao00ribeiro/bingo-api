@@ -8,10 +8,15 @@ namespace bingo_api.src.Interfaces.Repositories;
 
 public interface IRoundRepository : IRepositoryBase<Round>
 {
+
     Task<IEnumerable<Round>> FilterByDateTimeRange(DateTime today, TimeSpan timeOfDay1, TimeSpan timeOfDay2);
-    Task<IEnumerable<Round>> FilterByRoomIdAsync(Guid roomId, Guid PunterId);
+    Task<IEnumerable<Round>> FilterByRoomIdAsync(List<Guid> roomIds, Guid PunterId);
     Task<bool> GenerateRounds(RoundBulkRequestDto request);
     Task<IEnumerable<Round>> GetNextRoundsAsync(int? page, int? size,Guid sellerId);
+    Task<Round?> GetRoundsWithTimelineAsync(
+        Guid roomId,
+       Guid punterId
+    );
     Task<ICollection<Prize>> GetPrizes(Guid roundId);
     Task RemoveCards(Guid RoundId);
 }

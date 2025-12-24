@@ -1,6 +1,5 @@
 using bingo_api.src.Context;
 using bingo_api.src.Interfaces.Repositories;
-using bingo_api.src.Structs;
 using Hangfire;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Jobs;
@@ -8,21 +7,19 @@ using Microsoft.EntityFrameworkCore;
 
 public class ShowTimelineStepJob(
     DataContext context,
-    IWebSocketService _webSocketService,
      ITransactionHistoryRepository transactionHistoryRepository,
      IRoundRepository roundRepository,
       ILogger<ShowTimelineStepJob> logger) : IShowTimelineStepJob
 {
     private readonly DataContext _context = context;
-    private readonly IWebSocketService webSocketService = _webSocketService;
     private readonly ITransactionHistoryRepository _transactionHistoryRepository = transactionHistoryRepository;
     private readonly IRoundRepository _roundRepository = roundRepository;
     private readonly ILogger<ShowTimelineStepJob> _logger = logger;
 
     [AutomaticRetry(Attempts = 3, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-    public async Task Execute(Guid roundId, int index)
+    public async Task Execute(Guid roundId)
     {
-        _logger.LogInformation($"Executando passo {index} da timeline do round {roundId}");
+        _logger.LogInformation($"Executando Finalizacao da Rodada: {roundId}");
         var round = await _context.Rounds.FindAsync(roundId);
         if (round == null)
         {
@@ -30,24 +27,15 @@ public class ShowTimelineStepJob(
             return;
         }
 
-        var timeline = round.Timeline; // Assumindo que seja um JSON armazenado
+        var timeline = round.Timeline.ToList(); // Assumindo que seja um JSON armazenado
 
 
         if (timeline == null || timeline.Count == 0)
             return;
 
 
-        RoundMessage eventData = timeline[index].eventData;
-        int? delay = timeline[index].Delay;
-
-        if (eventData != null)
-        {
-            await this.webSocketService.SendMessageToChannelAsync($"room_{round.RoomId}", eventData.JsonSerializerRound());
-        }
-        else
-        {
-            await Task.Delay((int)delay);
-        }
+        var lastKey = round.Timeline.Keys.Max();
+        var eventData = round.Timeline[lastKey].eventData;
 
         if (eventData != null && eventData.Finished && eventData.Results != null)
         {
@@ -82,14 +70,10 @@ public class ShowTimelineStepJob(
                 }
             }
 
-            round.Timeline = [];
+            round.Timeline =  [];
             round.Finished = DateTime.UtcNow;
             await this._roundRepository.UpdateAsync(round);
             await this._roundRepository.RemoveCards(round.Id);
-        }
-        else
-        {
-            BackgroundJob.Enqueue<ShowTimelineStepJob>(job => job.Execute(roundId, index + 1));
         }
     }
 }

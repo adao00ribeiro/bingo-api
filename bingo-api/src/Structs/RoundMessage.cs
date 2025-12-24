@@ -20,6 +20,9 @@ public class RoundMessage
     public RoundResponseDto Round { get; set; } = null;
     public IEnumerable<PrizeResult> Results { get; set; }
     public PrizeResult? CurrentPrizeResult { get; set; } = null;
+    public double TotalMinutes { get;  set; }
+    public DateTime? StartedWeb { get;  set; }
+
     public RoundMessage()
     {
 

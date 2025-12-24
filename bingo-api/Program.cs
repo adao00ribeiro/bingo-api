@@ -39,7 +39,7 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: httpContext.User.Identity?.Name ?? httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon",
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 100,
+                PermitLimit = 500,
                 Window = TimeSpan.FromMinutes(3),
                 QueueLimit = 0,
                 AutoReplenishment = true

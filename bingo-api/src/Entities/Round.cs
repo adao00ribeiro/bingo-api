@@ -20,7 +20,7 @@ public class Round : Entity
     public DateTime? Finished { get; set; }
     public Guid RoomId { get; set; }
     public Room? Room { get; set; }
-    public List<TimelineEvent> Timeline { get; set; } = new List<TimelineEvent>();
+    public Dictionary<string, TimelineEvent> Timeline { get; set; } = new();
     public IEnumerable<Card>? Cards { get; set; }
     public ICollection<Prize>? Prizes { get; set; }
     public Round()
