@@ -29,10 +29,12 @@ public class InsertBotRoundService
             {
                 return Result.Failure("invalid_round");
             }
+            /*
             if (tempRound.CardSaleCount == 0)
             {
                 return Result.Failure("invalid_round", new { message = "Rodadas sem cartelas compradas" });
             }
+            */
             var config = tempRound.Room?.BotConfig;
             if (config == null)
             {
