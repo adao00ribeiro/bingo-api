@@ -67,7 +67,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 }
             }
             var message = new RoundMessage(tempRound.Id);
-
+            /*
             if (tempRound.CardSaleCount == 0)
             {
                 tempRound.Finished = DateTime.UtcNow;
@@ -76,7 +76,7 @@ public class RoundExecutionJob(ILogger<RoundExecutionJob> logger,
                 message.Finished = true;
                 return;
             }
-
+            */
             var drawnNumbers = new HashSet<int>();
             remainingNumbers = [.. Enumerable.Range(1, tempRound.MaxBalls).OrderBy(x => Guid.NewGuid())];
 
