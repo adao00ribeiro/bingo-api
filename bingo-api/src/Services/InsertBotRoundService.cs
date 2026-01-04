@@ -57,7 +57,7 @@ public class InsertBotRoundService
 
             var custo_premios = tempRound.Prizes.Sum(p => p.Value);
             decimal porcentagemDecimal = Convert.ToDecimal(config.PresenceRate);
-            var arrecadado = tempRound.CardSaleCount * tempRound.CardValue;
+            var arrecadado = tempRound.CardSaleCount + 1 * tempRound.CardValue;
             var total_cartelas = ((custo_premios / (1 - porcentagemDecimal)) - arrecadado) / tempRound.CardValue;
 
             if (total_cartelas <= 0)
