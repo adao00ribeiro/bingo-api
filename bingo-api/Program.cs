@@ -15,7 +15,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://bingo-dashboard.srv813210.hstgr.cloud", "http://bingo-web.srv813210.hstgr.cloud", "http://homologation-bingo-web.srv813210.hstgr.cloud", "http://homologation-bingo-dashboard.srv813210.hstgr.cloud", "http://homologation-bingo-dashboard.captain.localhost", "http://localhost", "http://localhost:4200", "http://localhost:4300", "https://localhost:4200", "https://localhost:4300")
+        policy.WithOrigins("https://dashboard.bngx.online", "https://web.bngx.online", "https://homologation-dashboard.bngx.online", "https://homologation-web.bngx.online", "http://localhost:4200", "http://localhost:4300", "https://localhost:4200", "https://localhost:4300")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
