@@ -4,14 +4,14 @@ namespace bingo_api.src.Entities;
 
 public class CardBuy : Entity
 {
-    public int Quantity { get; set; }
-    public Guid RoundId { get; set; }
-    public Guid PunterId { get; set; }
-    public virtual IEnumerable<Card> Cards { get; set; }
+    public int Quantity { get; private set; }
+    public Guid RoundId { get; private set; }
+    public Guid PunterId { get; private set; }
+    public virtual IEnumerable<Card> Cards { get; private set; } = [];
     public CardBuy(int quantity, Guid roundId, Guid punterId)
     {
         if (quantity <= 0)
-                throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
+            throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
         Quantity = quantity;
         RoundId = roundId;
         PunterId = punterId;

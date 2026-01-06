@@ -4,10 +4,10 @@ namespace bingo_api.src.Entities.Scratch;
 
 public class ScratchBuy : Entity
 {
-    public int Quantity { get; set; }
-    public Guid SellerGameId { get; set; }
-    public Guid PunterId { get; set; }
-    public IEnumerable<ScratchTicket> ScratchTickets { get; set; }
+    public int Quantity { get; private set; }
+    public Guid SellerGameId { get; private set; }
+    public Guid PunterId { get; private set; }
+    public IEnumerable<ScratchTicket> ScratchTickets { get;  private set; } = [];
 
     public ScratchBuy(int quantity, Guid sellerGameId, Guid punterId)
     {
