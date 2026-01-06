@@ -7,7 +7,7 @@ public class ScratchBuy : Entity
     public int Quantity { get; private set; }
     public Guid SellerGameId { get; private set; }
     public Guid PunterId { get; private set; }
-    public IEnumerable<ScratchTicket> ScratchTickets { get;  private set; } = [];
+    public IEnumerable<ScratchTicket> ScratchTickets { get;  private set; } 
 
     public ScratchBuy(int quantity, Guid sellerGameId, Guid punterId)
     {

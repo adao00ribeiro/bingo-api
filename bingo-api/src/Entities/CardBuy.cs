@@ -7,7 +7,7 @@ public class CardBuy : Entity
     public int Quantity { get; private set; }
     public Guid RoundId { get; private set; }
     public Guid PunterId { get; private set; }
-    public virtual IEnumerable<Card> Cards { get; private set; } = [];
+    public virtual IEnumerable<Card> Cards { get; private set; }
     public CardBuy(int quantity, Guid roundId, Guid punterId)
     {
         if (quantity <= 0)
