@@ -6,6 +6,7 @@ namespace bingo_api.src.DTOs.Request;
 public class CardBuyRequestDto
 {
     [Required(ErrorMessage = "Quantity is required.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than zero.")]
     public int Quantity { get; set; }
 
     [Required(ErrorMessage = "RoundId is required.")]

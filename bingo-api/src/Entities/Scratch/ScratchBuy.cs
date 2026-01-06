@@ -11,6 +11,8 @@ public class ScratchBuy : Entity
 
     public ScratchBuy(int quantity, Guid sellerGameId, Guid punterId)
     {
+        if (quantity <= 0)
+                throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
         Quantity = quantity;
         SellerGameId = sellerGameId;
         PunterId = punterId;
