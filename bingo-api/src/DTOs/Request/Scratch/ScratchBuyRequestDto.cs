@@ -6,6 +6,7 @@ namespace bingo_api.src.DTOs.Request;
 public class ScratchBuyRequestDto
 {
     [Required(ErrorMessage = "Quantity is required.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than zero.")]
     public int Quantity { get; set; }
 
     [Required(ErrorMessage = "ScratchGameId is required.")]
