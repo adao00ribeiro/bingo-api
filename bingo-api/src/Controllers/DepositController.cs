@@ -55,7 +55,7 @@ public class DepositController(
         }
         PaymentMethod method = null;
 
-        if (!string.IsNullOrEmpty(dto.Network)&& !string.IsNullOrEmpty(dto.TransactionHash))
+        if (!string.IsNullOrEmpty(dto.Network) && !string.IsNullOrEmpty(dto.TransactionHash))
         {
             // Se tiver rede, pega o método de pagamento do tipo CRYPTO
             method = methods.FirstOrDefault(m => m.Type == Enums.EPaymentMethodType.CRYPTO);
@@ -71,7 +71,7 @@ public class DepositController(
             throw new Exception("Nenhum método de pagamento válido encontrado.");
         }
 
-        var recharge = await _paymentService.CreateRechargeAsync(dto.Value ,dto.Amount, punter, method, dto.Network, dto.Token , dto.DestinationAddress , dto.TransactionHash);
+        var recharge = await _paymentService.CreateRechargeAsync(dto.Value, dto.Amount, punter, method, dto.Network, dto.Token, dto.DestinationAddress, dto.TransactionHash);
         if (recharge == null)
         {
             throw new Exception("Não foi possível criar a recarga.");

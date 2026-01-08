@@ -14,7 +14,7 @@ public class TokenAddressRepository : RepositoryBase<TokenAddress>, ITokenAddres
 
     public async Task<TokenAddress?> GetByNetworkNameAndTokenSymbol(string networkName, string tokenName)
     {
-        
+
         return this.Context.BlockchainTokenAddresss
         .Include(t => t.Network)
         .Include(t => t.Token)

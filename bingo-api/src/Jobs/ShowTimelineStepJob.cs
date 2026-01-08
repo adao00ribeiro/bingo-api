@@ -70,7 +70,7 @@ public class ShowTimelineStepJob(
                 }
             }
 
-            round.Timeline =  [];
+            round.Timeline = [];
             round.Finished = DateTime.UtcNow;
             await this._roundRepository.UpdateAsync(round);
             await this._roundRepository.RemoveCards(round.Id);

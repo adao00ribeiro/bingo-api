@@ -11,7 +11,7 @@ public abstract class PrizeBaseService(Prize _prize)
     public void Execute(IEnumerable<Card> cards, int row, int col)
     {
         if (prize.HasWinners()) return;
-    
+
         var resultCards = cards.Where(card => CheckWinner(card, row, col)).ToList();
 
         if (resultCards.Count > 0)

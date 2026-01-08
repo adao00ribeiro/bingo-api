@@ -15,7 +15,7 @@ public record MediaAttachmentResponseDto
     public static MediaAttachmentResponseDto? ConvertToDto(MediaAttachment? media)
     {
         if (media == null) return null;
-        
+
         return new MediaAttachmentResponseDto
         {
             FileName = media.FileName,

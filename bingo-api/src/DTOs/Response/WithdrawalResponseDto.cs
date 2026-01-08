@@ -12,9 +12,9 @@ public record WithdrawalResponseDto : EntityResponseDto
     public EPaymentStatus Status { get; set; }
     public DateTime? ConfirmedAt { get; set; } = null;
 
-    
 
-    public WithdrawalResponseDto(Guid id,string withdrawalType,decimal amount, EPaymentStatus status, DateTime? confirmedAt, DateTime createdAt,DateTime updatedAt):base(id,  createdAt,  updatedAt)
+
+    public WithdrawalResponseDto(Guid id, string withdrawalType, decimal amount, EPaymentStatus status, DateTime? confirmedAt, DateTime createdAt, DateTime updatedAt) : base(id, createdAt, updatedAt)
     {
         WithdrawalType = withdrawalType;
         Amount = amount;
@@ -27,7 +27,7 @@ public record WithdrawalResponseDto : EntityResponseDto
         {
             SellerWithdrawal sw => SellerWithdrawalResponseDto.ConvertToDto(sw),
             PunterWithdrawal pw => PunterWithdrawalResponseDto.ConvertToDto(pw),
-            _ => new WithdrawalResponseDto(entity.Id, entity.WithdrawalType, entity.Amount, entity.Status, entity.ConfirmedAt,entity.CreatedAt,entity.UpdatedAt)
+            _ => new WithdrawalResponseDto(entity.Id, entity.WithdrawalType, entity.Amount, entity.Status, entity.ConfirmedAt, entity.CreatedAt, entity.UpdatedAt)
         };
     }
 }

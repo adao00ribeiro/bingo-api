@@ -19,7 +19,7 @@ public class DataInitializer
             await seeder.SeedAsync();
         }
     }
-   
+
     private static HashSet<int> GetRandomDistinctPositions(int max, int count, Random rnd)
     {
         var result = new HashSet<int>();

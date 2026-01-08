@@ -18,7 +18,7 @@ public class TokenController(ITokenRepository tokenRepository) : ApiControllerBa
     private readonly ITokenRepository _tokenRepository = tokenRepository;
 
     [HttpGet()]
-    public async Task<ActionResult<ReportResponseDto<TokenResponseDto,object>>> GetAll(int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<TokenResponseDto, object>>> GetAll(int? page = null, int? size = null)
     {
 
         var entityId = User.FindFirst("entityid")?.Value;
@@ -29,7 +29,7 @@ public class TokenController(ITokenRepository tokenRepository) : ApiControllerBa
 
         var tokenResponse = tokens.Select(TokenResponseDto.ConvertToDto).ToList();
 
-          // Paginação simples
+        // Paginação simples
         var pageNumber = page ?? 1;
         var pageSize = size ?? tokenResponse.Count;
         var pagedRows = tokenResponse.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
@@ -37,7 +37,7 @@ public class TokenController(ITokenRepository tokenRepository) : ApiControllerBa
         var response = new ReportResponseDto<TokenResponseDto, object>
         {
             Rows = pagedRows,
-            Stats = null,                  
+            Stats = null,
             StartingOn = null,
             EndingOn = null,
             Page = pageNumber,

@@ -9,9 +9,9 @@ namespace bingo_api.src.Controllers;
 
 [Authorize]
 [ApiVersion("1.0")]
-public class MediaController: ApiControllerBase
+public class MediaController : ApiControllerBase
 {
-      private readonly MinioFileService _minioService;
+    private readonly MinioFileService _minioService;
 
     public MediaController(MinioFileService minioService)
     {
@@ -23,7 +23,7 @@ public class MediaController: ApiControllerBase
     /// Exemplo de chamada: GET /api/media/download?filePath=rooms/minhaImagem.jpg
     /// </summary>
     [HttpGet("download/{fileName}")]
-    public async Task<IActionResult> DownloadFile( string fileName)
+    public async Task<IActionResult> DownloadFile(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
             return BadRequest("fileName inválido!");
@@ -35,15 +35,15 @@ public class MediaController: ApiControllerBase
         // Tipo genérico de imagem (pode ajustar para outros tipos)
         return File(fileStream, "application/octet-stream", Path.GetFileName(fileName));
     }
-      [HttpGet("presigned/{fileName}")]
+    [HttpGet("presigned/{fileName}")]
     public async Task<ActionResult<string>> GetPresignedUrl(string fileName)
     {
-      
+
         if (string.IsNullOrWhiteSpace(fileName))
             return BadRequest("Nome do arquivo inválido.");
 
         string signedUrl = await _minioService.GetPresignedUrlAsync(fileName);
 
-        return Ok(signedUrl );
+        return Ok(signedUrl);
     }
 }

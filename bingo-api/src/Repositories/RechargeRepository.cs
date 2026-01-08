@@ -15,14 +15,14 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
     }
     public override async Task<Recharge?> GetByIdAsync(Guid id, Func<IQueryable<Recharge>, IQueryable<Recharge>>? includeProperties = null)
     {
-         var recharge = await Context.Recharges
-         .Include(r => r.Punter)
-             .ThenInclude(p => p.Seller)
-        .FirstOrDefaultAsync(recharge => recharge.Id == id);
+        var recharge = await Context.Recharges
+        .Include(r => r.Punter)
+            .ThenInclude(p => p.Seller)
+       .FirstOrDefaultAsync(recharge => recharge.Id == id);
         return recharge;
     }
 
-   
+
     public async Task<bool> UpdateStatusToCompleted(Guid id, Seller seller)
     {
         using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))

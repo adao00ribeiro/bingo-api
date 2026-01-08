@@ -38,16 +38,16 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
         }
         return entities;
     }
-  public virtual async Task<TEntity?> GetByIdAsync(
-    Guid id,
-    Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeProperties = null)
-{
-    IQueryable<TEntity> query = BuildQueryWithIncludes(includeProperties);
-    // como estamos usando query, precisa buscar por Where
+    public virtual async Task<TEntity?> GetByIdAsync(
+      Guid id,
+      Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeProperties = null)
+    {
+        IQueryable<TEntity> query = BuildQueryWithIncludes(includeProperties);
+        // como estamos usando query, precisa buscar por Where
 
-    Console.WriteLine(query);
-    return await query.FirstOrDefaultAsync(e => e.Id == id);
-}
+        Console.WriteLine(query);
+        return await query.FirstOrDefaultAsync(e => e.Id == id);
+    }
 
     public virtual async Task<Guid> AddAsync(TEntity objeto)
     {
@@ -122,8 +122,8 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : 
     {
         IQueryable<TEntity> query = Context.Set<TEntity>();
 
-         if (includeProperties != null)
-        query = includeProperties(query);
+        if (includeProperties != null)
+            query = includeProperties(query);
 
         return query;
     }

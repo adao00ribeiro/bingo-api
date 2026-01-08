@@ -15,11 +15,11 @@ public record RoomResponseDto
     public MediaAttachmentResponseDto? MediaAttachment { get; set; }
 
     public RoomResponseDto(
-        Guid id, 
+        Guid id,
         string name,
-        Guid ownerId, 
-        SellerResponseDto? owner, 
-        IEnumerable<RoomSellerResponseDto> roomSellers, 
+        Guid ownerId,
+        SellerResponseDto? owner,
+        IEnumerable<RoomSellerResponseDto> roomSellers,
         AccumulatedResponseDto accumulated,
         MediaAttachmentResponseDto? mediaAttachment
         )
@@ -38,7 +38,7 @@ public record RoomResponseDto
         var ownerResponse = room.Owner != null ? SellerResponseDto.ConvertToDto(room.Owner) : null;
         var accumulatedResponse = room.Accumulated != null ? AccumulatedResponseDto.ConvertToDto(room.Accumulated) : null;
         var mediaResponse = MediaAttachmentResponseDto.ConvertToDto(room.MediaAttachment);
-       
+
         return new RoomResponseDto(
             room.Id,
             room.Name,

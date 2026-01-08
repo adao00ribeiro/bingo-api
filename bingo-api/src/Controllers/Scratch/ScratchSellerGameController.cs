@@ -36,7 +36,7 @@ public class ScratchSellerGameController(
         {
             // Se for Admin, retorna todas as recargas
             totalCount = await _scratchSellerGameRepository.CountAsync();
-            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, includeProperties:x => x.Include(x => x.ScratchGame));
+            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, includeProperties: x => x.Include(x => x.ScratchGame));
         }
         else if (User.IsInRole(Roles.Punter) && Guid.TryParse(entityId, out _))
         {

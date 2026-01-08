@@ -25,7 +25,7 @@ public abstract class Entity
     {
         _domainEvents.Add(domainEvent);
     }
-        public void Discard()
+    public void Discard()
     {
         DiscardedAt = DateTime.UtcNow;
     }

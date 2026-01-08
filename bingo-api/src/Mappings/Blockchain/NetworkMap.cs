@@ -38,7 +38,7 @@ public class NetworkMap : IEntityTypeConfiguration<Network>
                .HasColumnName("updated_at")
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-     
+
 
         builder.Property(x => x.DiscardedAt)
                .HasColumnName("discarded_at")

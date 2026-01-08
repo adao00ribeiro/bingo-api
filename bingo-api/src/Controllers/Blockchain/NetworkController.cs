@@ -21,18 +21,18 @@ public class NetworkController(INetworkRepository networkRepository) : ApiContro
     private readonly INetworkRepository _networkRepository = networkRepository;
 
     [HttpGet()]
-    public async Task<ActionResult<ReportResponseDto<NetworkResponseDto,object>>> GetAll(int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<NetworkResponseDto, object>>> GetAll(int? page = null, int? size = null)
     {
 
         var entityId = User.FindFirst("entityid")?.Value;
         int totalCount;
         IEnumerable<Network> networks;
         totalCount = await _networkRepository.CountAsync();
-        networks = await _networkRepository.GetAllAsync(page, size , includeProperties: q => q.Include(x=>x.TokenAddresses).ThenInclude(t=>t.Token));
+        networks = await _networkRepository.GetAllAsync(page, size, includeProperties: q => q.Include(x => x.TokenAddresses).ThenInclude(t => t.Token));
 
         var networkResponse = networks.Select(n => NetworkResponseDto.ConvertToDto(n)).ToList();
 
-         // Paginação simples
+        // Paginação simples
         var pageNumber = page ?? 1;
         var pageSize = size ?? networkResponse.Count;
         var pagedRows = networkResponse.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
@@ -40,7 +40,7 @@ public class NetworkController(INetworkRepository networkRepository) : ApiContro
         var response = new ReportResponseDto<NetworkResponseDto, object>
         {
             Rows = pagedRows,
-            Stats = null,                  
+            Stats = null,
             StartingOn = null,
             EndingOn = null,
             Page = pageNumber,

@@ -7,7 +7,7 @@ using bingo_api.src.Interfaces.blockchain;
 
 namespace bingo_api.src.Services.Blockchain;
 
-public class BlockchainConfigService: IBlockchainConfigService
+public class BlockchainConfigService : IBlockchainConfigService
 {
     private readonly INetworkRepository _networkRepo;
     private readonly ITokenAddressRepository _tokenAddressRepo;
@@ -25,7 +25,7 @@ public class BlockchainConfigService: IBlockchainConfigService
 
     public async Task<TokenAddress?> GetTokenAddressAsync(string networkName, string tokenName)
     {
-        return await _tokenAddressRepo.GetByNetworkNameAndTokenSymbol(networkName,  tokenName);
-         
+        return await _tokenAddressRepo.GetByNetworkNameAndTokenSymbol(networkName, tokenName);
+
     }
 }

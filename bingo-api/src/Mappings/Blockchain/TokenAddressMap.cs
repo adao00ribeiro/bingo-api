@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace bingo_api.src.Mappings.Blockchain;
 
-public class TokenAddressMap: IEntityTypeConfiguration<TokenAddress>
+public class TokenAddressMap : IEntityTypeConfiguration<TokenAddress>
 {
     public void Configure(EntityTypeBuilder<TokenAddress> builder)
     {
-       builder.ToTable("blockchain_token_addresses");
+        builder.ToTable("blockchain_token_addresses");
 
         builder.HasKey(x => x.Id);
 

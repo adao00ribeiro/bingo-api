@@ -6,8 +6,8 @@ namespace bingo_api.src.Interfaces.Repositories;
 public interface IWithdrawalRepository : IRepositoryBase<Withdrawal>
 {
 
-  IQueryable<Withdrawal> GetPunterWithdrawalsQuery(
-       Guid? sellerId);
+    IQueryable<Withdrawal> GetPunterWithdrawalsQuery(
+         Guid? sellerId);
 
-   IQueryable<Withdrawal> GetSellerWithdrawalsQuery(Guid? sellerId);
+    IQueryable<Withdrawal> GetSellerWithdrawalsQuery(Guid? sellerId);
 }

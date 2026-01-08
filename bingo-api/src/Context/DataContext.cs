@@ -42,7 +42,7 @@ public class DataContext : DbContext
     {
         _dispatcher = dispatcher;
     }
-        
+
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder.Properties<string>()
@@ -55,30 +55,30 @@ public class DataContext : DbContext
 
         modelBuilder.ApplyAllConfigurationsFromCurrentAssembly("bingo_api.src.Mappings");
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-    
 
-    foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-    {
-        foreach (var property in entityType.GetProperties())
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            if (property.ClrType == typeof(DateTime))
+            foreach (var property in entityType.GetProperties())
             {
-                property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
-                    v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(), // antes de salvar -> garante UTC
-                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc)            // ao ler do banco -> marca como UTC
-                ));
-            }
-            else if (property.ClrType == typeof(DateTime?))
-            {
-                property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime?, DateTime?>(
-                    v => v.HasValue ? (v.Value.Kind == DateTimeKind.Utc ? v : v.Value.ToUniversalTime()) : v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v
-                ));
+                if (property.ClrType == typeof(DateTime))
+                {
+                    property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(), // antes de salvar -> garante UTC
+                        v => DateTime.SpecifyKind(v, DateTimeKind.Utc)            // ao ler do banco -> marca como UTC
+                    ));
+                }
+                else if (property.ClrType == typeof(DateTime?))
+                {
+                    property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime?, DateTime?>(
+                        v => v.HasValue ? (v.Value.Kind == DateTimeKind.Utc ? v : v.Value.ToUniversalTime()) : v,
+                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v
+                    ));
+                }
             }
         }
-    }
         base.OnModelCreating(modelBuilder);
-    
+
         /*
         var allWithdrawals = await _context.Withdrawals.ToListAsync(); // Inclui ambos
         Buscar só de Seller:

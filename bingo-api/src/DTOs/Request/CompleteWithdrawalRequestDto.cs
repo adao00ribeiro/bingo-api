@@ -7,5 +7,5 @@ namespace bingo_api.src.DTOs.Request;
 
 public record CompleteWithdrawalRequestDto
 {
-     public Guid Id { get; set; }
+    public Guid Id { get; set; }
 }

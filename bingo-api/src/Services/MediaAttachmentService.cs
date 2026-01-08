@@ -4,12 +4,12 @@ using bingo_api.src.Interfaces.Services;
 
 namespace bingo_api.src.Services;
 
-public class MediaAttachmentService(IMediaAttachmentRepository repo ,  MinioFileService minioFileService) : IMediaAttachmentService
+public class MediaAttachmentService(IMediaAttachmentRepository repo, MinioFileService minioFileService) : IMediaAttachmentService
 {
     private readonly IMediaAttachmentRepository _repo = repo;
     private readonly MinioFileService _minioFileService = minioFileService;
 
-  /// <summary>
+    /// <summary>
     /// Remove o arquivo do MinIO e remove a entidade do banco (se existir).
     /// </summary>
     public async Task RemoveAsync(MediaAttachment? attachment)

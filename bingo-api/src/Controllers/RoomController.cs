@@ -140,7 +140,7 @@ public class RoomController(IRoomRepository _roomRepository, IMediaAttachmentSer
         {
             await mediaAttachmentService.RemoveAsync(
                   entityRoom.MediaAttachment
-             ); 
+             );
         }
 
         return Ok();

@@ -93,16 +93,16 @@ public class RoundExecutionJob : IRoundExecutionJob
             // ------------------------------------------------------------------
             var timeline = new List<TimelineEvent>();
             var message = new RoundMessage(tempRound.Id);
-             /*
-            if (tempRound.CardSaleCount == 0)
-            {
-                tempRound.Finished = DateTime.UtcNow;
-                context.Rounds.Entry(tempRound).State = EntityState.Modified;
-                await context.SaveChangesAsync();
-                message.Finished = true;
-                return;
-            }
-            */
+            /*
+           if (tempRound.CardSaleCount == 0)
+           {
+               tempRound.Finished = DateTime.UtcNow;
+               context.Rounds.Entry(tempRound).State = EntityState.Modified;
+               await context.SaveChangesAsync();
+               message.Finished = true;
+               return;
+           }
+           */
             var drawnNumbers = new HashSet<int>();
             remainingNumbers = [.. Enumerable.Range(1, tempRound.MaxBalls).OrderBy(x => Guid.NewGuid())];
 

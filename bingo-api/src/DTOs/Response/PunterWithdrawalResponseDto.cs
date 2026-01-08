@@ -8,14 +8,14 @@ public record PunterWithdrawalResponseDto : WithdrawalResponseDto
     public Guid PunterId { get; set; }
     public PunterResponseDto Punter { get; set; }
 
-    public PunterWithdrawalResponseDto(Guid id,string withdrawalType, decimal amount, EPaymentStatus status, DateTime? confirmedAt, DateTime createdAt, DateTime updatedAt, Guid punterId , PunterResponseDto punter)
-                                : base(id, withdrawalType,amount, status, confirmedAt, createdAt, updatedAt)
+    public PunterWithdrawalResponseDto(Guid id, string withdrawalType, decimal amount, EPaymentStatus status, DateTime? confirmedAt, DateTime createdAt, DateTime updatedAt, Guid punterId, PunterResponseDto punter)
+                                : base(id, withdrawalType, amount, status, confirmedAt, createdAt, updatedAt)
     {
         PunterId = punterId;
         Punter = punter;
     }
     public static PunterWithdrawalResponseDto ConvertToDto(PunterWithdrawal w)
     {
-        return new PunterWithdrawalResponseDto(w.Id, w.WithdrawalType, w.Amount, w.Status, w.ConfirmedAt, w.CreatedAt, w.UpdatedAt, w.PunterId , PunterResponseDto.ConvertToDto(w.Punter));
+        return new PunterWithdrawalResponseDto(w.Id, w.WithdrawalType, w.Amount, w.Status, w.ConfirmedAt, w.CreatedAt, w.UpdatedAt, w.PunterId, PunterResponseDto.ConvertToDto(w.Punter));
     }
 }

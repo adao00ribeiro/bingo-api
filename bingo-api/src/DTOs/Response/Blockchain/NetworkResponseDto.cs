@@ -14,14 +14,14 @@ public record NetworkResponseDto
     public int ChainId { get; set; }
     public IEnumerable<TokenAddressResponseDto> TokenAddresses { get; set; } = null!;
 
-    internal static NetworkResponseDto ConvertToDto(Network network ,  bool includeTokenAddresses = true)
+    internal static NetworkResponseDto ConvertToDto(Network network, bool includeTokenAddresses = true)
     {
-        var tokenAddressesResponse = includeTokenAddresses 
+        var tokenAddressesResponse = includeTokenAddresses
             ? network.TokenAddresses?
-                .Select(x => TokenAddressResponseDto.ConvertToDto(x, includeNetwork: false)) 
+                .Select(x => TokenAddressResponseDto.ConvertToDto(x, includeNetwork: false))
                 ?? Enumerable.Empty<TokenAddressResponseDto>()
             : Enumerable.Empty<TokenAddressResponseDto>();
-      
+
         return new NetworkResponseDto
         {
             Id = network.Id,
