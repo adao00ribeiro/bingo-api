@@ -24,7 +24,7 @@ public class Recharge : Entity
     public bool IsConfirmed => ConfirmedAt.HasValue; // calculated property
 
 
-    public Recharge(decimal value, decimal amount , EPaymentStatus status, Guid punterId)
+    public Recharge(decimal value, decimal amount, EPaymentStatus status, Guid punterId)
     {
         this.Value = value;
         this.Amount = amount;

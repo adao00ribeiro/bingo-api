@@ -53,7 +53,7 @@ public class CardController(ICardRepository _cardRepository, IPunterRepository _
         {
             return BadRequest();
         }
-        var cards = await cardRepository.GetAllByRoundId(punter.Id, roundId, page, size, includeProperties: c => c.Include(x=> x.Round));
+        var cards = await cardRepository.GetAllByRoundId(punter.Id, roundId, page, size, includeProperties: c => c.Include(x => x.Round));
         int totalCount = cards.Count();
         var cardDtos = cards.Select(r => CardResponseDto.ConvertToDto(r)).ToList();
         // Paginação simples

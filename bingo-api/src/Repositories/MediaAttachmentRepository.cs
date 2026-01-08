@@ -5,7 +5,7 @@ using bingo_api.src.Repositories.Shared;
 
 namespace bingo_api.src.Repositories;
 
-public class MediaAttachmentRepository: RepositoryBase<MediaAttachment>, IMediaAttachmentRepository
+public class MediaAttachmentRepository : RepositoryBase<MediaAttachment>, IMediaAttachmentRepository
 {
     public MediaAttachmentRepository(DataContext dataContext) : base(dataContext)
     {

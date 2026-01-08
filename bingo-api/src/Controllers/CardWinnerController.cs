@@ -38,7 +38,7 @@ public class CardWinnerController(ICardWinnerRepository cardWinnerRepository) : 
             totalCount = await _cardWinnerRepository.CountAsync(Guid.Parse(entityId));
             cardWinners = await _cardWinnerRepository.GetAllAsync(page, size,
                 filter: r => r.Card.PunterId == Guid.Parse(entityId),
-                includeProperties:q => q.Include(x => x.Prize).ThenInclude(x=>x.Round).Include(x => x.Card));
+                includeProperties: q => q.Include(x => x.Prize).ThenInclude(x => x.Round).Include(x => x.Card));
         }
         else
         {

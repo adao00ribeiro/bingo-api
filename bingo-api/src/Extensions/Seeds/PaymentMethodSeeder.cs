@@ -14,7 +14,7 @@ public class PaymentMethodSeeder
         _context = context;
     }
 
-       public async Task SeedAsync(Guid sellerId)
+    public async Task SeedAsync(Guid sellerId)
     {
         // Define todos os métodos que devem existir
         var requiredMethods = new List<PaymentMethod>
@@ -60,7 +60,7 @@ public class PaymentMethodSeeder
         var toInsert = requiredMethods
             .Where(rm => !existingTypes.Contains(rm.Type))
             .ToList();
-    
+
         if (toInsert.Any())
         {
             _context.PaymentMethods.AddRange(toInsert);

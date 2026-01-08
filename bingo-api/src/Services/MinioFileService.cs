@@ -56,7 +56,7 @@ public class MinioFileService
     }
     public async Task<string> GetPresignedUrlAsync(string objectName, int expiresSeconds = 3600)
     {
-        
+
         var args = new PresignedGetObjectArgs()
             .WithBucket(_settings.DefaultBucketName)
             .WithObject(objectName)

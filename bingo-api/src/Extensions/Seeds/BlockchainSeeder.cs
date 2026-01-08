@@ -4,9 +4,9 @@ using bingo_api.src.Entities.Blockchain;
 
 namespace bingo_api.src.Extensions.Seeds;
 
-public class BlockchainSeeder: IDataSeeder
+public class BlockchainSeeder : IDataSeeder
 {
-       private readonly DataContext _context;
+    private readonly DataContext _context;
 
     public BlockchainSeeder(DataContext context)
     {

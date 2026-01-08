@@ -3,7 +3,7 @@ using bingo_api.src.Entities.Shared;
 
 namespace bingo_api.src.Entities;
 
-public class MediaAttachment: Entity
+public class MediaAttachment : Entity
 {
     public string FileName { get; set; } = null!;
     public string Url { get; set; } = null!;
@@ -12,7 +12,7 @@ public class MediaAttachment: Entity
     public Guid EntityId { get; set; }
     public string EntityType { get; set; } = null!;
 
-    public MediaAttachment(string fileName, string url , string contentType, long size, Guid entityId, string entityType)
+    public MediaAttachment(string fileName, string url, string contentType, long size, Guid entityId, string entityType)
     {
         FileName = fileName;
         Url = url;

@@ -12,6 +12,6 @@ public record TokenRequestDto
 
     internal static Token ConvertToEntity(TokenRequestDto dto)
     {
-        return new Token(dto.Symbol, dto.Name, dto.Decimals , dto.IsNative);
+        return new Token(dto.Symbol, dto.Name, dto.Decimals, dto.IsNative);
     }
 }

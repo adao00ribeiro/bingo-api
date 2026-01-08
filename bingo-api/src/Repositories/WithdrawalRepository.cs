@@ -13,7 +13,7 @@ public class WithdrawalRepository : RepositoryBase<Withdrawal>, IWithdrawalRepos
     public WithdrawalRepository(DataContext dataContext) : base(dataContext)
     {
     }
-   
+
     public IQueryable<Withdrawal> GetPunterWithdrawalsQuery(Guid? sellerId)
     {
         return Context.Withdrawals

@@ -77,9 +77,9 @@ public class IdentityController(IIdentityService _identityService, IEmailSenderS
         return Unauthorized(resultado);
     }
     [HttpPost("login-wallet")]
-    public async Task<ActionResult<ResultResponseDto>> LoginWallet(WalletLoginRequestDto  dto)
+    public async Task<ActionResult<ResultResponseDto>> LoginWallet(WalletLoginRequestDto dto)
     {
-          var signer = new EthereumMessageSigner();
+        var signer = new EthereumMessageSigner();
         var recoveredAddress = signer.EncodeUTF8AndEcRecover(dto.Message, dto.Signature);
 
         if (!string.Equals(recoveredAddress, dto.Address, StringComparison.OrdinalIgnoreCase))

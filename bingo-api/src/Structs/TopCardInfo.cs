@@ -13,5 +13,5 @@ public class TopCardInfo
     public CardResponseDto Card { get; set; }
     public List<int> MissingNumbers { get; set; }
     public int Hits { get; set; }
-    public DateTime CreatedAt{ get; set; }
+    public DateTime CreatedAt { get; set; }
 }

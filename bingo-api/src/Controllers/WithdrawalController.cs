@@ -30,12 +30,12 @@ public class WithdrawalController(
 
     private readonly ISellerRepository _sellerRepository = sellerRepository;
 
-       [Authorize(Roles = $"{Roles.Admin},{Roles.Seller}")]
+    [Authorize(Roles = $"{Roles.Admin},{Roles.Seller}")]
     [HttpGet]
     public async Task<ActionResult<ReportResponseDto<object, object>>> GetAll(
-        int? page = null, 
-        int? size = null
-    )
+     int? page = null,
+     int? size = null
+ )
     {
         var entityId = User.FindFirst("entityid")?.Value;
         Guid? sellerId = null;
@@ -74,7 +74,7 @@ public class WithdrawalController(
 
         // Unifica + converte (sem generics complicando)
         var punterDtos = punterWithdrawals
-        
+
             .Select(WithdrawalResponseDto.ConvertToDto)
             .ToList();
 
@@ -82,7 +82,7 @@ public class WithdrawalController(
             .Select(WithdrawalResponseDto.ConvertToDto)
             .ToList();
 
-        var all = punterDtos .Cast<object>().Concat(sellerDtos).ToList();
+        var all = punterDtos.Cast<object>().Concat(sellerDtos).ToList();
 
         // Paginação
         var pageNumber = page ?? 1;
@@ -125,7 +125,7 @@ public class WithdrawalController(
     [HttpPatch("complete")]
     public async Task<ActionResult> UpdateStatusToCompleted(CompleteWithdrawalRequestDto dto)
     {
-        Console.WriteLine("FDP"+dto.Id);
+        Console.WriteLine("FDP" + dto.Id);
         var entityId = User.FindFirst("entityid")?.Value;
         bool isAdmin = User.IsInRole(Roles.Admin);
         Guid? sellerId = null;

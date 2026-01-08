@@ -12,7 +12,7 @@ public static class RabbitMQSetup
     {
         services.AddMassTransit(config =>
         {
-            config.UsingRabbitMq((ctx , cfg) =>
+            config.UsingRabbitMq((ctx, cfg) =>
             {
                 cfg.Host(new Uri("amqp://localhost:5672"), host =>
                 {
@@ -24,6 +24,6 @@ public static class RabbitMQSetup
             });
         });
 
-        
+
     }
 }

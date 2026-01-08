@@ -23,19 +23,19 @@ public class TokenAddressController(ITokenAddressRepository tokenAddressReposito
 
 
     [HttpGet()]
-    public async Task<ActionResult<ReportResponseDto<TokenAddressResponseDto,object>>> GetAll(int? page = null, int? size = null)
+    public async Task<ActionResult<ReportResponseDto<TokenAddressResponseDto, object>>> GetAll(int? page = null, int? size = null)
     {
 
         var entityId = User.FindFirst("entityid")?.Value;
         int totalCount;
         IEnumerable<TokenAddress> tokenAddress;
         totalCount = await _tokenAddressRepository.CountAsync();
-        tokenAddress = await _tokenAddressRepository.GetAllAsync(page, size ,includeProperties:q => q.Include(x => x.Network)
-          .Include(x => x.Token) );
+        tokenAddress = await _tokenAddressRepository.GetAllAsync(page, size, includeProperties: q => q.Include(x => x.Network)
+          .Include(x => x.Token));
 
         var networkResponse = tokenAddress.Select(t => TokenAddressResponseDto.ConvertToDto(t)).ToList();
 
-         // Paginação simples
+        // Paginação simples
         var pageNumber = page ?? 1;
         var pageSize = size ?? networkResponse.Count;
         var pagedRows = networkResponse.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
@@ -43,7 +43,7 @@ public class TokenAddressController(ITokenAddressRepository tokenAddressReposito
         var response = new ReportResponseDto<TokenAddressResponseDto, object>
         {
             Rows = pagedRows,
-            Stats = null,                  
+            Stats = null,
             StartingOn = null,
             EndingOn = null,
             Page = pageNumber,

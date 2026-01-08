@@ -304,7 +304,7 @@ namespace bingo_api.src.Extensions.Seeds
             {
                 Name = "CryptoFortune",
                 LayoutType = EScratchLayoutType.Layout3x3,
-                Price =0.90m,
+                Price = 0.90m,
                 MaxPrize = 1_000_000m,
                 Probability = 2.8m,
                 AllowedMultipliers = new[] { 1, 2, 5, 10, 50 },

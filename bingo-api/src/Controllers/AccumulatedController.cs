@@ -11,7 +11,7 @@ namespace bingo_api.src.Controllers;
 
 
 [ApiVersion("1.0")]
-public class AccumulatedController(IAccumulatedRepository _repository , DepositWatcher watch) : ApiControllerBase
+public class AccumulatedController(IAccumulatedRepository _repository, DepositWatcher watch) : ApiControllerBase
 {
     private readonly IAccumulatedRepository accumulatedRepository = _repository;
     private readonly DepositWatcher _watch = watch;

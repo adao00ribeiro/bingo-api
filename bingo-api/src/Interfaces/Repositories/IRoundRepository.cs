@@ -12,7 +12,7 @@ public interface IRoundRepository : IRepositoryBase<Round>
     Task<IEnumerable<Round>> FilterByDateTimeRange(DateTime today, TimeSpan timeOfDay1, TimeSpan timeOfDay2);
     Task<IEnumerable<Round>> FilterByRoomIdAsync(List<Guid> roomIds, Guid PunterId);
     Task<bool> GenerateRounds(RoundBulkRequestDto request);
-    Task<IEnumerable<Round>> GetNextRoundsAsync(int? page, int? size,Guid sellerId);
+    Task<IEnumerable<Round>> GetNextRoundsAsync(int? page, int? size, Guid sellerId);
     Task<Round?> GetRoundsWithTimelineAsync(
         Guid roomId,
        Guid punterId

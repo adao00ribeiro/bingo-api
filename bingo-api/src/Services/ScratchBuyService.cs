@@ -48,14 +48,14 @@ public class ScratchBuyService(
             {
                 throw new Exception("Compra nao realizada");
             }
-         
+
             var ticket = await GenerateTicket(punterId, sellerGame, ScratchBuyId);
 
             await CreateTransactionHistory(punterId, punter, sellerGame.ScratchGame.Price);
 
             await ProcessPurchase(punter, sellerGame.ScratchGame.Price);
 
-       
+
             await _dataContext.ScratchTickets.AddAsync(ticket);
             await _dataContext.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -358,13 +358,13 @@ public class ScratchBuyService(
         {
             EntityType = "Punter",
             EntityId = punterId,
-            PreviousBalance =punter.Balance,
+            PreviousBalance = punter.Balance,
             CurrentBalance = punter.Balance - amount,
             Amount = amount,
             Type = TransactionType.ScratchPurchased,
             CreatedAt = DateTime.UtcNow
         };
-       
+
         await _dataContext.TransactionHistories.AddAsync(transactionHistory);
     }
 }

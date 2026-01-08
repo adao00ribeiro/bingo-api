@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace bingo_api.src.Mappings.Blockchain;
 
-public class TokenMap: IEntityTypeConfiguration<Token>
+public class TokenMap : IEntityTypeConfiguration<Token>
 {
     public void Configure(EntityTypeBuilder<Token> builder)
     {
@@ -30,9 +30,9 @@ public class TokenMap: IEntityTypeConfiguration<Token>
                .HasColumnName("decimals")
                .IsRequired();
 
-       builder.Property(x => x.IsNative)
-               .HasColumnName("is_native")
-               .IsRequired();
+        builder.Property(x => x.IsNative)
+                .HasColumnName("is_native")
+                .IsRequired();
 
         builder.Property(x => x.CreatedAt)
                .HasColumnName("created_at")
@@ -43,15 +43,15 @@ public class TokenMap: IEntityTypeConfiguration<Token>
                .HasColumnName("updated_at")
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-         builder.Property(x => x.DiscardedAt)
-               .HasColumnName("discarded_at")
-               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        builder.Property(x => x.DiscardedAt)
+              .HasColumnName("discarded_at")
+              .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
         // Relacionamento 1:N com TokenAddresses
-          builder.HasMany(t => t.TokenAddresses)
-               .WithOne(ta => ta.Token)
-               .HasForeignKey(ta => ta.TokenId)
-               .HasConstraintName("fk_blockchain_token_addresses_token_id")
-               .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany(t => t.TokenAddresses)
+             .WithOne(ta => ta.Token)
+             .HasForeignKey(ta => ta.TokenId)
+             .HasConstraintName("fk_blockchain_token_addresses_token_id")
+             .OnDelete(DeleteBehavior.Cascade);
     }
 }

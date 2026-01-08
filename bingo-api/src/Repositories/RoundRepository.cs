@@ -177,35 +177,35 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
         await Context.SaveChangesAsync();
     }
 
-    public async Task<Round?> GetRoundsWithTimelineAsync(Guid roomId , Guid punterId)
+    public async Task<Round?> GetRoundsWithTimelineAsync(Guid roomId, Guid punterId)
     {
 
-    // 1️⃣ Busca o round ativo mais próximo
-    var round = await Context.Rounds
-        .Include(r => r.Prizes)
-        .AsNoTracking()
-        .Where(r =>
-            r.RoomId == roomId &&
-            r.Finished == null &&
-            r.DiscardedAt == null
-        )
-        .OrderBy(r => r.Started)
-        .FirstOrDefaultAsync();
+        // 1️⃣ Busca o round ativo mais próximo
+        var round = await Context.Rounds
+            .Include(r => r.Prizes)
+            .AsNoTracking()
+            .Where(r =>
+                r.RoomId == roomId &&
+                r.Finished == null &&
+                r.DiscardedAt == null
+            )
+            .OrderBy(r => r.Started)
+            .FirstOrDefaultAsync();
 
-    if (round == null)
-        return null;
+        if (round == null)
+            return null;
 
-    // 2️⃣ Conta quantos cards o punter comprou nesse round
-    round.CardsPurchased = await Context.Cards
-        .AsNoTracking()
-        .CountAsync(c =>
-            c.RoundId == round.Id &&
-            c.PunterId == punterId
-        );
+        // 2️⃣ Conta quantos cards o punter comprou nesse round
+        round.CardsPurchased = await Context.Cards
+            .AsNoTracking()
+            .CountAsync(c =>
+                c.RoundId == round.Id &&
+                c.PunterId == punterId
+            );
 
-    return round;
+        return round;
 
 
-        
+
     }
 }

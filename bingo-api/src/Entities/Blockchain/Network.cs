@@ -13,7 +13,7 @@ public class Network : Entity
     public int ChainId { get; set; }
     public IEnumerable<TokenAddress> TokenAddresses { get; set; } = null!;
 
-    public Network(string name, string rpcUrl, int chainId) 
+    public Network(string name, string rpcUrl, int chainId)
     {
         Name = name;
         RpcUrl = rpcUrl;

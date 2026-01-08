@@ -12,7 +12,7 @@ public record TokenResponseDto
     public IEnumerable<TokenAddressResponseDto> TokenAddresses { get; set; } = null!;
     internal static TokenResponseDto ConvertToDto(Token token)
     {
-       // var tokenAddressResponse = token.TokenAddresses?.Select(x => TokenAddressResponseDto.ConvertToDto(x)) ?? Enumerable.Empty<TokenAddressResponseDto>();
+        // var tokenAddressResponse = token.TokenAddresses?.Select(x => TokenAddressResponseDto.ConvertToDto(x)) ?? Enumerable.Empty<TokenAddressResponseDto>();
         return new TokenResponseDto
         {
             Id = token.Id,
