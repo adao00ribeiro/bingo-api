@@ -1,4 +1,5 @@
-﻿using bingo_api.src.Entities.Shared;
+﻿using bingo_api.src.Entities.Bingo;
+using bingo_api.src.Entities.Shared;
 using bingo_api.src.Interfaces.Services;
 using bingo_api.src.Structs;
 
@@ -13,6 +14,7 @@ public class Seller : Entity, ITransactionParticipant
     public DateTime DateBirth { get; set; }
     public decimal Comission { get; set; }
     public decimal IndicateRewardValue { get; set; }
+    public OnlineHouse OnlineHouse { get; set; }
     public SellerSettings Settings { get; set; } = new SellerSettings();
     public IEnumerable<Punter> Punters { get; set; }
     public IEnumerable<RoomSeller> Rooms { get; set; }
