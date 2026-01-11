@@ -29,6 +29,7 @@ using bingo_api.src.Interfaces;
 using bingo_api.src.Configurations;
 using Minio;
 using Microsoft.Extensions.Options;
+using bingo_api.src.Interfaces.Services.Bingo;
 
 
 
@@ -90,6 +91,7 @@ public static class NativeInjectorConfig
 
         //repository
         services.AddScoped<JwtSecurityExtensionEvents>();
+        services.AddScoped<OnlineHouseService>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IMediaAttachmentService, MediaAttachmentService>();
         services.AddScoped<ICardRepository, CardRepository>();

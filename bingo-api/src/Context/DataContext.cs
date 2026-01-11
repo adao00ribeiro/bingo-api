@@ -2,6 +2,7 @@
 using System.Reflection;
 
 using bingo_api.src.Entities;
+using bingo_api.src.Entities.Bingo;
 using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Entities.Shared;
@@ -37,6 +38,7 @@ public class DataContext : DbContext
     public DbSet<Token> BlockchainTokens { get; set; }
     public DbSet<TokenAddress> BlockchainTokenAddresss { get; set; }
     public DbSet<MediaAttachment> MediaAttachments { get; set; }
+    public DbSet<OnlineHouse> OnlineHouses { get; set; }
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
     public DataContext(DbContextOptions<DataContext> options, EventDispatcher dispatcher) : base(options)
     {
