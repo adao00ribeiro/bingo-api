@@ -5,5 +5,5 @@ namespace bingo_api.src.Interfaces.Repositories;
 
 public interface IMediaAttachmentRepository : IRepositoryBase<MediaAttachment>
 {
-
+    Task<List<MediaAttachment>> GetForAsync<TEntity>(IEnumerable<Guid> entityIds);
 }

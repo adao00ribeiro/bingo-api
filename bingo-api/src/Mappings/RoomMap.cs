@@ -59,7 +59,7 @@ public class RoomMap : IEntityTypeConfiguration<Room>
                .HasConstraintName("fk_bot_config_room_id")
                .IsRequired();
 
-        builder.HasOne(x => x.MediaAttachment)
+               builder.HasOne(x => x.MediaAttachment)
             .WithOne()
             .HasForeignKey<MediaAttachment>(x => x.EntityId)
             .HasPrincipalKey<Room>(x => x.Id)
