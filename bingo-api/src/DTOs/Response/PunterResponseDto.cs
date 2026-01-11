@@ -1,5 +1,6 @@
 
 using System.Text.Json.Serialization;
+using bingo_api.src.DTOs.Response.Bingo;
 using bingo_api.src.DTOs.Shared;
 using bingo_api.src.Entities;
 namespace bingo_api.src.DTOs.Response;
@@ -11,8 +12,8 @@ public record PunterResponseDto : EntityResponseDto
     public decimal Balance { get; set; }
     public decimal PrizeBalance { get; set; }
     public IEnumerable<CardResponseDto>? Cards { get; set; }
-    public Guid SellerId { get; set; }
-    public SellerResponseToPunterDto Seller { get; set; }
+    public Guid OnlineHouseId { get; set; }
+    public OnlineHouseResponseDto OnlineHouse { get; set; }
     public UserResponseDto user { get; set; }
 
     [JsonIgnore]
@@ -26,8 +27,8 @@ public record PunterResponseDto : EntityResponseDto
         DateTime CreatedAt,
         DateTime UpdatedAt,
         IEnumerable<CardResponseDto> cards,
-        Guid sellerId,
-        SellerResponseToPunterDto seller,
+        Guid onlineHouseId,
+        OnlineHouseResponseDto onlineHouse,
         IEnumerable<RechargeResponseDto> recharges)
     : base(id, CreatedAt, UpdatedAt)
     {
@@ -37,15 +38,15 @@ public record PunterResponseDto : EntityResponseDto
         Balance = balance;
         PrizeBalance = prizeBalance;
         Cards = cards;
-        SellerId = sellerId;
-        Seller = seller;
+        OnlineHouseId = onlineHouseId;
+        OnlineHouse = onlineHouse;
         Recharges = recharges;
 
     }
     internal static PunterResponseDto ConvertToDto(Punter punter)
     {
 
-        var SellerResponse = punter.Seller != null ? SellerResponseToPunterDto.ConvertToDto(punter.Seller) : null;
+        var SellerResponse = punter.OnlineHouse != null ? OnlineHouseResponseDto.ConvertToDto(punter.OnlineHouse) : null;
         var RechargeResponse = punter.Recharges?.Select(r => RechargeResponseDto.ConvertToDto(r)) ?? Enumerable.Empty<RechargeResponseDto>();
         return new PunterResponseDto(
             punter.Id,
@@ -56,7 +57,7 @@ public record PunterResponseDto : EntityResponseDto
             punter.CreatedAt,
             punter.UpdatedAt,
             null,
-            punter.SellerId,
+            punter.OnlineHouseId,
             SellerResponse,
             RechargeResponse
         );
@@ -73,7 +74,7 @@ public record PunterResponseDto : EntityResponseDto
             punter.CreatedAt,
             punter.UpdatedAt,
             null,
-            punter.SellerId,
+            punter.OnlineHouseId,
             null,
             Enumerable.Empty<RechargeResponseDto>()
         );

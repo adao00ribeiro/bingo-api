@@ -30,13 +30,8 @@ public class SellerController(ISellerRepository _sellerRepository) : ApiControll
          bool? enabledScratch = null
         )
     {
-        Expression<Func<Seller, bool>>? filter = null;
-
-        if (enabledScratch.HasValue)
-        {
-            filter = s => s.Settings != null && s.Settings.EnabledScratch == enabledScratch.Value;
-        }
-        var sellers = await sellerRepository.GetAllAsync(pageNumber: page, pageSize: size, filter: filter);
+        
+        var sellers = await sellerRepository.GetAllAsync(pageNumber: page);
         var sellerDtos = sellers.Select(s => SellerResponseDto.ConvertToDto(s)).ToList();
         var totalCount = await sellerRepository.CountAsync();
         var response = new ReportResponseDto<SellerResponseDto, object>

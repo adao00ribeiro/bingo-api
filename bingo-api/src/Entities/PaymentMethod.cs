@@ -1,3 +1,4 @@
+using bingo_api.src.Entities.Bingo;
 using bingo_api.src.Entities.Shared;
 using bingo_api.src.Enums;
 
@@ -11,10 +12,10 @@ public class PaymentMethod : Entity
     public string? QrCodeUrl { get; set; } // Usado no Pix
     public string? Instructions { get; set; } // Texto adicional
     public bool Active { get; set; } = true;
-    public Guid SellerId { get; set; }
-    public Seller Seller { get; set; }
+    public Guid OnlineHouseId { get; set; }
+    public OnlineHouse OnlineHouse { get; set; }
 
-    public PaymentMethod(string name, EPaymentMethodType type, string? token, string? qrCodeUrl, string? instructions, bool active, Guid sellerId)
+    public PaymentMethod(string name, EPaymentMethodType type, string? token, string? qrCodeUrl, string? instructions, bool active, Guid onlineHouseId)
     {
         Name = name;
         Type = type;
@@ -22,6 +23,6 @@ public class PaymentMethod : Entity
         QrCodeUrl = qrCodeUrl;
         Instructions = instructions;
         Active = active;
-        SellerId = sellerId;
+        OnlineHouseId = onlineHouseId;
     }
 }

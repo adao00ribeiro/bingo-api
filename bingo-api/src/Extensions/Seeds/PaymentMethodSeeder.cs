@@ -52,7 +52,7 @@ public class PaymentMethodSeeder
 
         // Busca do banco somente os tipos já existentes
         var existingTypes = await _context.PaymentMethods
-            .Where(pm => pm.SellerId == sellerId)
+            .Where(pm => pm.OnlineHouseId == sellerId)
             .Select(pm => pm.Type)
             .ToListAsync();
 

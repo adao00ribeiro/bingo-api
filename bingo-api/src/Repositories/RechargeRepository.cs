@@ -17,7 +17,7 @@ public class RechargeRepository : RepositoryBase<Recharge>, IRechargeRepository
     {
         var recharge = await Context.Recharges
         .Include(r => r.Punter)
-            .ThenInclude(p => p.Seller)
+            .ThenInclude(p => p.OnlineHouse)
        .FirstOrDefaultAsync(recharge => recharge.Id == id);
         return recharge;
     }

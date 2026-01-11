@@ -263,14 +263,14 @@ public class IdentityService : IIdentityService
 
         var resetLink = $"{_configuration["ConnectionStrings:HostUrl"]}reset-password?email={user.Email}&token={encodedToken}";
 
-        if (punter.Seller.Settings.EmailConfig == null)
+        if (punter.OnlineHouse.Settings.EmailConfig == null)
         {
-            await _notifier.SendMessageAsync($"⚠️ Configuracao STMP Null para Vendedor {punter.SellerId} ");
+            await _notifier.SendMessageAsync($"⚠️ Configuracao STMP Null para Vendedor {punter.OnlineHouseId} ");
             return false;
         }
         // Enviar e-mail com fallback SMTP
         await _emailSender.SendEmailAsync(user.Email, "Recuperação de senha",
-            $"Olá!<br>Clique aqui para redefinir sua senha: <a href='{resetLink}'>Redefinir senha</a>", punter.Seller.Settings.EmailConfig);
+            $"Olá!<br>Clique aqui para redefinir sua senha: <a href='{resetLink}'>Redefinir senha</a>", punter.OnlineHouse.Settings.EmailConfig);
 
         return true;
     }

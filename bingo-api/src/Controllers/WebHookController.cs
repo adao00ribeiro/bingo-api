@@ -25,7 +25,7 @@ public class WebHookController(ILogger<WebHookController> logger, IRechargeRepos
         if (recharge is null)
             throw new Exception("recharge não encontrado");
 
-        await rechargeRepository.UpdateStatusToCompleted(dto.Id, recharge.Punter.Seller);
+        await rechargeRepository.UpdateStatusToCompleted(dto.Id, recharge.Punter.OnlineHouse.Seller);
 
         return Ok();
     }

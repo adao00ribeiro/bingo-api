@@ -19,7 +19,7 @@ public class WithdrawalRepository : RepositoryBase<Withdrawal>, IWithdrawalRepos
         return Context.Withdrawals
             .OfType<PunterWithdrawal>()
             .Include(x => x.Punter)
-            .ThenInclude(p => p.Seller)
+            .ThenInclude(p => p.OnlineHouse)
             .Cast<Withdrawal>();
     }
     public IQueryable<Withdrawal> GetSellerWithdrawalsQuery(Guid? sellerId)
