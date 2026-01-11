@@ -1,5 +1,5 @@
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG ConnectionStrings__DatabasePostgreSQL=${ConnectionStrings__DatabasePostgreSQL}
 ENV ConnectionStrings__DatabasePostgreSQL=${ConnectionStrings__DatabasePostgreSQL}
 ARG ConnectionStrings__RedisConnection=${ConnectionStrings__RedisConnection}
@@ -53,7 +53,7 @@ RUN dotnet build --configuration Release --output /app/build
 
 RUN dotnet publish --configuration Release --output /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
 RUN apt-get update && \
     apt-get install -y locales tzdata
