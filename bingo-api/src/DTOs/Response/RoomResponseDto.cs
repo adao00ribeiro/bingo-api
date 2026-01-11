@@ -1,4 +1,5 @@
 
+using bingo_api.src.DTOs.Response.Bingo;
 using bingo_api.src.Entities;
 
 
@@ -10,7 +11,7 @@ public record RoomResponseDto
     public string Name { get; set; }
     public Guid OwnerId { get; set; }
     public AccumulatedResponseDto? Accumulated { get; set; }
-    public SellerResponseDto? Owner { get; set; }
+    public OnlineHouseResponseDto? Owner { get; set; }
     public IEnumerable<RoomSellerResponseDto>? RoomSellers { get; set; }
     public MediaAttachmentResponseDto? MediaAttachment { get; set; }
 
@@ -18,7 +19,7 @@ public record RoomResponseDto
         Guid id,
         string name,
         Guid ownerId,
-        SellerResponseDto? owner,
+        OnlineHouseResponseDto? owner,
         IEnumerable<RoomSellerResponseDto> roomSellers,
         AccumulatedResponseDto accumulated,
         MediaAttachmentResponseDto? mediaAttachment
@@ -35,7 +36,7 @@ public record RoomResponseDto
     internal static RoomResponseDto ConvertToDto(Room room)
     {
         var roomSellerResponse = room.RoomsSellers?.Select(r => RoomSellerResponseDto.ConvertToDto(r)) ?? Enumerable.Empty<RoomSellerResponseDto>();
-        var ownerResponse = room.Owner != null ? SellerResponseDto.ConvertToDto(room.Owner) : null;
+        var ownerResponse = room.Owner != null ? OnlineHouseResponseDto.ConvertToDto(room.Owner) : null;
         var accumulatedResponse = room.Accumulated != null ? AccumulatedResponseDto.ConvertToDto(room.Accumulated) : null;
         var mediaResponse = MediaAttachmentResponseDto.ConvertToDto(room.MediaAttachment);
 
@@ -52,7 +53,7 @@ public record RoomResponseDto
     internal static RoomResponseDto ConvertToSocketDto(Room room)
     {
         var roomSellerResponse = room.RoomsSellers?.Select(r => RoomSellerResponseDto.ConvertToDto(r)) ?? Enumerable.Empty<RoomSellerResponseDto>();
-        var ownerResponse = room.Owner != null ? SellerResponseDto.ConvertToDto(room.Owner) : null;
+        var ownerResponse = room.Owner != null ? OnlineHouseResponseDto.ConvertToDto(room.Owner) : null;
         return new RoomResponseDto(
             room.Id,
             room.Name,

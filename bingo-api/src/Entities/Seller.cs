@@ -15,11 +15,6 @@ public class Seller : Entity, ITransactionParticipant
     public decimal Comission { get; set; }
     public decimal IndicateRewardValue { get; set; }
     public OnlineHouse OnlineHouse { get; set; }
-    public SellerSettings Settings { get; set; } = new SellerSettings();
-    public IEnumerable<Punter> Punters { get; set; }
-    public IEnumerable<RoomSeller> Rooms { get; set; }
-    public IEnumerable<Room> OwnerRooms { get; set; }
-    public IEnumerable<PaymentMethod> PaymentMethods { get; set; }
     public IEnumerable<SellerWithdrawal> Withdrawals { get; set; }
     public Seller()
     {

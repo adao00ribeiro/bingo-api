@@ -24,8 +24,8 @@ public class RoomSellerMap : IEntityTypeConfiguration<RoomSeller>
         builder.Property(rs => rs.RoomId)
                .HasColumnName("room_id");
 
-        builder.Property(rs => rs.SellerId)
-               .HasColumnName("seller_id");
+        builder.Property(rs => rs.OnlineHouseId)
+               .HasColumnName("online_house_id");
         builder.Property(x => x.CreatedAt)
                     .HasColumnName("created_at")
                     .IsRequired()
@@ -40,9 +40,9 @@ public class RoomSellerMap : IEntityTypeConfiguration<RoomSeller>
                .HasForeignKey(rs => rs.RoomId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(rs => rs.Seller)
-               .WithMany(s => s.Rooms)
-               .HasForeignKey(rs => rs.SellerId)
+        builder.HasOne(rs => rs.OnlineHouse)
+               .WithMany(s => s.ParticipantRooms)
+               .HasForeignKey(rs => rs.OnlineHouseId)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -46,7 +46,7 @@ public class InsertBotRoundService
             }
 
             var bots = await _context.Punters
-                .Where(p => p.SellerId == tempRound.Room.OwnerId && p.IsBot)
+                .Where(p => p.OnlineHouseId == tempRound.Room.OwnerId && p.IsBot)
                 .ToListAsync();
 
             if (!bots.Any())

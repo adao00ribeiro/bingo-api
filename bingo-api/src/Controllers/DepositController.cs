@@ -41,7 +41,7 @@ public class DepositController(
         if (punter is null)
             throw new Exception("Usuário não encontrado");
 
-        var seller = punter.Seller;
+        var seller = punter.OnlineHouse;
         if (seller is null)
             throw new Exception("Sem vendedor associado");
 

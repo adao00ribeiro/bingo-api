@@ -53,13 +53,13 @@ public class PaymentMethodMap : IEntityTypeConfiguration<PaymentMethod>
                .HasDefaultValue(true)
                .IsRequired();
 
-        builder.Property(pm => pm.SellerId)
+        builder.Property(pm => pm.OnlineHouseId)
                .HasColumnName("seller_id")
                .IsRequired();
 
-        builder.HasOne(pm => pm.Seller)
+        builder.HasOne(pm => pm.OnlineHouse)
                .WithMany(s => s.PaymentMethods)
-               .HasForeignKey(pm => pm.SellerId)
+               .HasForeignKey(pm => pm.OnlineHouseId)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }

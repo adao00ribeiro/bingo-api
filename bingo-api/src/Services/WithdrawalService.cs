@@ -96,7 +96,7 @@ public class WithdrawalService : IWithdrawalService
                 switch (withdrawal)
                 {
                     case PunterWithdrawal pw:
-                        if (pw.Punter.SellerId != sellerId.Value)
+                        if (pw.Punter.OnlineHouse.SellerId != sellerId.Value)
                             throw new UnauthorizedAccessException("Esse saque não pertence a você.");
                         break;
 

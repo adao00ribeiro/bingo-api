@@ -54,29 +54,5 @@ public class SellerMap : IEntityTypeConfiguration<Seller>
                      .HasColumnName("date_birth")
                      .IsRequired();
 
-        builder.Property(s => s.Settings)
-             .HasColumnName("settings")
-             .HasColumnType("jsonb")
-             .HasDefaultValueSql("'{}'::jsonb");
-
-        builder.HasMany(s => s.OwnerRooms)
-               .WithOne(r => r.Owner)
-               .HasForeignKey(r => r.OwnerId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasMany(s => s.Rooms)
-               .WithOne(rs => rs.Seller)
-               .HasForeignKey(rs => rs.SellerId)
-               .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(s => s.Punters)
-               .WithOne(p => p.Seller)
-               .HasForeignKey(p => p.SellerId)
-               .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(s => s.PaymentMethods)
-               .WithOne(pm => pm.Seller)
-               .HasForeignKey(pm => pm.SellerId)
-               .OnDelete(DeleteBehavior.Cascade);
     }
 }

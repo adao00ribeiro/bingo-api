@@ -93,7 +93,7 @@ public class RoundController(IRoundRepository _roundRepository, IPunterRepositor
                 return Forbid();
             }
             // Punter pode ver apenas as salas dos Sellers associados a ele
-            rounds = await roundRepository.GetNextRoundsAsync(page, size, punter.SellerId);
+            rounds = await roundRepository.GetNextRoundsAsync(page, size, punter.OnlineHouseId);
         }
         else
         {

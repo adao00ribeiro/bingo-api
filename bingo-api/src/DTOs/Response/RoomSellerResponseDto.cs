@@ -5,8 +5,6 @@ namespace bingo_api.src.DTOs.Response;
 
 public record RoomSellerResponseDto
 {
-
-
     public Guid Id { get; set; }
     public Guid RoomId { get; set; }
     public RoomResponseDto Room { get; set; }
@@ -31,7 +29,7 @@ public record RoomSellerResponseDto
              roomSeller.Id,
              roomSeller.RoomId,
              null,
-             roomSeller.SellerId,
+             roomSeller.OnlineHouseId,
              null,
              roomSeller.AssignedBy
         );

@@ -40,7 +40,7 @@ public class BotConfigRepository : RepositoryBase<BotConfig>, IBotConfigReposito
 
             // Verifica se o Seller já tem Punters bots
             bool sellerHasPunters = await this.Context.Punters
-                .AnyAsync(p => p.SellerId == sellerId && p.IsBot == true);
+                .AnyAsync(p => p.OnlineHouseId == sellerId && p.IsBot == true);
 
             if (!sellerHasPunters) // Se não tem Punters, cria novos
             {

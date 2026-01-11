@@ -45,8 +45,8 @@ public class ScratchSellerGameController(
             {
                 throw new Exception("Usuário não encontrado");
             }
-            totalCount = await _scratchSellerGameRepository.CountAsync(punter.SellerId);
-            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, filter: r => r.SellerId == punter.SellerId,
+            totalCount = await _scratchSellerGameRepository.CountAsync(punter.OnlineHouseId);
+            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, filter: r => r.SellerId == punter.OnlineHouseId,
                     includeProperties: x => x.Include(x => x.ScratchGame)
                 );
         }

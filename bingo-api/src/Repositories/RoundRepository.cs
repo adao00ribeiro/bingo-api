@@ -15,15 +15,15 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     public RoundRepository(DataContext dataContext) : base(dataContext)
     {
     }
-    public async Task<IEnumerable<Round>> GetNextRoundsAsync(int? page, int? size, Guid sellerId)
+    public async Task<IEnumerable<Round>> GetNextRoundsAsync(int? page, int? size, Guid onlineHouseId)
     {
         var roundIds = await Context.Rounds
     .Where(r =>
         r.Started > DateTime.UtcNow &&
         r.Finished == null &&
         (
-            r.Room.OwnerId == sellerId ||
-            r.Room.RoomsSellers.Any(rs => rs.SellerId == sellerId)
+            r.Room.OwnerId == onlineHouseId ||
+            r.Room.RoomsSellers.Any(rs => rs.OnlineHouseId == onlineHouseId)
         )
     )
     .GroupBy(r => r.RoomId)

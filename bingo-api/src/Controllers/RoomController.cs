@@ -45,10 +45,10 @@ public class RoomController(IRoomRepository _roomRepository, IMediaAttachmentSer
         {
             // Punter pode ver apenas as salas dos Sellers associados a ele
             rooms = await roomRepository.GetAllAsync(includeProperties: q => q.Where(r => r.RoomsSellers
-            .Any(rs => rs.Seller.Punters
+            .Any(rs => rs.OnlineHouse.Punters
             .Any(p => p.Id == Guid.Parse(entityId))))
             .Include(r => r.RoomsSellers)
-            .ThenInclude(rs => rs.Seller)
+            .ThenInclude(rs => rs.OnlineHouse)
                 .ThenInclude(s => s.Punters)
         .Include(r => r.Owner).Include(x => x.MediaAttachment)
             );

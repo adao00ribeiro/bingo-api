@@ -10,34 +10,27 @@ public record SellerResponseToPunterDto
     public string Email { get; set; }
     public IEnumerable<RoomResponseDto> Rooms { get; set; }
 
-    public SellerSettings Settings { get; set; }
 
-    public SellerResponseToPunterDto(Guid id, string email, IEnumerable<RoomResponseDto> rooms, SellerSettings settings)
+    public SellerResponseToPunterDto(Guid id, string email)
     {
         Id = id;
         Email = email;
-        Rooms = rooms;
-        Settings = settings;
     }
     internal static SellerResponseToPunterDto ConvertToDtoInPunter(Seller seller)
     {
-        var roomResponse = seller.OwnerRooms?.Select(x => RoomResponseDto.ConvertToDto(x)) ?? Enumerable.Empty<RoomResponseDto>();
+        
         return new SellerResponseToPunterDto(
             seller.Id,
-            seller.Email,
-            roomResponse,
-            seller.Settings
+            seller.Email
+        
 
         );
     }
     internal static SellerResponseToPunterDto ConvertToDto(Seller seller)
     {
-        var roomResponse = seller.OwnerRooms?.Select(x => RoomResponseDto.ConvertToDto(x)) ?? Enumerable.Empty<RoomResponseDto>();
         return new SellerResponseToPunterDto(
             seller.Id,
-            seller.Email,
-            roomResponse,
-            seller.Settings
+            seller.Email
 
         );
     }

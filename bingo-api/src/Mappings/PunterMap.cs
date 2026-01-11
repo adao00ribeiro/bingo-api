@@ -67,8 +67,8 @@ public class PunterMap : IEntityTypeConfiguration<Punter>
                .HasColumnName("date_birth")
                .IsRequired();
 
-        builder.Property(x => x.SellerId)
-               .HasColumnName("seller_id");
+        builder.Property(x => x.OnlineHouseId)
+               .HasColumnName("online_house_id");
 
         builder.HasIndex(x => x.Email)
                .IsUnique()
@@ -84,9 +84,9 @@ public class PunterMap : IEntityTypeConfiguration<Punter>
                .HasForeignKey(r => r.PunterId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(p => p.Seller)
+        builder.HasOne(p => p.OnlineHouse)
                .WithMany(s => s.Punters)
-               .HasForeignKey(p => p.SellerId)
+               .HasForeignKey(p => p.OnlineHouseId)
                .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(x => x.Cpf)

@@ -40,7 +40,7 @@ public class DepositWatcher : BackgroundService
 
                 var pendentes = await rechargeRepository.GetAllAsync(
                     filter: x => x.ConfirmedAt == null && x.DestinationAddress != null,
-                    includeProperties: r => r.Include(x => x.Punter).ThenInclude(x => x.Seller)
+                    includeProperties: r => r.Include(x => x.Punter).ThenInclude(x => x.OnlineHouse)
                 );
 
                 if (!pendentes.Any())
@@ -71,7 +71,7 @@ public class DepositWatcher : BackgroundService
                         var ok = await svc.VerifyTransactionAsync(dep.TxHash, dep.DestinationAddress!, dep.Amount, dep.Token);
                         if (ok)
                         {
-                            await rechargeRepository.UpdateStatusToCompleted(dep.Id, dep.Punter.Seller);
+                            await rechargeRepository.UpdateStatusToCompleted(dep.Id, dep.Punter.OnlineHouse.Seller);
                             _logger.LogInformation("Depósito Id={id} confirmado", dep.Id);
                         }
                     }

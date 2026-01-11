@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using bingo_api.src.Entities.Bingo;
 using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Entities.Shared;
 using bingo_api.src.Interfaces.Services;
@@ -16,8 +17,8 @@ public class Punter : Entity, ITransactionParticipant
     public bool IsBot { get; set; }
     public DateTime DateBirth { get; set; }
     public IEnumerable<Card> Cards { get; set; }
-    public Guid SellerId { get; set; }
-    public Seller Seller { get; set; }
+    public Guid OnlineHouseId { get; set; }
+    public OnlineHouse OnlineHouse { get; set; }
     public IEnumerable<Recharge>? Recharges { get; set; }
     public IEnumerable<PunterWithdrawal> Withdrawals { get; set; }
     public string IndicateTag { get; set; }
@@ -27,23 +28,23 @@ public class Punter : Entity, ITransactionParticipant
     {
 
     }
-    public Punter(string email, string name, string cpf, DateTime datebirth, Guid sellerId, string RegisteredWithTag)
+    public Punter(string email, string name, string cpf, DateTime datebirth, Guid onlineHouseId, string RegisteredWithTag)
     {
         this.Email = email;
         this.Name = name;
         this.Cpf = cpf;
         this.DateBirth = datebirth;
-        this.SellerId = sellerId;
+        this.OnlineHouseId = onlineHouseId;
         this.IndicateTag = "";
         this.RegisteredWithTag = RegisteredWithTag;
     }
-    public Punter(string email, string name, string cpf, DateTime datebirth, Guid sellerId, bool isBot)
+    public Punter(string email, string name, string cpf, DateTime datebirth, Guid onlineHouseId, bool isBot)
     {
         this.Email = email;
         this.Name = name;
         this.Cpf = cpf;
         this.DateBirth = datebirth;
-        this.SellerId = sellerId;
+        this.OnlineHouseId = onlineHouseId;
         this.IndicateTag = "";
         this.RegisteredWithTag = "";
         this.IsBot = isBot;

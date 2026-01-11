@@ -1,7 +1,6 @@
+using bingo_api.src.DTOs.Response.Bingo;
 using bingo_api.src.DTOs.Shared;
 using bingo_api.src.Entities;
-using bingo_api.src.Enums;
-using bingo_api.src.Structs;
 
 namespace bingo_api.src.DTOs.Response;
 
@@ -12,12 +11,8 @@ public record SellerResponseDto : EntityResponseDto
     public string Cpf { get; set; }
     public DateTime DateBirth { get; set; }
     public decimal Comission { get; set; }
-    public SellerSettings Settings { get; set; }
-    public IEnumerable<Punter> Punters { get; set; }
-    public IEnumerable<RoomSeller> Rooms { get; set; }
-    public IEnumerable<Room> OwnerRooms { get; set; }
-
-    public SellerResponseDto(Guid id, decimal balance, string email, string cpf, DateTime dateBirth, decimal comission, SellerSettings settings, DateTime CreatedAt,
+    public OnlineHouseResponseDto OnlineHouse { get; set; }
+    public SellerResponseDto(Guid id, decimal balance, string email, string cpf, DateTime dateBirth, decimal comission, OnlineHouseResponseDto onlineHouse, DateTime CreatedAt,
         DateTime UpdatedAt)
     : base(id, CreatedAt, UpdatedAt)
     {
@@ -27,11 +22,12 @@ public record SellerResponseDto : EntityResponseDto
         Cpf = cpf;
         DateBirth = dateBirth;
         Comission = comission;
-        Settings = settings;
+        OnlineHouse = onlineHouse;
     }
 
     internal static SellerResponseDto ConvertToDto(Seller seller)
     {
+       var onlineReponse =  seller.OnlineHouse != null ?   OnlineHouseResponseDto.ConvertToDto(seller.OnlineHouse) : null;
         return new SellerResponseDto(
             seller.Id,
             seller.Balance,
@@ -39,7 +35,7 @@ public record SellerResponseDto : EntityResponseDto
             seller.Cpf,
             seller.DateBirth,
             seller.Comission,
-            seller.Settings,
+            onlineReponse,
             seller.CreatedAt,
             seller.UpdatedAt
         );
