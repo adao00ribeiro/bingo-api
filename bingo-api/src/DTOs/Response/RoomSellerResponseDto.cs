@@ -11,6 +11,10 @@ public record RoomSellerResponseDto
     public Guid SellerId { get; set; }
     public SellerResponseDto Seller { get; set; }
     public string AssignedBy { get; set; }
+   public RoomSellerResponseDto()
+    {
+    
+    }
 
     public RoomSellerResponseDto(Guid id, Guid roomId, RoomResponseDto room, Guid sellerId, SellerResponseDto seller, string assignedBy)
     {
@@ -34,4 +38,16 @@ public record RoomSellerResponseDto
              roomSeller.AssignedBy
         );
     }
+
+    internal static RoomSellerResponseDto ConvertToDtoToOnlineHouse(RoomSeller r)
+    {
+        return new RoomSellerResponseDto
+        {
+          Id=   r.Id,
+           RoomId = r.RoomId,
+            Room = RoomResponseDto.ConvertToDto(r.Room)
+        };
+           
+    }
+
 }
