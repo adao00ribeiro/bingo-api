@@ -14,7 +14,11 @@ public record RoomResponseDto
     public OnlineHouseResponseDto? Owner { get; set; }
     public IEnumerable<RoomSellerResponseDto>? RoomSellers { get; set; }
     public MediaAttachmentResponseDto? MediaAttachment { get; set; }
-
+    
+    public RoomResponseDto()
+    {
+     
+    }
     public RoomResponseDto(
         Guid id,
         string name,
@@ -49,6 +53,16 @@ public record RoomResponseDto
             accumulatedResponse,
             mediaResponse
         );
+    }
+     internal static RoomResponseDto ConvertToDtoToOnlineHouse(Room room)
+    {
+        return new RoomResponseDto
+        {
+          Id=   room.Id,
+          Name =   room.Name  
+        };
+           
+     
     }
     internal static RoomResponseDto ConvertToSocketDto(Room room)
     {

@@ -29,9 +29,10 @@ public class PunterRepository : RepositoryBase<Punter>, IPunterRepository
              .Include(p => p.OnlineHouse)
                  .ThenInclude(s => s.OwnerRooms)
              .Include(p => p.OnlineHouse)
+                 .ThenInclude(s => s.ParticipantRooms)
+             .Include(p => p.OnlineHouse)
                  .ThenInclude(s => s.PaymentMethods)
             .FirstOrDefaultAsync(punter => punter.Email == email);
-
         return punter;
     }
 

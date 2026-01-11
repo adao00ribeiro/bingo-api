@@ -16,7 +16,7 @@ public class RoomSeeder
         _botConfigRepository = botConfigRepository;
     }
 
-    public async Task SeedAsync(Guid sellerId)
+    public async Task SeedAsync(Guid OnlineHouseId)
     {
         const string defaultRoomName = "Sala de Desenvolvimento";
         // ------------------------------------------------------------
@@ -24,7 +24,7 @@ public class RoomSeeder
         // ------------------------------------------------------------
         var existingRoom = await _context.Rooms
             .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.OwnerId == sellerId && r.Name == defaultRoomName);
+            .FirstOrDefaultAsync(r => r.OwnerId == OnlineHouseId && r.Name == defaultRoomName);
 
         if (existingRoom != null)
             return; // idempotência garantida
@@ -32,7 +32,7 @@ public class RoomSeeder
         // ------------------------------------------------------------
         // 2. Criar a nova sala
         // ------------------------------------------------------------
-        var room = new Room(defaultRoomName, sellerId)
+        var room = new Room(defaultRoomName, OnlineHouseId)
         {
             Accumulated = new Accumulated
             {

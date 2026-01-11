@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using bingo_api.src.Entities.Bingo;
 using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Entities.Shared;
@@ -32,7 +33,7 @@ public class Punter : Entity, ITransactionParticipant
     {
         this.Email = email;
         this.Name = name;
-        this.Cpf = cpf;
+        this.Cpf = NormalizeCpf(cpf);
         this.DateBirth = datebirth;
         this.OnlineHouseId = onlineHouseId;
         this.IndicateTag = "";
@@ -42,11 +43,24 @@ public class Punter : Entity, ITransactionParticipant
     {
         this.Email = email;
         this.Name = name;
-        this.Cpf = cpf;
+        this.Cpf =  NormalizeCpf(cpf);
         this.DateBirth = datebirth;
         this.OnlineHouseId = onlineHouseId;
         this.IndicateTag = "";
         this.RegisteredWithTag = "";
         this.IsBot = isBot;
+    }
+
+     private static string NormalizeCpf(string cpf)
+    {
+        if (string.IsNullOrWhiteSpace(cpf))
+            throw new ArgumentException("CPF é obrigatório");
+
+        var onlyNumbers = Regex.Replace(cpf, @"\D", "");
+
+        if (onlyNumbers.Length != 11)
+            throw new ArgumentException("CPF inválido");
+
+        return onlyNumbers;
     }
 }

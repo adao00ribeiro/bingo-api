@@ -17,6 +17,7 @@ public class RoundRepository : RepositoryBase<Round>, IRoundRepository
     }
     public async Task<IEnumerable<Round>> GetNextRoundsAsync(int? page, int? size, Guid onlineHouseId)
     {
+        Console.WriteLine("FDP"+onlineHouseId);
         var roundIds = await Context.Rounds
     .Where(r =>
         r.Started > DateTime.UtcNow &&

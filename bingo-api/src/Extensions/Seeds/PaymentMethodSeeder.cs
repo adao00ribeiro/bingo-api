@@ -14,7 +14,7 @@ public class PaymentMethodSeeder
         _context = context;
     }
 
-    public async Task SeedAsync(Guid sellerId)
+    public async Task SeedAsync(Guid onlineHouseId)
     {
         // Define todos os métodos que devem existir
         var requiredMethods = new List<PaymentMethod>
@@ -26,7 +26,7 @@ public class PaymentMethodSeeder
                 "https://exemplo.com/qrcode.png",
                 "Escaneie o QR Code e envie o comprovante para o suporte.",
                 true,
-                sellerId
+                onlineHouseId
             ),
 
             new PaymentMethod(
@@ -36,7 +36,7 @@ public class PaymentMethodSeeder
                 "",
                 "",
                 false,
-                sellerId
+                onlineHouseId
             ),
 
             new PaymentMethod(
@@ -46,13 +46,13 @@ public class PaymentMethodSeeder
                 "",
                 "",
                 false,
-                sellerId
+                onlineHouseId
             )
         };
 
         // Busca do banco somente os tipos já existentes
         var existingTypes = await _context.PaymentMethods
-            .Where(pm => pm.OnlineHouseId == sellerId)
+            .Where(pm => pm.OnlineHouseId == onlineHouseId)
             .Select(pm => pm.Type)
             .ToListAsync();
 

@@ -1,6 +1,7 @@
 using bingo_api.src.Constants;
 using bingo_api.src.Context;
 using bingo_api.src.Entities;
+using bingo_api.src.Entities.Bingo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ public class SellerSeeder : IDataSeeder
     private readonly UserManager<User> _userManager;
     private readonly PaymentMethodSeeder _paymentSeeder;
     private readonly RoomSeeder _roomSeeder;
+    private const string SellerEmail = "default@seller.com";
 
     public SellerSeeder(
         DataContext context,
@@ -27,63 +29,68 @@ public class SellerSeeder : IDataSeeder
 
     public async Task SeedAsync()
     {
-        var sellerId = Guid.Parse("b9c2d2b5-eeae-486c-85ea-06dd5cfe0c06");
-        var sellerEmail = "default@seller.com";
-
         // ----------------------------------------------------------------------
         // 1. SEED DO SELLER
         // ----------------------------------------------------------------------
 
-        var existingSeller = await _context.Sellers
-            .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.Id == sellerId);
+        var seller = await _context.Sellers
+          .FirstOrDefaultAsync(s => s.Email == SellerEmail);
 
-        if (existingSeller == null)
+        if (seller == null)
         {
-            var newSeller = new Seller
+           seller = new Seller
             {
                 Balance = 0,
-                Email = sellerEmail,
+                Email = SellerEmail,
                 Cpf = "11111111111",
                 DateBirth = DateTime.UtcNow,
                 Comission = 0,
                 IndicateRewardValue = 20
             };
 
-            newSeller.SetIdGuid(sellerId);
-
-            _context.Sellers.Add(newSeller);
+            _context.Sellers.Add(seller);
             await _context.SaveChangesAsync();
-
-            existingSeller = newSeller;
         }
 
+        var onlineHouse = await _context.OnlineHouses
+            .FirstOrDefaultAsync(o => o.SellerId == seller.Id);
+
+        if (onlineHouse == null)
+        {
+            onlineHouse = new OnlineHouse(
+                name: "Demonstrativo",
+                sellerId: seller.Id
+            )
+            {
+                Hostname = "localhost"
+            };
+
+            _context.OnlineHouses.Add(onlineHouse);
+            await _context.SaveChangesAsync();
+        }
         // ----------------------------------------------------------------------
         // 2. SEED PAYMENT METHODS
         // ----------------------------------------------------------------------
-
-        await _paymentSeeder.SeedAsync(existingSeller.Id);
-
+        await _paymentSeeder.SeedAsync(onlineHouse.Id);
         // ----------------------------------------------------------------------
         // 3. SEED DEFAULT ROOMS
         // ----------------------------------------------------------------------
 
-        await _roomSeeder.SeedAsync(existingSeller.Id);
+        await _roomSeeder.SeedAsync(onlineHouse.Id);
 
         // ----------------------------------------------------------------------
         // 4. IDENTITY USER
         // ----------------------------------------------------------------------
 
-        var existingUser = await _userManager.FindByIdAsync(sellerId.ToString());
+        var existingUser = await _userManager.FindByEmailAsync(SellerEmail);
         if (existingUser == null)
         {
             var identityUser = new User
             {
-                Id = sellerId.ToString(),
-                EntityId = sellerId,
+                EntityId = seller.Id,
                 EntityType = nameof(Seller),
-                UserName = sellerEmail,
-                Email = sellerEmail,
+                UserName = SellerEmail,
+                Email = SellerEmail,
                 EmailConfirmed = true,
                 PhoneNumber = "11111111111"
             };

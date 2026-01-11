@@ -7,8 +7,8 @@ namespace bingo_api.src.DTOs.Request;
 
 public record PunterRequestDto : RegisterRequestDto
 {
-    [Required(ErrorMessage = "O campo Id do dono da sala é Obrigatorio")]
-    public Guid SellerId { get; set; }
+    [Required(ErrorMessage = "O campo Id do OnlineHouse é Obrigatorio")]
+    public Guid OnlineHouseId { get; set; }
     public string Name { get; set; } = "";
 
     [DefaultValue("")]
@@ -20,7 +20,7 @@ public record PunterRequestDto : RegisterRequestDto
              dto.Name,
              dto.Cpf,
              dto.DateBirth,
-             dto.SellerId,
+             dto.OnlineHouseId,
              dto.RegisteredWithTag
         );
     }

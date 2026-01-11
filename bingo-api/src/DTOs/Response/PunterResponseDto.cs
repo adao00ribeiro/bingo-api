@@ -46,7 +46,7 @@ public record PunterResponseDto : EntityResponseDto
     internal static PunterResponseDto ConvertToDto(Punter punter)
     {
 
-        var SellerResponse = punter.OnlineHouse != null ? OnlineHouseResponseDto.ConvertToDto(punter.OnlineHouse) : null;
+        var onlineHouseResponse = punter.OnlineHouse != null ? OnlineHouseResponseDto.ConvertToDto(punter.OnlineHouse) : null;
         var RechargeResponse = punter.Recharges?.Select(r => RechargeResponseDto.ConvertToDto(r)) ?? Enumerable.Empty<RechargeResponseDto>();
         return new PunterResponseDto(
             punter.Id,
@@ -58,7 +58,7 @@ public record PunterResponseDto : EntityResponseDto
             punter.UpdatedAt,
             null,
             punter.OnlineHouseId,
-            SellerResponse,
+            onlineHouseResponse,
             RechargeResponse
         );
     }

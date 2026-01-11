@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using bingo_api.src.Entities.Bingo;
 using bingo_api.src.Entities.Shared;
 
@@ -12,7 +13,9 @@ public class Room : Entity
     public IEnumerable<Round>? Rounds { get; set; }
     public Accumulated Accumulated { get; set; }
     public BotConfig BotConfig { get; set; }
-    public MediaAttachment MediaAttachment { get; set; }
+
+    [NotMapped]
+    public MediaAttachment? MediaAttachment { get; set; }
     public Room()
     {
 
