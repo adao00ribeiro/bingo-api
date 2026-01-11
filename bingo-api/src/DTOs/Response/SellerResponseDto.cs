@@ -7,7 +7,6 @@ namespace bingo_api.src.DTOs.Response;
 
 public record SellerResponseDto : EntityResponseDto
 {
-    public Guid Id { get; set; }
     public decimal Balance { get; set; }
     public string Email { get; set; }
     public string Cpf { get; set; }
