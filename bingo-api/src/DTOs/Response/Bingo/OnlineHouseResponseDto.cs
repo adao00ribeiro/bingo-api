@@ -1,6 +1,6 @@
 using bingo_api.src.DTOs.Shared;
 using bingo_api.src.Entities.Bingo;
-using bingo_api.src.Structs;
+using bingo_api.src.Structs.OnlineHouse;
 
 namespace bingo_api.src.DTOs.Response.Bingo;
 

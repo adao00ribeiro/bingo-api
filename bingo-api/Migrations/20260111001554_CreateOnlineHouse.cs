@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using bingo_api.src.Structs;
+using bingo_api.src.Structs.OnlineHouse;
 
 #nullable disable
 

@@ -9,6 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using bingo_api.src.Context;
 using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Structs;
+using bingo_api.src.Structs.OnlineHouse;
 
 #nullable disable
 
