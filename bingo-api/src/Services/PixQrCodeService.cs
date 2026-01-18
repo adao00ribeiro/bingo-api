@@ -1,5 +1,3 @@
-using System.Drawing;
-using System.Drawing.Imaging;
 using QRCoder;
 
 namespace bingo_api.src.Services;
@@ -11,13 +9,11 @@ public static  class PixQrCodeService
             var qrGenerator = new QRCodeGenerator();
             var qrData = qrGenerator.CreateQrCode(pixCopiaECola, QRCodeGenerator.ECCLevel.Q);
 
-            using var qrCode = new QRCode(qrData);
-            using Bitmap qrImage = qrCode.GetGraphic(20);
+            var qrCode = new PngByteQRCode(qrData);
+            byte[] pngBytes = qrCode.GetGraphic(20);
             using var ms = new MemoryStream();
 
-            qrImage.Save(ms, ImageFormat.Png);
-            
-              var base64 = Convert.ToBase64String(ms.ToArray());
-              return $"data:image/png;base64,{base64}";
+            var base64 = Convert.ToBase64String(pngBytes);
+            return $"data:image/png;base64,{base64}";
         }
 }
