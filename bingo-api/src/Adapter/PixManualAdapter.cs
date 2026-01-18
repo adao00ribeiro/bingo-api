@@ -10,8 +10,8 @@ public class PixManualAdapter : IPaymentProvider
     {
         var recharge = new Recharge(value, amount, EPaymentStatus.PENDING, punter.Id)
         {
-            Qrcode = method.QrCodeUrl,
-            ImagemQrcode = method.Instructions
+            Qrcode = method.PixPayload,
+            ImagemQrcode = method.QrCodeUrl
         };
 
         return Task.FromResult(recharge);
