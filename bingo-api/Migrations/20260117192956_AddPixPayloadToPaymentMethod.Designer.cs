@@ -16,8 +16,8 @@ using bingo_api.src.Structs.OnlineHouse;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260111134218_AjustReferenceOnlineHouse")]
-    partial class AjustReferenceOnlineHouse
+    [Migration("20260117192956_AddPixPayloadToPaymentMethod")]
+    partial class AddPixPayloadToPaymentMethod
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -578,6 +578,11 @@ namespace bingo_api.Migrations
                     b.Property<Guid>("OnlineHouseId")
                         .HasColumnType("uuid")
                         .HasColumnName("seller_id");
+
+                    b.Property<string>("PixPayload")
+                        .HasMaxLength(500)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("QrCodeUrl")
                         .HasMaxLength(500)
@@ -1785,8 +1790,7 @@ namespace bingo_api.Migrations
                     b.Navigation("BotConfig")
                         .IsRequired();
 
-                    b.Navigation("MediaAttachment")
-                        .IsRequired();
+                    b.Navigation("MediaAttachment");
 
                     b.Navigation("RoomsSellers");
 

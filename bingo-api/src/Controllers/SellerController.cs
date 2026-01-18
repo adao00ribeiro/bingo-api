@@ -12,6 +12,7 @@ using bingo_api.src.Entities;
 using bingo_api.src.Repositories.Shared;
 using bingo_api.src.DTOs.Response.report;
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Controllers;
 
@@ -51,7 +52,7 @@ public class SellerController(ISellerRepository _sellerRepository) : ApiControll
     [HttpGet("id/{id}")]
     public async Task<ActionResult<SellerResponseDto>> GetById(Guid id)
     {
-        var user = await sellerRepository.GetByIdAsync(id);
+        var user = await sellerRepository.GetByIdAsync(id , includeProperties: q => q.Include(x => x.OnlineHouse).ThenInclude(x=>x.PaymentMethods));
         if (user is null)
         {
             return NotFound();

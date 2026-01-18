@@ -23,6 +23,7 @@ public class PaymentMethodSeeder
                 "PIX Manual",
                 EPaymentMethodType.PIXMANUAL,
                 "",
+                "",
                 "https://exemplo.com/qrcode.png",
                 "Escaneie o QR Code e envie o comprovante para o suporte.",
                 true,
@@ -35,6 +36,7 @@ public class PaymentMethodSeeder
                 "SEU_TOKEN_PADRAO_SE_FOR_APLICÁVEL",
                 "",
                 "",
+                "",
                 false,
                 onlineHouseId
             ),
@@ -43,6 +45,7 @@ public class PaymentMethodSeeder
                 "Crypto",
                 EPaymentMethodType.CRYPTO,
                 "SEU_TOKEN_PADRAO_SE_FOR_APLICÁVEL",
+                "",
                 "",
                 "",
                 false,

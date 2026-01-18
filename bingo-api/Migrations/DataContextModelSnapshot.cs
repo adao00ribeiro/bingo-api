@@ -8,6 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using bingo_api.src.Context;
 using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Structs;
+using bingo_api.src.Structs.OnlineHouse;
 
 #nullable disable
 
@@ -573,12 +574,17 @@ namespace bingo_api.Migrations
 
                     b.Property<Guid>("OnlineHouseId")
                         .HasColumnType("uuid")
-                        .HasColumnName("seller_id");
+                        .HasColumnName("online_house_id");
+
+                    b.Property<string>("PixPayload")
+                        .HasMaxLength(500)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("QrCodeUrl")
                         .HasMaxLength(500)
                         .IsUnicode(false)
-                        .HasColumnType("character varying(500)")
+                        .HasColumnType("text")
                         .HasColumnName("qrcode_url");
 
                     b.Property<string>("Token")
@@ -1781,8 +1787,7 @@ namespace bingo_api.Migrations
                     b.Navigation("BotConfig")
                         .IsRequired();
 
-                    b.Navigation("MediaAttachment")
-                        .IsRequired();
+                    b.Navigation("MediaAttachment");
 
                     b.Navigation("RoomsSellers");
 

@@ -51,8 +51,8 @@ public class OnlineHouseMap : IEntityTypeConfiguration<OnlineHouse>
             .HasColumnName("settings")
             .HasColumnType("jsonb")
             .HasDefaultValueSql("'{}'::jsonb");
-        /*
-   // Relationships
+
+ 
    builder.HasMany(x => x.Punters)
        .WithOne(p => p.OnlineHouse)
        .HasForeignKey(p => p.OnlineHouseId)
@@ -62,12 +62,12 @@ public class OnlineHouseMap : IEntityTypeConfiguration<OnlineHouse>
        .WithOne(r => r.Owner)
        .HasForeignKey(r => r.OwnerId)
        .OnDelete(DeleteBehavior.Cascade);
-
+  
    builder.HasMany(x => x.PaymentMethods)
        .WithOne(pm => pm.OnlineHouse)
        .HasForeignKey(pm => pm.OnlineHouseId)
        .OnDelete(DeleteBehavior.Cascade);
-       */
+  
 
         //      builder.Ignore(x => x.NavBarMediaAttachment);
         //      builder.Ignore(x => x.LoginLogoMediaAttachment);

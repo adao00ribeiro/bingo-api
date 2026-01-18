@@ -24,4 +24,3 @@ public class ScratchPrize : Entity
     }
 
 }
-public record ScratchPrizeCreatedDomainEvent(ScratchPrize Prize) : IDomainEvent;

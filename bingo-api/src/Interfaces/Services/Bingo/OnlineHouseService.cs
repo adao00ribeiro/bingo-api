@@ -1,16 +1,14 @@
 using bingo_api.src.Context;
 using bingo_api.src.Entities.Bingo;
+using bingo_api.src.Repositories.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Interfaces.Services.Bingo;
 
-public class OnlineHouseService
+public class OnlineHouseService : RepositoryBase<OnlineHouse>
 {
-    protected readonly DataContext Context;
-
-    public OnlineHouseService(DataContext dataContext)
+     public OnlineHouseService(DataContext dataContext) : base(dataContext)
     {
-        this.Context = dataContext;
     }
 
     internal async Task<OnlineHouse?> GetByHostnameAsync(string hostname)
@@ -20,5 +18,5 @@ public class OnlineHouseService
             .Include(oh => oh.Seller) // traz os dados do seller junto
             .FirstOrDefaultAsync(oh => oh.Hostname.ToLower() == hostname.ToLower());
     }
-
+  
 }
