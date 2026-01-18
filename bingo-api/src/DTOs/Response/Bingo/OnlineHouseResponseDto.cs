@@ -15,10 +15,11 @@ public record OnlineHouseResponseDto : EntityResponseDto
     public IEnumerable<RoomResponseDto> OwnerRooms { get; set; }
     public IEnumerable<RoomSellerResponseDto> ParticipantRooms { get; set; }
 
+    public IEnumerable<PaymentMethodResponseDto> PaymentMethods { get; set; } = new List<PaymentMethodResponseDto>();
     
 
     protected OnlineHouseResponseDto(Guid id, string name, string hostname, OnlineHouseSettings settings, Guid sellerId, DateTime CreatedAt,
-        DateTime UpdatedAt, IEnumerable<RoomResponseDto> ownerRooms, IEnumerable<RoomSellerResponseDto> participantRooms)
+        DateTime UpdatedAt, IEnumerable<RoomResponseDto> ownerRooms, IEnumerable<RoomSellerResponseDto> participantRooms , IEnumerable<PaymentMethodResponseDto> paymentMethods)
     : base(id, CreatedAt, UpdatedAt)
     {
         Id = id;
@@ -28,12 +29,14 @@ public record OnlineHouseResponseDto : EntityResponseDto
         SellerId = sellerId;
         OwnerRooms = ownerRooms;
         ParticipantRooms = participantRooms;
+        PaymentMethods = paymentMethods;
     }
 
     internal static OnlineHouseResponseDto ConvertToDto(OnlineHouse onlineHouse)
     {
         var ownerRoomsReponse = onlineHouse.OwnerRooms?.Select(r => RoomResponseDto.ConvertToDtoToOnlineHouse(r)) ?? Enumerable.Empty<RoomResponseDto>();
         var participantRoomsReponse = onlineHouse.ParticipantRooms?.Select(r => RoomSellerResponseDto.ConvertToDtoToOnlineHouse(r)) ?? Enumerable.Empty<RoomSellerResponseDto>();
+        var paymentReponse = onlineHouse.PaymentMethods?.Select(r => PaymentMethodResponseDto.ConvertToDtoToOnlineHouse(r)) ?? Enumerable.Empty<PaymentMethodResponseDto>();
 
         return new OnlineHouseResponseDto(
             onlineHouse.Id,
@@ -44,7 +47,8 @@ public record OnlineHouseResponseDto : EntityResponseDto
             onlineHouse.CreatedAt,
             onlineHouse.UpdatedAt,
             ownerRoomsReponse,
-            participantRoomsReponse
+            participantRoomsReponse,
+            paymentReponse
         );
     }
 }

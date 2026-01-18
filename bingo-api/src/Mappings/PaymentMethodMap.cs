@@ -40,7 +40,7 @@ public class PaymentMethodMap : IEntityTypeConfiguration<PaymentMethod>
 
         builder.Property(pm => pm.QrCodeUrl)
                .HasColumnName("qrcode_url")
-               .HasMaxLength(500)
+               .HasColumnType("text")   // 🔥 IMPORTANTE
                .IsRequired(false);
 
         builder.Property(pm => pm.Instructions)
@@ -54,7 +54,7 @@ public class PaymentMethodMap : IEntityTypeConfiguration<PaymentMethod>
                .IsRequired();
 
         builder.Property(pm => pm.OnlineHouseId)
-               .HasColumnName("seller_id")
+               .HasColumnName("online_house_id")
                .IsRequired();
 
         builder.HasOne(pm => pm.OnlineHouse)

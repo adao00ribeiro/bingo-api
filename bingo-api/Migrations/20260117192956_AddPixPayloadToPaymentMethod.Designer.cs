@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using bingo_api.src.Context;
@@ -15,9 +16,11 @@ using bingo_api.src.Structs.OnlineHouse;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260117192956_AddPixPayloadToPaymentMethod")]
+    partial class AddPixPayloadToPaymentMethod
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -574,7 +577,7 @@ namespace bingo_api.Migrations
 
                     b.Property<Guid>("OnlineHouseId")
                         .HasColumnType("uuid")
-                        .HasColumnName("online_house_id");
+                        .HasColumnName("seller_id");
 
                     b.Property<string>("PixPayload")
                         .HasMaxLength(500)
@@ -584,7 +587,7 @@ namespace bingo_api.Migrations
                     b.Property<string>("QrCodeUrl")
                         .HasMaxLength(500)
                         .IsUnicode(false)
-                        .HasColumnType("text")
+                        .HasColumnType("character varying(500)")
                         .HasColumnName("qrcode_url");
 
                     b.Property<string>("Token")

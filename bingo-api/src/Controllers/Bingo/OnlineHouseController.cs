@@ -31,7 +31,7 @@ public class OnlineHouseController(OnlineHouseService onlineHouseService) : ApiC
     }
     [Authorize]
     [HttpPatch("{id}")]
-    public async Task<IActionResult> Patch(Guid id, [FromBody] IOnlineHousePatchRequestDto request)
+    public async Task<IActionResult> Patch(Guid id, [FromBody] OnlineHousePatchRequestDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
