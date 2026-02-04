@@ -11,10 +11,10 @@ public record PaymentMethodResponseDto
     public string? PixPayload { get; set; } // Copia e Cola
     public string? QrCodeUrl { get; set; } // Usado no Pix
     public string? Instructions { get; set; } // Texto adicional
-    public bool Active { get; set; } 
+    public bool Active { get; set; }
     public Guid OnlineHouseId { get; set; }
 
- 
+
     internal static object ConvertToDto(object room)
     {
         throw new NotImplementedException();
@@ -22,16 +22,16 @@ public record PaymentMethodResponseDto
 
     internal static PaymentMethodResponseDto ConvertToDtoToOnlineHouse(PaymentMethod r)
     {
-      return new PaymentMethodResponseDto
-      {
-          Id = r.Id,
-          Name = r.Name,
-          Type = r.Type,
-          PixPayload = r.PixPayload,
-          QrCodeUrl = r.QrCodeUrl,
-          Instructions = r.Instructions,
-          Active = r.Active
-         
-      };
+        return new PaymentMethodResponseDto
+        {
+            Id = r.Id,
+            Name = r.Name,
+            Type = r.Type,
+            PixPayload = r.PixPayload,
+            QrCodeUrl = r.QrCodeUrl,
+            Instructions = r.Instructions,
+            Active = r.Active
+
+        };
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 namespace bingo_api.src.DTOs.Response;
+
 public record UserResponseDto
 {
     public Guid Id { get; set; }

@@ -43,7 +43,7 @@ public class Punter : Entity, ITransactionParticipant
     {
         this.Email = email;
         this.Name = name;
-        this.Cpf =  NormalizeCpf(cpf);
+        this.Cpf = NormalizeCpf(cpf);
         this.DateBirth = datebirth;
         this.OnlineHouseId = onlineHouseId;
         this.IndicateTag = "";
@@ -51,7 +51,7 @@ public class Punter : Entity, ITransactionParticipant
         this.IsBot = isBot;
     }
 
-     private static string NormalizeCpf(string cpf)
+    private static string NormalizeCpf(string cpf)
     {
         if (string.IsNullOrWhiteSpace(cpf))
             throw new ArgumentException("CPF é obrigatório");

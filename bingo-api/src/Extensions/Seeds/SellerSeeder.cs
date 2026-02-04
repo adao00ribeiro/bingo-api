@@ -38,7 +38,7 @@ public class SellerSeeder : IDataSeeder
 
         if (seller == null)
         {
-           seller = new Seller
+            seller = new Seller
             {
                 Balance = 0,
                 Email = SellerEmail,

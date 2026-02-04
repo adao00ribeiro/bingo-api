@@ -49,7 +49,7 @@ public class PaymentController(IPaymentService paymentService) : ApiControllerBa
         }
         var json = JsonSerializer.Serialize(updates);
 
-        Console.WriteLine("ARROMBADO"+json);
+        Console.WriteLine("ARROMBADO" + json);
         await _paymentService.UpdatePartialAsync(id, updates);
 
         return Ok(true);

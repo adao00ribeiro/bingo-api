@@ -27,7 +27,7 @@ public record SellerResponseDto : EntityResponseDto
 
     internal static SellerResponseDto ConvertToDto(Seller seller)
     {
-       var onlineReponse =  seller.OnlineHouse != null ?   OnlineHouseResponseDto.ConvertToDto(seller.OnlineHouse) : null;
+        var onlineReponse = seller.OnlineHouse != null ? OnlineHouseResponseDto.ConvertToDto(seller.OnlineHouse) : null;
         return new SellerResponseDto(
             seller.Id,
             seller.Balance,

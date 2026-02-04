@@ -7,11 +7,11 @@ namespace bingo_api.src.Entities.Bingo;
 public class OnlineHouse : Entity
 {
     public string Name { get; set; }
-    public string Hostname { get; set; } 
-   // public MediaAttachment? NavBarMediaAttachment { get; set; }
-   // public MediaAttachment? LoginLogoMediaAttachment { get; set; }
+    public string Hostname { get; set; }
+    // public MediaAttachment? NavBarMediaAttachment { get; set; }
+    // public MediaAttachment? LoginLogoMediaAttachment { get; set; }
     public Guid SellerId { get; set; }
-    public Seller Seller { get; set; } 
+    public Seller Seller { get; set; }
     public OnlineHouseSettings Settings { get; set; } = new();
     public IEnumerable<Punter> Punters { get; set; } = new List<Punter>();
     public IEnumerable<Room> OwnerRooms { get; set; } = new List<Room>();

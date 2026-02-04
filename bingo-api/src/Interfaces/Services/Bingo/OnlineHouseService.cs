@@ -7,7 +7,7 @@ namespace bingo_api.src.Interfaces.Services.Bingo;
 
 public class OnlineHouseService : RepositoryBase<OnlineHouse>
 {
-     public OnlineHouseService(DataContext dataContext) : base(dataContext)
+    public OnlineHouseService(DataContext dataContext) : base(dataContext)
     {
     }
 
@@ -18,5 +18,5 @@ public class OnlineHouseService : RepositoryBase<OnlineHouse>
             .Include(oh => oh.Seller) // traz os dados do seller junto
             .FirstOrDefaultAsync(oh => oh.Hostname.ToLower() == hostname.ToLower());
     }
-  
+
 }

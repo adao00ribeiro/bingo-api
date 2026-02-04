@@ -18,11 +18,11 @@ public record SellerResponseToPunterDto
     }
     internal static SellerResponseToPunterDto ConvertToDtoInPunter(Seller seller)
     {
-        
+
         return new SellerResponseToPunterDto(
             seller.Id,
             seller.Email
-        
+
 
         );
     }

@@ -7,19 +7,19 @@ namespace bingo_api.src.DTOs.Response.Bingo;
 public record OnlineHouseResponseDto : EntityResponseDto
 {
     public string Name { get; set; }
-    public string Hostname { get; set; } 
+    public string Hostname { get; set; }
     public Guid SellerId { get; set; }
-    public SellerResponseDto Seller { get; set; } 
+    public SellerResponseDto Seller { get; set; }
     public OnlineHouseSettings Settings { get; set; }
     public IEnumerable<PunterResponseDto> Punters { get; set; }
     public IEnumerable<RoomResponseDto> OwnerRooms { get; set; }
     public IEnumerable<RoomSellerResponseDto> ParticipantRooms { get; set; }
 
     public IEnumerable<PaymentMethodResponseDto> PaymentMethods { get; set; } = new List<PaymentMethodResponseDto>();
-    
+
 
     protected OnlineHouseResponseDto(Guid id, string name, string hostname, OnlineHouseSettings settings, Guid sellerId, DateTime CreatedAt,
-        DateTime UpdatedAt, IEnumerable<RoomResponseDto> ownerRooms, IEnumerable<RoomSellerResponseDto> participantRooms , IEnumerable<PaymentMethodResponseDto> paymentMethods)
+        DateTime UpdatedAt, IEnumerable<RoomResponseDto> ownerRooms, IEnumerable<RoomSellerResponseDto> participantRooms, IEnumerable<PaymentMethodResponseDto> paymentMethods)
     : base(id, CreatedAt, UpdatedAt)
     {
         Id = id;

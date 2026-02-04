@@ -7,7 +7,7 @@ namespace bingo_api.src.Application.Handlers;
 
 public class PixPayloadUpdatedHandler : IDomainEventHandler<PixPayloadUpdatedEvent>
 {
-     private readonly DataContext _context;
+    private readonly DataContext _context;
 
     public PixPayloadUpdatedHandler(DataContext context)
     {
@@ -15,15 +15,15 @@ public class PixPayloadUpdatedHandler : IDomainEventHandler<PixPayloadUpdatedEve
     }
     public async Task HandleAsync(PixPayloadUpdatedEvent domainEvent)
     {
-         var paymentMethod = domainEvent.PaymentMethod;
+        var paymentMethod = domainEvent.PaymentMethod;
 
         if (string.IsNullOrEmpty(paymentMethod.PixPayload))
             return;
 
         var qrCode = PixQrCodeService.GerarQrCodeBase64(paymentMethod.PixPayload);
-        paymentMethod.QrCodeUrl =  qrCode;
+        paymentMethod.QrCodeUrl = qrCode;
         paymentMethod.UpdatedAt = DateTime.UtcNow;
 
-         await _context.SaveChangesWithoutEventsAsync(); // ✅ grava as alterações
-        }
+        await _context.SaveChangesWithoutEventsAsync(); // ✅ grava as alterações
+    }
 }

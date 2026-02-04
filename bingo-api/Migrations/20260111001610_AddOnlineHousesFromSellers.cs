@@ -7,9 +7,9 @@ namespace bingo_api.Migrations
     /// <inheritdoc />
     public partial class AddOnlineHousesFromSellers : Migration
     {
-          protected override void Up(MigrationBuilder migrationBuilder)
-    {
-        migrationBuilder.Sql("""
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.Sql("""
             INSERT INTO online_houses (
                 id,
                 name,
@@ -32,11 +32,11 @@ namespace bingo_api.Migrations
                 WHERE oh.seller_id = s.id
             );
         """);
-    }
+        }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
-    {
-        migrationBuilder.Sql("""
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.Sql("""
             DELETE FROM online_houses oh
             WHERE EXISTS (
                 SELECT 1
@@ -44,6 +44,6 @@ namespace bingo_api.Migrations
                 WHERE s.id = oh."SellerId"
             );
         """);
-    }
+        }
     }
 }
