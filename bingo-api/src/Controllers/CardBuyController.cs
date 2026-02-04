@@ -6,6 +6,7 @@ using bingo_api.src.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.src.Controllers;
+
 [ApiVersion("1.0")]
 public class CardBuyController(ICardBuyService _cardBuyService) : ApiControllerBase
 {

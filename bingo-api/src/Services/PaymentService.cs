@@ -33,17 +33,17 @@ public class PaymentService : RepositoryBase<PaymentMethod>, IPaymentService
 
     public async Task SetActiveCurrentPayment(Guid sellerId)
     {
-       await Context.PaymentMethods
-    .Where(x =>
-        x.Type != EPaymentMethodType.CRYPTO &&
-        Context.OnlineHouses
-            .Where(h => h.SellerId == sellerId)
-            .Select(h => h.Id)
-            .Contains(x.OnlineHouseId)
-    )
-    .ExecuteUpdateAsync(setters =>
-        setters.SetProperty(p => p.Active, false)
-    );
+        await Context.PaymentMethods
+     .Where(x =>
+         x.Type != EPaymentMethodType.CRYPTO &&
+         Context.OnlineHouses
+             .Where(h => h.SellerId == sellerId)
+             .Select(h => h.Id)
+             .Contains(x.OnlineHouseId)
+     )
+     .ExecuteUpdateAsync(setters =>
+         setters.SetProperty(p => p.Active, false)
+     );
     }
 
 }

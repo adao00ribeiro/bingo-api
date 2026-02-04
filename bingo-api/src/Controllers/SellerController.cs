@@ -31,7 +31,7 @@ public class SellerController(ISellerRepository _sellerRepository) : ApiControll
          bool? enabledScratch = null
         )
     {
-        
+
         var sellers = await sellerRepository.GetAllAsync(pageNumber: page);
         var sellerDtos = sellers.Select(s => SellerResponseDto.ConvertToDto(s)).ToList();
         var totalCount = await sellerRepository.CountAsync();
@@ -52,7 +52,7 @@ public class SellerController(ISellerRepository _sellerRepository) : ApiControll
     [HttpGet("id/{id}")]
     public async Task<ActionResult<SellerResponseDto>> GetById(Guid id)
     {
-        var user = await sellerRepository.GetByIdAsync(id , includeProperties: q => q.Include(x => x.OnlineHouse).ThenInclude(x=>x.PaymentMethods));
+        var user = await sellerRepository.GetByIdAsync(id, includeProperties: q => q.Include(x => x.OnlineHouse).ThenInclude(x => x.PaymentMethods));
         if (user is null)
         {
             return NotFound();

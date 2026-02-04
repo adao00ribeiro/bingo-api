@@ -12,17 +12,17 @@ public class MediaAttachmentRepository : RepositoryBase<MediaAttachment>, IMedia
     {
     }
 
-   public async Task<List<MediaAttachment>> GetForAsync<TEntity>(
-    IEnumerable<Guid> entityIds
-)
-{
-    var entityType = typeof(TEntity).Name;
+    public async Task<List<MediaAttachment>> GetForAsync<TEntity>(
+     IEnumerable<Guid> entityIds
+ )
+    {
+        var entityType = typeof(TEntity).Name;
 
-    return await Context.Set<MediaAttachment>()
-        .Where(x =>
-            entityIds.Contains(x.EntityId) &&
-            x.EntityType == entityType
-        )
-        .ToListAsync();
-}
+        return await Context.Set<MediaAttachment>()
+            .Where(x =>
+                entityIds.Contains(x.EntityId) &&
+                x.EntityType == entityType
+            )
+            .ToListAsync();
+    }
 }
