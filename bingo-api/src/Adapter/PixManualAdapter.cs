@@ -6,14 +6,18 @@ namespace bingo_api.src.Adapter;
 
 public class PixManualAdapter : IPaymentProvider
 {
-    public Task<Recharge> CreateRechargeAsync(decimal value, decimal amount, Punter punter, PaymentMethod method, string? network = null, string? Token = null, string? destinationAddress = null, string? txHash = null)
+     public Task<PaymentGatewayResult> CreatePaymentAsync(
+        Recharge recharge,
+        Punter punter,
+        PaymentMethod method,
+        CancellationToken cancellationToken = default)
     {
-        var recharge = new Recharge(value, amount, EPaymentStatus.PENDING, punter.Id)
+        return Task.FromResult(new PaymentGatewayResult
         {
-            Qrcode = method.PixPayload,
-            ImagemQrcode = method.QrCodeUrl
-        };
-
-        return Task.FromResult(recharge);
+            GatewayTransactionId = recharge.Id.ToString(),
+            Status = EPaymentStatus.WAITING_PAYMENT,
+            QrCode = method.PixPayload,
+            QrImageUrl = method.QrCodeUrl
+        });
     }
 }

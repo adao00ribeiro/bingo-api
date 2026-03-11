@@ -4,44 +4,159 @@ using bingo_api.src.Enums;
 
 namespace bingo_api.src.Entities;
 
-
-
-//mudar para BalanceOperation 
 public class Recharge : Entity
 {
-    public string? Network { get; set; }  // "Ethereum", "Bsc", etc.
-    public string? Token { get; set; }  // "USDT", "USDC", etc.
-    public string? DestinationAddress { get; set; }  // address where the user should send the tokens
-    public string? TxHash { get; set; } // transaction hash sent by the user
-    public DateTime? ConfirmedAt { get; set; } // date/time it was confirmed
-    public decimal Value { get; set; }
-    public decimal Amount { get; set; }
-    public EPaymentStatus Status { get; set; } = EPaymentStatus.PENDING;
-    public string Qrcode { get; set; }
-    public string ImagemQrcode { get; set; }
-    public Guid PunterId { get; set; }
-    public Punter Punter { get; set; }
-    public bool IsConfirmed => ConfirmedAt.HasValue; // calculated property
+    // 🔹 Gateway
+    public string? GatewayTransactionId { get; private set; }
+    public DateTime? ExpiresAt { get; private set; }
 
+    // 🔹 Crypto
+    public string? Network { get; private set; }
+    public string? Token { get; private set; }
+    public string? DestinationAddress { get; private set; }
+    public string? TxHash { get; private set; }
 
-    public Recharge(decimal value, decimal amount, EPaymentStatus status, Guid punterId)
+    // 🔹 PIX / QR
+    public string? Qrcode { get; private set; }
+    public string? ImagemQrcode { get; private set; }
+
+    // 🔹 Controle
+    public DateTime? ConfirmedAt { get; private set; }
+    public DateTime? CreditedAt { get; private set; }
+
+    public decimal Value { get; private set; }
+    public decimal Amount { get; private set; }
+
+    public EPaymentStatus Status { get; private set; }
+
+    public Guid PunterId { get; private set; }
+    public Punter Punter { get; private set; } = null!;
+
+    public bool IsConfirmed => Status == EPaymentStatus.CONFIRMED || Status == EPaymentStatus.CREDITED;
+    public bool IsCredited => Status == EPaymentStatus.CREDITED;
+
+    protected Recharge() { } // EF
+
+    public Recharge(decimal value, decimal amount, Guid punterId)
     {
-        this.Value = value;
-        this.Amount = amount;
-        this.Status = status;
-        this.Qrcode = "";
-        this.ImagemQrcode = "";
-        this.PunterId = punterId;
+        Value = value;
+        Amount = amount;
+        PunterId = punterId;
+        Status = EPaymentStatus.CREATED;
     }
 
-    public Recharge(QrCodeResponse qrCodeResponse, Guid punterId)
-    {
+    // =========================================================
+    // 🔹 Gateway Initialization
+    // =========================================================
 
-        this.Id = qrCodeResponse.Id;
-        this.Value = qrCodeResponse.Value / 100;
-        this.Status = EPaymentStatus.PENDING;
-        this.Qrcode = qrCodeResponse.QrCode;
-        this.ImagemQrcode = qrCodeResponse.QrCodeBase64;
-        this.PunterId = punterId;
+    public void SetGatewayData(PaymentGatewayResult result)
+    {
+        if (result == null)
+            throw new ArgumentNullException(nameof(result));
+
+        GatewayTransactionId = result.GatewayTransactionId;
+        Qrcode = result.QrCode;
+        ImagemQrcode = result.QrImageUrl;
+        DestinationAddress = result.WalletAddress;
+        Network = result.Network;
+        //Token = result.Token;
+        ExpiresAt = result.ExpiresAt;
+
+        Status = EPaymentStatus.WAITING_PAYMENT;
+    }
+
+    // =========================================================
+    // 🔹 Webhook → Confirma pagamento no gateway
+    // =========================================================
+
+    public void ConfirmFromGateway(string? txHash = null)
+    {
+        if (Status == EPaymentStatus.CREDITED)
+            return; // idempotência real
+
+        if (Status == EPaymentStatus.CONFIRMED)
+            return;
+
+        if (Status is EPaymentStatus.FAILED or 
+            EPaymentStatus.CANCELED or 
+            EPaymentStatus.EXPIRED)
+            throw new InvalidOperationException("Recharge cannot be confirmed.");
+
+        TxHash = txHash;
+        ConfirmedAt = DateTime.UtcNow;
+        Status = EPaymentStatus.CONFIRMED;
+    }
+
+    // =========================================================
+    // 🔹 Crédito interno (após criar TransactionHistory)
+    // =========================================================
+
+    public void MarkAsCredited()
+    {
+        if (Status != EPaymentStatus.CONFIRMED)
+            throw new InvalidOperationException("Recharge must be confirmed before crediting.");
+
+        CreditedAt = DateTime.UtcNow;
+        Status = EPaymentStatus.CREDITED;
+    }
+
+    // =========================================================
+    // 🔹 Falhas
+    // =========================================================
+
+    public void MarkAsFailed()
+    {
+        if (IsCredited)
+            throw new InvalidOperationException("Cannot fail a credited recharge.");
+
+        Status = EPaymentStatus.FAILED;
+    }
+
+    public void MarkAsExpired()
+    {
+        if (IsCredited)
+            return;
+
+        Status = EPaymentStatus.EXPIRED;
+    }
+
+    public void Cancel()
+    {
+        if (IsCredited)
+            throw new InvalidOperationException("Cannot cancel a credited recharge.");
+
+        Status = EPaymentStatus.CANCELED;
+    }
+
+    // =========================================================
+    // 🔹 Map Gateway Status
+    // =========================================================
+
+    public static EPaymentStatus MapStatus(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+            return EPaymentStatus.WAITING_PAYMENT;
+
+        status = status.ToLowerInvariant();
+
+        return status switch
+        {
+            "paid" or "completed" or "approved" or "aprovado"
+                => EPaymentStatus.CONFIRMED,
+
+            "failed"
+                => EPaymentStatus.FAILED,
+
+            "canceled"
+                => EPaymentStatus.CANCELED,
+
+            "expired"
+                => EPaymentStatus.EXPIRED,
+
+            "pending"
+                => EPaymentStatus.WAITING_PAYMENT,
+
+            _ => EPaymentStatus.WAITING_PAYMENT
+        };
     }
 }

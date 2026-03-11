@@ -1,4 +1,3 @@
-using bingo_api.src.Enums;
 using bingo_api.src.Entities;
 using bingo_api.src.Interfaces.Services;
 
@@ -6,15 +5,18 @@ namespace bingo_api.src.Adapter;
 
 public class CryptoAdapter : IPaymentProvider
 {
-    public Task<Recharge> CreateRechargeAsync(decimal value, decimal amount, Punter punter, PaymentMethod method, string? network = null, string? Token = null, string? destinationAddress = null, string? txHash = null)
+        public Task<PaymentGatewayResult> CreatePaymentAsync(
+        Recharge recharge,
+        Punter punter,
+        PaymentMethod method,
+        CancellationToken cancellationToken = default)
     {
-        var recharge = new Recharge(value, amount, EPaymentStatus.PENDING, punter.Id)
+        return Task.FromResult(new PaymentGatewayResult
         {
-            DestinationAddress = destinationAddress,
-            TxHash = txHash,
-            Network = network,
-            Token = Token,
-        };
-        return Task.FromResult(recharge);
+            GatewayTransactionId = recharge.Id.ToString(),
+            Status = Enums.EPaymentStatus.WAITING_PAYMENT,
+           // WalletAddress = method.WalletAddress,
+           // Network = method.Network
+        });
     }
 }
