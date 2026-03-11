@@ -10,51 +10,33 @@ public class ScratchPrizeMap : IEntityTypeConfiguration<ScratchPrize>
     {
         builder.ToTable("scratch_prizes");
 
-        // Chave primária
         builder.HasKey(x => x.Id);
 
-        // Descrição do prêmio
-        builder.Property(x => x.Description)
-               .HasColumnName("description")
-               .IsRequired()
-               .HasMaxLength(200);
+        builder.Property(x => x.Value)
+            .HasColumnName("value")
+            .HasColumnType("numeric(12,2)")
+            .IsRequired();
 
-        // Valor do prêmio
-        builder.Property(x => x.Amount)
-               .HasColumnName("amount")
-               .IsRequired()
-               .HasColumnType("numeric(12,2)");
-
-        // ID do jogo
-        builder.Property(x => x.ScratchGameId)
-               .HasColumnName("scratch_game_id")
-               .IsRequired();
-
-        // ID do bilhete
         builder.Property(x => x.ScratchTicketId)
-               .HasColumnName("scratch_ticket_id")
-               .IsRequired();
+            .HasColumnName("scratch_ticket_id")
+            .IsRequired();
 
-        // Timestamps
         builder.Property(x => x.CreatedAt)
-               .HasColumnName("created_at")
-               .IsRequired()
-               .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            .HasColumnName("created_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .IsRequired();
 
         builder.Property(x => x.UpdatedAt)
-               .HasColumnName("updated_at")
-               .IsRequired()
-               .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-        // Relacionamentos
-        builder.HasOne(x => x.ScratchGame)
-               .WithMany(g => g.ScratchPrizes)
-               .HasForeignKey(x => x.ScratchGameId)
-               .OnDelete(DeleteBehavior.Cascade);
+            .HasColumnName("updated_at")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .IsRequired();
 
         builder.HasOne(x => x.ScratchTicket)
-               .WithOne(t => t.ScratchPrize)
-               .HasForeignKey<ScratchPrize>(x => x.ScratchTicketId)
-               .OnDelete(DeleteBehavior.Cascade);
+            .WithOne(x => x.ScratchPrize)
+            .HasForeignKey<ScratchPrize>(x => x.ScratchTicketId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(x => x.ScratchTicketId)
+            .IsUnique();
     }
 }

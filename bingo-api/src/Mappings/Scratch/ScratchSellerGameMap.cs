@@ -10,22 +10,33 @@ public class ScratchSellerGameMap : IEntityTypeConfiguration<ScratchSellerGame>
     {
         builder.ToTable("scratch_seller_games");
 
-        // Chave primária
         builder.HasKey(x => x.Id);
 
-        builder.HasIndex(x => new { x.SellerId, x.ScratchGameId })
+        builder.HasIndex(x => new { x.OnlineHouseId, x.ScratchGameId })
                .IsUnique();
-        // ID do vendedor
-        builder.Property(x => x.SellerId)
-               .HasColumnName("seller_id")
+
+        builder.Property(x => x.OnlineHouseId)
+               .HasColumnName("online_house_id")
                .IsRequired();
 
-        // ID do jogo
         builder.Property(x => x.ScratchGameId)
                .HasColumnName("scratch_game_id")
                .IsRequired();
 
-        // Timestamps
+        builder.Property(x => x.Title)
+               .HasColumnName("title")
+               .HasMaxLength(150)
+               .IsRequired();
+
+        builder.Property(x => x.Subtitle)
+               .HasColumnName("subtitle")
+               .HasMaxLength(200);
+
+        builder.Property(x => x.CardValue)
+               .HasColumnName("card_value")
+               .HasColumnType("numeric(15,2)")
+               .IsRequired();
+
         builder.Property(x => x.CreatedAt)
                .HasColumnName("created_at")
                .IsRequired()
@@ -36,20 +47,19 @@ public class ScratchSellerGameMap : IEntityTypeConfiguration<ScratchSellerGame>
                .IsRequired()
                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        // Relacionamentos
-        builder.HasOne(x => x.Seller)
+        builder.HasOne(x => x.OnlineHouse)
                .WithMany()
-               .HasForeignKey(x => x.SellerId)
+               .HasForeignKey(x => x.OnlineHouseId)
                .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.ScratchGame)
-               .WithMany(g => g.ScratchSellerGames)
+               .WithMany(x => x.ScratchSellerGames)
                .HasForeignKey(x => x.ScratchGameId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(x => x.ScratchTickets)
-               .WithOne(t => t.ScratchSellerGame)
-               .HasForeignKey(t => t.ScratchSellerGameId)
+        builder.HasMany(x => x.ScratchBuys)
+               .WithOne(x => x.ScratchSellerGame)
+               .HasForeignKey(x => x.ScratchSellerGameId)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }
