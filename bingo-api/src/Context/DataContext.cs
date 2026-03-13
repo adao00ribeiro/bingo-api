@@ -31,6 +31,7 @@ public class DataContext : DbContext
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<ScratchGame> ScratchGames { get; set; }
     public DbSet<ScratchGameOverride> ScratchGameOverrides { get; set; }
+    public DbSet<ScratchBuy> ScratchBuys { get; set; }
     public DbSet<ScratchTicket> ScratchTickets { get; set; }
     public DbSet<ScratchPrize> ScratchPrizes { get; set; }
     public DbSet<Withdrawal> Withdrawals { get; set; }
