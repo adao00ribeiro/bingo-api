@@ -30,7 +30,7 @@ public class DataContext : DbContext
     public DbSet<TransactionHistory> TransactionHistories { get; set; }
     public DbSet<PaymentMethod> PaymentMethods { get; set; }
     public DbSet<ScratchGame> ScratchGames { get; set; }
-    public DbSet<ScratchSellerGame> ScratchSellerGames { get; set; }
+    public DbSet<ScratchGameOverride> ScratchGameOverrides { get; set; }
     public DbSet<ScratchTicket> ScratchTickets { get; set; }
     public DbSet<ScratchPrize> ScratchPrizes { get; set; }
     public DbSet<Withdrawal> Withdrawals { get; set; }
