@@ -57,7 +57,7 @@ public class ScratchGameMap : IEntityTypeConfiguration<ScratchGame>
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .IsRequired();
 
-        builder.HasMany(x => x.ScratchSellerGames)
+        builder.HasMany(x => x.ScratchGameOverrides)
             .WithOne(x => x.ScratchGame)
             .HasForeignKey(x => x.ScratchGameId)
             .OnDelete(DeleteBehavior.Cascade);

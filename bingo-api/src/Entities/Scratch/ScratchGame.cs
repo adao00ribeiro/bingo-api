@@ -16,6 +16,6 @@ public class ScratchGame : Entity
     // Stored as array in PostgreSQL (if using Npgsql)
     public int[] AllowedMultipliers { get; set; }
     // Navigation
-    public IEnumerable<ScratchSellerGame> ScratchSellerGames { get; set; }
+    public IEnumerable<ScratchGameOverride> ScratchGameOverrides { get; set; }
 
 }
