@@ -6,29 +6,28 @@ namespace bingo_api.src.DTOs.Response.Scratch;
 
 public record ScratchTicketResponseDto
 {
-    public Guid Id { get; set; }
-    public int Multiplier { get; set; }
-    public decimal PrizeWon { get; set; }
-    public bool Revealed { get; set; }
-    public ScratchTicketAttributesDto? Attributes { get; set; }
-    public Guid ScratchSellerGameId { get; set; }
-    public ScratchSellerGameResponseDto? ScratchSellerGame { get; set; }
+   public Guid Id { get; set; }
 
-    internal static ScratchTicketResponseDto ConvertToDto(ScratchTicket entity)
+    public decimal Value { get; set; }
+
+    public ScratchAreaResponseDto Areas { get; set; }
+
+    public Guid? ScratchPrizeId { get; set; }
+
+    public Guid? ScratchBuyId { get; set; }
+
+    public decimal? PrizeValue { get; set; }
+
+    public static ScratchTicketResponseDto ConvertToDto(ScratchTicket entity)
     {
         return new ScratchTicketResponseDto
         {
             Id = entity.Id,
-            Multiplier = entity.Multiplier,
-            PrizeWon = entity.PrizeWon,
-            Revealed = entity.Revealed,
-            ScratchSellerGameId = entity.ScratchSellerGameId,
-            Attributes = entity.Attributes is null
-                ? null
-                : ScratchTicketAttributesDto.ConvertToDto(entity.Attributes),
-            ScratchSellerGame = entity.ScratchSellerGame is null
-                ? null
-                : ScratchSellerGameResponseDto.ConvertToDto(entity.ScratchSellerGame)
+            Value = entity.Value,
+            Areas = ScratchAreaResponseDto.ConvertToDto(entity.Areas),
+            ScratchPrizeId = entity.ScratchPrizeId,
+            ScratchBuyId = entity.ScratchBuyId,
+            PrizeValue = entity.ScratchPrize?.Value
         };
     }
 }
