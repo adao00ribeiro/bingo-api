@@ -8,7 +8,7 @@ public class ScratchGameOverrideMap : IEntityTypeConfiguration<ScratchGameOverri
 {
     public void Configure(EntityTypeBuilder<ScratchGameOverride> builder)
     {
-        builder.ToTable("scratch_seller_games");
+        builder.ToTable("scratch_game_overrides");
 
         builder.HasKey(x => x.Id);
 
@@ -59,8 +59,8 @@ public class ScratchGameOverrideMap : IEntityTypeConfiguration<ScratchGameOverri
                .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.ScratchBuys)
-               .WithOne(x => x.ScratchSellerGame)
-               .HasForeignKey(x => x.ScratchSellerGameId)
+               .WithOne(x => x.ScratchGameOverride)
+               .HasForeignKey(x => x.ScratchGameOverrideId)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }

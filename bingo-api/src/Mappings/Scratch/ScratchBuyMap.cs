@@ -21,8 +21,8 @@ public class ScratchBuyMap : IEntityTypeConfiguration<ScratchBuy>
                .HasColumnName("quantity")
                .IsRequired();
 
-        builder.Property(x => x.ScratchSellerGameId)
-               .HasColumnName("scratch_seller_game_id")
+        builder.Property(x => x.ScratchGameOverrideId)
+               .HasColumnName("scratch_game_override_id")
                .IsRequired();
 
         builder.Property(x => x.PunterId)
@@ -39,9 +39,9 @@ public class ScratchBuyMap : IEntityTypeConfiguration<ScratchBuy>
                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                .IsRequired();
 
-        builder.HasOne<ScratchSellerGame>()
+        builder.HasOne<ScratchGameOverride>()
                .WithMany(x => x.ScratchBuys)
-               .HasForeignKey(x => x.ScratchSellerGameId)
+               .HasForeignKey(x => x.ScratchGameOverrideId)
                .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(x => x.Punter)
@@ -54,7 +54,7 @@ public class ScratchBuyMap : IEntityTypeConfiguration<ScratchBuy>
                .HasForeignKey(x => x.ScratchBuyId)
                .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(x => x.ScratchSellerGameId);
+        builder.HasIndex(x => x.ScratchGameOverrideId);
         builder.HasIndex(x => x.PunterId);
     }
 }

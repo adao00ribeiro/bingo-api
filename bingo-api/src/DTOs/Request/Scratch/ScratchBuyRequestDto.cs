@@ -10,7 +10,7 @@ public class ScratchBuyRequestDto
     public int Quantity { get; set; }
 
     [Required(ErrorMessage = "ScratchGameId is required.")]
-    public Guid ScratchSellerGameId { get; set; }
+    public Guid ScratchGameOverrideId { get; set; }
 
     [Required(ErrorMessage = "PunterId is required.")]
     public Guid PunterId { get; set; }
@@ -18,7 +18,7 @@ public class ScratchBuyRequestDto
 
     internal static ScratchBuy ConvertToEntity(ScratchBuyRequestDto dto)
     {
-        return new ScratchBuy(dto.Quantity, dto.ScratchSellerGameId, dto.PunterId);
+        return new ScratchBuy(dto.Quantity, dto.ScratchGameOverrideId, dto.PunterId);
     }
 
 }
