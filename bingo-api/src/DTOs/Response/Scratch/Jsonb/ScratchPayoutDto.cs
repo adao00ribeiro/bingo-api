@@ -1,4 +1,4 @@
-using bingo_api.src.Extensions.Seeds;
+using bingo_api.src.Structs.Scratchcard;
 
 namespace bingo_api.src.DTOs.Response.Scratch.Jsonb;
 

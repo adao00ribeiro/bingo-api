@@ -7,29 +7,39 @@ namespace bingo_api.src.DTOs.Response.Scratch;
 
 public record ScratchGameResponseDto
 {
-    public Guid Id { get; set; }
-    public string? Name { get; set; }
-    public EScratchLayoutType? LayoutType { get; set; }
-    public decimal? Price { get; set; }
-    public decimal? MaxPrize { get; set; }
-    public decimal? Probability { get; set; }
-    public int[]? AllowedMultipliers { get; set; }
-    public ScratchGameAttributesDto? Attributes { get; set; }
+      public Guid Id { get; set; }
 
-    internal static ScratchGameResponseDto ConvertToDto(ScratchGame entity)
+    public string Name { get; set; }
+
+    public int QuantityToAward { get; set; }
+
+    public decimal Rtp { get; set; }
+
+    public int Rows { get; set; }
+
+    public int Cols { get; set; }
+
+    public string Component { get; set; }
+
+    public List<ScratchPayoutDto> PayoutTable { get; set; }
+
+    public int[] AllowedMultipliers { get; set; }
+
+    public static ScratchGameResponseDto ConvertToDto(ScratchGame entity)
     {
         return new ScratchGameResponseDto
         {
             Id = entity.Id,
             Name = entity.Name,
-            LayoutType = entity.LayoutType,
-            Price = entity.Price,
-            MaxPrize = entity.MaxPrize,
-            Probability = entity.Probability,
+            QuantityToAward = entity.QuantityToAward,
+            Rtp = entity.Rtp,
+            Rows = entity.Rows,
+            Cols = entity.Cols,
+            Component = entity.Component,
             AllowedMultipliers = entity.AllowedMultipliers,
-            Attributes = entity.Attributes is null
-                ? null
-                : ScratchGameAttributesDto.ConvertToDto(entity.Attributes)
+            PayoutTable = entity.PayoutTable
+                .Select(x => ScratchPayoutDto.ConvertToDto(x))
+                .ToList()
         };
     }
 }

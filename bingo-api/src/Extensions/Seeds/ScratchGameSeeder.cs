@@ -361,5 +361,5 @@ namespace bingo_api.src.Extensions.Seeds
         }
     }
 
-    public record ScratchPayout(double Probability, double Prize);
+
 }
