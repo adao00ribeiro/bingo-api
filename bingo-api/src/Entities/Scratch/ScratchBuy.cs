@@ -7,8 +7,8 @@ public class ScratchBuy : Entity
 {
     public decimal Value { get; set; }
     public int Quantity { get; set; }
-    public ScratchGameOverride ScratchGameOverride { get; set; }
     public Guid ScratchGameOverrideId { get;  set; }
+    public ScratchGameOverride  ScratchGameOverride { get; set; }
     public Punter Punter { get; set; }
     public Guid PunterId { get;  set; }
    public ICollection<ScratchTicket> ScratchTickets{ get;  set; }= new List<ScratchTicket>();

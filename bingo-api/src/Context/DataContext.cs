@@ -7,6 +7,7 @@ using bingo_api.src.Entities.Blockchain;
 using bingo_api.src.Entities.Scratch;
 using bingo_api.src.Entities.Shared;
 using bingo_api.src.Infrastructure;
+using bingo_api.src.Structs.Scratchcard;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.src.Context;
@@ -80,6 +81,7 @@ public class DataContext : DbContext
                 }
             }
         }
+          modelBuilder.Ignore<ScratchArea>();
         base.OnModelCreating(modelBuilder);
 
         /*

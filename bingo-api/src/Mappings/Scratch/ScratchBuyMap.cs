@@ -39,7 +39,7 @@ public class ScratchBuyMap : IEntityTypeConfiguration<ScratchBuy>
                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                .IsRequired();
 
-        builder.HasOne<ScratchGameOverride>()
+        builder.HasOne(x => x.ScratchGameOverride)
                .WithMany(x => x.ScratchBuys)
                .HasForeignKey(x => x.ScratchGameOverrideId)
                .OnDelete(DeleteBehavior.Cascade);
