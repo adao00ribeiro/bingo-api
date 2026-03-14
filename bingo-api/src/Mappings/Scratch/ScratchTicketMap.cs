@@ -1,4 +1,6 @@
+using System.Text.Json;
 using bingo_api.src.Entities.Scratch;
+using bingo_api.src.Structs.Scratchcard;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,14 +17,9 @@ public class ScratchTicketMap : IEntityTypeConfiguration<ScratchTicket>
             .HasColumnType("numeric(12,2)")
             .IsRequired();
 
-        builder.Property(x => x.Areas)
-            .HasColumnName("areas")
-            .HasColumnType("jsonb");
-      
-     
-        builder.Property(x => x.ScratchPrizeId)
-            .HasColumnName("scratch_prize_id")
-            .IsRequired();
+        builder.Property(x => x.Attributes)
+               .HasColumnName("attributes")
+               .HasColumnType("jsonb");
 
         builder.Property(x => x.ScratchBuyId)
             .HasColumnName("scratch_buy_id")
@@ -38,9 +35,9 @@ public class ScratchTicketMap : IEntityTypeConfiguration<ScratchTicket>
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .IsRequired();
 
-        builder.HasOne(x => x.ScratchPrize)
+        builder.HasMany(x => x.ScratchPrizes)
             .WithOne(x => x.ScratchTicket)
-            .HasForeignKey<ScratchTicket>(x => x.ScratchPrizeId)
+            .HasForeignKey(x => x.ScratchTicketId)
             .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasOne(x => x.ScratchBuy)
@@ -50,7 +47,7 @@ public class ScratchTicketMap : IEntityTypeConfiguration<ScratchTicket>
 
         builder.HasIndex(x => x.ScratchBuyId);
 
-        builder.HasIndex(x => x.Areas)
+        builder.HasIndex(x => x.Attributes)
             .HasMethod("gin");
     }
 }

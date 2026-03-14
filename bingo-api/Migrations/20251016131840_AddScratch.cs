@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using bingo_api.src.Entities.Scratch;
+using bingo_api.src.Structs.Scratchcard;
 
 #nullable disable
 

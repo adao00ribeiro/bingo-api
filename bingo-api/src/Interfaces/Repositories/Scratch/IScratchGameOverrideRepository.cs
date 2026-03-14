@@ -3,7 +3,7 @@ using bingo_api.src.Interfaces.Repositories.Shared;
 
 namespace bingo_api.src.Interfaces.Repositories.Scratch;
 
-public interface IScratchSellerGameRepository : IRepositoryBase<ScratchSellerGame>
+public interface IScratchGameOverrideRepository : IRepositoryBase<ScratchGameOverride>
 {
     Task<int> CountAsync(Guid ownerId);
 

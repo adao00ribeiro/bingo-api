@@ -13,7 +13,7 @@ public record ScratchGameResponseDto
 
     public int QuantityToAward { get; set; }
 
-    public decimal Rtp { get; set; }
+    public double Rtp { get; set; }
 
     public int Rows { get; set; }
 
@@ -21,7 +21,7 @@ public record ScratchGameResponseDto
 
     public string Component { get; set; }
 
-    public List<ScratchPayoutDto> PayoutTable { get; set; }
+    public ScratchGameAttributesDto Attributes { get; set; } = new();
 
     public int[] AllowedMultipliers { get; set; }
 
@@ -37,9 +37,9 @@ public record ScratchGameResponseDto
             Cols = entity.Cols,
             Component = entity.Component,
             AllowedMultipliers = entity.AllowedMultipliers,
-            PayoutTable = entity.PayoutTable
-                .Select(x => ScratchPayoutDto.ConvertToDto(x))
-                .ToList()
+            Attributes = entity.Attributes is null
+                ? null
+                : ScratchGameAttributesDto.ConvertToDto(entity.Attributes)
         };
     }
 }

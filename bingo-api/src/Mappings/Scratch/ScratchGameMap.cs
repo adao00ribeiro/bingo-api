@@ -43,9 +43,9 @@ public class ScratchGameMap : IEntityTypeConfiguration<ScratchGame>
             .HasColumnName("allowed_multipliers")
             .HasColumnType("integer[]");
 
-        builder.Property(x => x.PayoutTable)
-            .HasColumnName("payout_table")
-            .HasColumnType("jsonb");
+        builder.Property(x => x.Attributes)
+                      .HasColumnName("attributes")
+                      .HasColumnType("jsonb");
 
         builder.Property(x => x.CreatedAt)
             .HasColumnName("created_at")

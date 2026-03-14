@@ -29,6 +29,8 @@ namespace bingo_api.src.Extensions.Seeds
                 AllowedMultipliers = new[] { 1, 5, 10, 25 },
                 Rows = 3,
                 Cols = 3,
+                Attributes = new ScratchGameAttributes
+                {
                 PayoutTable = new List<ScratchPayout>
 
                     {
@@ -44,6 +46,7 @@ namespace bingo_api.src.Extensions.Seeds
                         new(2000, 0.000001),
                         new(10000, 1e-7)
                     },
+                },
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -58,6 +61,8 @@ namespace bingo_api.src.Extensions.Seeds
                 AllowedMultipliers = new[] { 1, 5, 10, 25 },
                 Rows = 3,
                 Cols = 3,
+                Attributes = new ScratchGameAttributes
+                {
                 PayoutTable = new List<ScratchPayout>
 
                     {
@@ -73,6 +78,7 @@ namespace bingo_api.src.Extensions.Seeds
                         new(2000, 0.000001),
                         new(10000, 1e-7)
                     },
+                },
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -87,6 +93,8 @@ namespace bingo_api.src.Extensions.Seeds
                 AllowedMultipliers = new[] { 1, 5, 10, 25 },
                 Rows = 3,
                 Cols = 3,
+                Attributes = new ScratchGameAttributes
+                {
                 PayoutTable = new List<ScratchPayout>
 
                     {
@@ -102,6 +110,7 @@ namespace bingo_api.src.Extensions.Seeds
                         new(2000, 0.000001),
                         new(10000, 1e-7)
                     },
+                },
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -116,6 +125,8 @@ namespace bingo_api.src.Extensions.Seeds
                 AllowedMultipliers = new[] { 1, 5, 10, 25 },
                 Rows = 3,
                 Cols = 3,
+                 Attributes = new ScratchGameAttributes
+                {
                 PayoutTable = new List<ScratchPayout>
 
                     {
@@ -131,6 +142,7 @@ namespace bingo_api.src.Extensions.Seeds
                         new(2000, 0.000001),
                         new(10000, 1e-7)
                     },
+                },
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -145,6 +157,8 @@ namespace bingo_api.src.Extensions.Seeds
                 AllowedMultipliers = new[] { 1, 5, 10, 25 },
                 Rows = 3,
                 Cols = 3,
+                Attributes = new ScratchGameAttributes
+                {
                 PayoutTable = new List<ScratchPayout>
 
                     {
@@ -160,6 +174,7 @@ namespace bingo_api.src.Extensions.Seeds
                         new(2000, 0.000001),
                         new(10000, 1e-7)
                     },
+                },
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -174,6 +189,8 @@ namespace bingo_api.src.Extensions.Seeds
                 AllowedMultipliers = new[] { 1, 5, 10, 25 },
                 Rows = 3,
                 Cols = 3,
+                Attributes = new ScratchGameAttributes
+                {
                 PayoutTable = new List<ScratchPayout>
 
                     {
@@ -189,6 +206,7 @@ namespace bingo_api.src.Extensions.Seeds
                         new(2000, 0.000001),
                         new(10000, 1e-7)
                     },
+                },
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -203,6 +221,8 @@ namespace bingo_api.src.Extensions.Seeds
                 AllowedMultipliers = new[] { 1, 5, 10, 25 },
                 Rows = 3,
                 Cols = 3,
+                Attributes = new ScratchGameAttributes
+                {
                 PayoutTable = new List<ScratchPayout>
 
                     {
@@ -218,6 +238,7 @@ namespace bingo_api.src.Extensions.Seeds
                         new(2000, 0.000001),
                         new(10000, 1e-7)
                     },
+                },
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };

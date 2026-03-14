@@ -32,8 +32,8 @@ public class ScratchPrizeMap : IEntityTypeConfiguration<ScratchPrize>
             .IsRequired();
 
         builder.HasOne(x => x.ScratchTicket)
-            .WithOne(x => x.ScratchPrize)
-            .HasForeignKey<ScratchPrize>(x => x.ScratchTicketId)
+            .WithMany(x => x.ScratchPrizes)
+            .HasForeignKey(x => x.ScratchTicketId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(x => x.ScratchTicketId)

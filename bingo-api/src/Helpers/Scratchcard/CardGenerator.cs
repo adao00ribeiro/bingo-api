@@ -19,7 +19,7 @@ public class CardGenerator
         var rtpEngine = new RtpEngine(
             rtp: _modality.Rtp,
             cardValue: _modalityOverride.CardValue,
-            payout: _modality.PayoutTable,
+            payout: _modality.Attributes.PayoutTable,
             totalSales: totalSales,
             totalPrizes: totalPrizes
         );
@@ -89,9 +89,9 @@ public class CardGenerator
 
     private int SymbolForPrize(decimal prize)
     {
-        for (int i = 0; i < _modality.PayoutTable.Count; i++)
+        for (int i = 0; i < _modality.Attributes.PayoutTable.Count; i++)
         {
-            var m = _modality.PayoutTable[i];
+            var m = _modality.Attributes.PayoutTable[i];
             if (Math.Round(_modalityOverride.CardValue * (decimal)m.Multiplier, 2) == prize)
                 return i + 1;
         }
@@ -100,7 +100,7 @@ public class CardGenerator
 
     private List<ScratchArea> BuildAreas(List<int> symbols)
     {
-        return symbols.Select(s => new ScratchArea { Element = s, ScratchedAt = null }).ToList();
+        return symbols.Select(s => new ScratchArea(s,null)).ToList();
     }
 }
 

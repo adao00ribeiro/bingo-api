@@ -24,7 +24,7 @@ public class ScratchPrizeCreatedHandler : IDomainEventHandler<ScratchPrizeCreate
         if (ticket == null) return;
 
         var punter = _context.Punters
-            .FirstOrDefault(p => p.Id == ticket.Attributes.PunterId);
+            .FirstOrDefault(p => p.Id == ticket.ScratchBuy.PunterId);
         if (punter == null) return;
 
         _context.TransactionHistories.Add(new TransactionHistory
@@ -32,11 +32,11 @@ public class ScratchPrizeCreatedHandler : IDomainEventHandler<ScratchPrizeCreate
             EntityType = "Punter", // Pode ser Seller se o participante for um Seller
             EntityId = punter.Id,
             PreviousBalance = punter.PrizeBalance, // Antes da alteração
-            CurrentBalance = punter.PrizeBalance + prize.Amount, // O saldo será alterado após o registro da transação
-            Amount = prize.Amount,
+            CurrentBalance = punter.PrizeBalance + prize.Value, // O saldo será alterado após o registro da transação
+            Amount = prize.Value,
             Type = TransactionType.ScratchPrizeReceived, // Assume que Purchase é o tipo de transação para compra de cartela
         });
-        punter.PrizeBalance += prize.Amount;
+        punter.PrizeBalance += prize.Value;
         punter.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesWithoutEventsAsync(); // ✅ grava as alterações
     }

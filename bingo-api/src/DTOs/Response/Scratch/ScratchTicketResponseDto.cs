@@ -10,24 +10,22 @@ public record ScratchTicketResponseDto
 
     public decimal Value { get; set; }
 
-    public ScratchAreaResponseDto Areas { get; set; }
+    public IEnumerable<ScratchAreaResponseDto> Areas { get; set; }
 
     public Guid? ScratchPrizeId { get; set; }
 
     public Guid? ScratchBuyId { get; set; }
 
-    public decimal? PrizeValue { get; set; }
-
     public static ScratchTicketResponseDto ConvertToDto(ScratchTicket entity)
     {
+          var areas = entity.Attributes.Areas?.Select(r => ScratchAreaResponseDto.ConvertToDto(r)) ?? Enumerable.Empty<ScratchAreaResponseDto>();
+
         return new ScratchTicketResponseDto
         {
             Id = entity.Id,
             Value = entity.Value,
-            Areas = ScratchAreaResponseDto.ConvertToDto(entity.Areas),
-            ScratchPrizeId = entity.ScratchPrizeId,
+            Areas = areas,
             ScratchBuyId = entity.ScratchBuyId,
-            PrizeValue = entity.ScratchPrize?.Value
         };
     }
 }

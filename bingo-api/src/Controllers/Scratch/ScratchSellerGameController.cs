@@ -16,27 +16,27 @@ namespace bingo_api.src.Controllers.Scratch;
 [Authorize]
 [ApiVersion("1.0")]
 public class ScratchSellerGameController(
-    IScratchSellerGameRepository scratchSellerGameRepository,
+    IScratchGameOverrideRepository scratchSellerGameRepository,
         IPunterRepository punterRepository
 
     ) : ApiControllerBase
 {
-    private readonly IScratchSellerGameRepository _scratchSellerGameRepository = scratchSellerGameRepository;
+    private readonly IScratchGameOverrideRepository _scratchSellerGameRepository = scratchSellerGameRepository;
     private readonly IPunterRepository _punterRepository = punterRepository;
 
     [HttpGet]
-    public async Task<ActionResult<ReportResponseDto<ScratchSellerGameResponseDto, object>>> GetAll(
+    public async Task<ActionResult<ReportResponseDto<ScratchGameOverrideResponseDto, object>>> GetAll(
      int? page = null, int? size = null)
     {
 
         var entityId = User.FindFirst("entityid")?.Value;
         int totalCount;
-        IEnumerable<ScratchSellerGame> ScratchSellerGames;
+        IEnumerable<ScratchGameOverride> ScratchGameOverrides;
         if (User.IsInRole(Roles.Admin))
         {
             // Se for Admin, retorna todas as recargas
             totalCount = await _scratchSellerGameRepository.CountAsync();
-            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, includeProperties: x => x.Include(x => x.ScratchGame));
+            ScratchGameOverrides = await _scratchSellerGameRepository.GetAllAsync(page, size, includeProperties: x => x.Include(x => x.ScratchGame));
         }
         else if (User.IsInRole(Roles.Punter) && Guid.TryParse(entityId, out _))
         {
@@ -46,7 +46,7 @@ public class ScratchSellerGameController(
                 throw new Exception("Usuário não encontrado");
             }
             totalCount = await _scratchSellerGameRepository.CountAsync(punter.OnlineHouseId);
-            ScratchSellerGames = await _scratchSellerGameRepository.GetAllAsync(page, size, filter: r => r.SellerId == punter.OnlineHouseId,
+            ScratchGameOverrides = await _scratchSellerGameRepository.GetAllAsync(page, size, filter: r => r.OnlineHouseId == punter.OnlineHouseId,
                     includeProperties: x => x.Include(x => x.ScratchGame)
                 );
         }
@@ -56,13 +56,13 @@ public class ScratchSellerGameController(
             return Forbid(); // Bloqueia caso o usuário não seja admin nem punter
         }
 
-        var sellerGamesDtos = ScratchSellerGames.Select(r => ScratchSellerGameResponseDto.ConvertToDto(r)).ToList();
+        var sellerGamesDtos = ScratchGameOverrides.Select(r => ScratchGameOverrideResponseDto.ConvertToDto(r)).ToList();
 
         var pageNumber = page ?? 1;
         var pageSize = size ?? sellerGamesDtos.Count;
         var pagedRows = sellerGamesDtos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
 
-        var response = new ReportResponseDto<ScratchSellerGameResponseDto, object>
+        var response = new ReportResponseDto<ScratchGameOverrideResponseDto, object>
         {
             Rows = pagedRows,
             Stats = null,
@@ -78,16 +78,16 @@ public class ScratchSellerGameController(
     }
 
     [HttpPost]
-    public async Task<ActionResult<Guid>> Create(ScratchSellerGameRequestDto request)
+    public async Task<ActionResult<Guid>> Create(ScratchGameOverrideRequestDto request)
     {
 
-        var scratchSellerGame = ScratchSellerGameRequestDto.ConvertToEntity(request);
+        var scratchSellerGame = ScratchGameOverrideRequestDto.ConvertToEntity(request);
         var id = await _scratchSellerGameRepository.AddAsync(scratchSellerGame);
         return CreatedAtAction(nameof(GetById), new { id = id }, id);
     }
 
     [HttpGet("id/{id}")]
-    public async Task<ActionResult<ScratchSellerGameResponseDto>> GetById(Guid id)
+    public async Task<ActionResult<ScratchGameOverrideResponseDto>> GetById(Guid id)
     {
         var scratchSellerGame = await _scratchSellerGameRepository.GetByIdAsync(id);
 
@@ -96,6 +96,6 @@ public class ScratchSellerGameController(
             return NotFound();
         }
 
-        return Ok(ScratchSellerGameResponseDto.ConvertToDto(scratchSellerGame));
+        return Ok(ScratchGameOverrideResponseDto.ConvertToDto(scratchSellerGame));
     }
 }

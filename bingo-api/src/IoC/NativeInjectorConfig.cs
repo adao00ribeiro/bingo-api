@@ -30,6 +30,7 @@ using bingo_api.src.Configurations;
 using Minio;
 using Microsoft.Extensions.Options;
 using bingo_api.src.Interfaces.Services.Bingo;
+using bingo_api.src.Services.Scratchcard;
 
 
 
@@ -119,7 +120,7 @@ public static class NativeInjectorConfig
 
         services.AddScoped<BlockchainServiceFactory>();
         services.AddScoped<IScratchGameRepository, ScratchGameRepository>();
-        services.AddScoped<IScratchSellerGameRepository, ScratchSellerGameRepository>();
+        services.AddScoped<IScratchGameOverrideRepository, ScratchGameOverrideRepository>();
         services.AddScoped<IScratchTicketRepository, ScratchTicketRepository>();
         services.AddScoped<InsertBotRoundService>();
 
