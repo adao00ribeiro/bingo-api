@@ -1068,9 +1068,11 @@ namespace bingo_api.Migrations
 
                     b.Property<string>("Component")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
                         .IsUnicode(false)
                         .HasColumnType("character varying(100)")
+                        .HasDefaultValue("")
                         .HasColumnName("component");
 
                     b.Property<DateTime>("CreatedAt")

@@ -16,7 +16,7 @@ using bingo_api.src.Structs.Scratchcard;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260314024021_RefactoringScratch")]
+    [Migration("20260314025212_RefactoringScratch")]
     partial class RefactoringScratch
     {
         /// <inheritdoc />
@@ -1071,9 +1071,11 @@ namespace bingo_api.Migrations
 
                     b.Property<string>("Component")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(100)
                         .IsUnicode(false)
                         .HasColumnType("character varying(100)")
+                        .HasDefaultValue("")
                         .HasColumnName("component");
 
                     b.Property<DateTime>("CreatedAt")

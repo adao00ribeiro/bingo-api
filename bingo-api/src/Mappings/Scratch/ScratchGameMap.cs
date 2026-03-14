@@ -33,7 +33,8 @@ public class ScratchGameMap : IEntityTypeConfiguration<ScratchGame>
 
         builder.Property(x => x.Component)
             .HasColumnName("component")
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .HasDefaultValue("");
 
         builder.Property(x => x.Rtp)
             .HasColumnName("rtp")
