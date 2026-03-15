@@ -2,6 +2,7 @@ using Asp.Versioning;
 using bingo_api.src.Controllers.Shared;
 using bingo_api.src.DTOs.Request.Bingo;
 using bingo_api.src.DTOs.Response.Bingo;
+using bingo_api.src.DTOs.Response.report;
 using bingo_api.src.Interfaces.Services.Bingo;
 using Microsoft.AspNetCore.Authorization;
 
@@ -13,7 +14,31 @@ namespace bingo_api.src.Controllers.Bingo;
 public class OnlineHouseController(OnlineHouseService onlineHouseService) : ApiControllerBase
 {
     private OnlineHouseService _onlineHouseService = onlineHouseService;
+     [Authorize]
+    [HttpGet()]
 
+    public async Task<ActionResult<ReportResponseDto<OnlineHouseResponseDto, object>>> GetAll(
+        int? page = null,
+        int? size = null,
+         bool? enabledScratch = null
+        )
+    {
+        var sellers = await _onlineHouseService.GetAllAsync(pageNumber: page ,filter: x => x.Settings.EnabledScratch == enabledScratch);
+        var sellerDtos = sellers.Select(s => OnlineHouseResponseDto.ConvertToDto(s)).ToList();
+        var totalCount = await _onlineHouseService.CountAsync();
+        var response = new ReportResponseDto<OnlineHouseResponseDto, object>
+        {
+            Rows = sellerDtos,
+            Stats = null,
+            StartingOn = null,
+            EndingOn = null,
+            Page = page,
+            PerPage = size,
+            RowsCount = totalCount
+        };
+
+        return Ok(response);
+    }
     /// <summary>
     /// Retorna as informações da OnlineHouse pelo hostname
     /// </summary>
@@ -57,4 +82,7 @@ public class OnlineHouseController(OnlineHouseService onlineHouseService) : ApiC
 
         return Ok(true);
     }
+
+
+    
 }

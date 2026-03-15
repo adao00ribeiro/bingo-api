@@ -13,6 +13,6 @@ public record ScratchGameOverrideRequestDto
 
     internal static ScratchGameOverride ConvertToEntity(ScratchGameOverrideRequestDto request)
     {
-        return new ScratchGameOverride(request.OnlineHouseId, request.ScratchGameId);
+        return new ScratchGameOverride(request.Title , request.Subtitle, request.CardValue,request.OnlineHouseId, request.ScratchGameId);
     }
 }

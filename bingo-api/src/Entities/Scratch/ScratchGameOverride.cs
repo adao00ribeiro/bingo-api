@@ -13,9 +13,14 @@ public class ScratchGameOverride : Entity
     public Guid ScratchGameId { get; set; }
     public ScratchGame ScratchGame { get; set; }
     public ICollection<ScratchBuy> ScratchBuys { get; set; }
-    public ScratchGameOverride(Guid onlineHouseId, Guid scratchGameId)
+
+    public ScratchGameOverride(string title, string subtitle, decimal cardValue, Guid onlineHouseId, Guid scratchGameId)
     {
+        Title = title;
+        Subtitle = subtitle;
+        CardValue = cardValue;
         OnlineHouseId = onlineHouseId;
         ScratchGameId = scratchGameId;
     }
+
 }

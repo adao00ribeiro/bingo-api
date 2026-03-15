@@ -13,12 +13,12 @@ public class ScratchGameOverrideRepository : RepositoryBase<ScratchGameOverride>
     }
     public override async Task<ScratchGameOverride?> GetByIdAsync(Guid id, Func<IQueryable<ScratchGameOverride>, IQueryable<ScratchGameOverride>>? includeProperties = null)
     {
-        var sellerGame = await base.GetByIdAsync(id);
-        sellerGame.ScratchGame = await this.Context.ScratchGames.FirstAsync(x => x.Id == sellerGame.ScratchGameId);
-        return sellerGame;
+        var scratchGameOverrideGame = await base.GetByIdAsync(id);
+        scratchGameOverrideGame.ScratchGame = await this.Context.ScratchGames.FirstAsync(x => x.Id == scratchGameOverrideGame.ScratchGameId);
+        return scratchGameOverrideGame;
     }
-    public Task<int> CountAsync(Guid ownerId)
+    public async Task<int> CountAsync(Guid onlineHouseId)
     {
-        throw new NotImplementedException();
+       return await Context.ScratchGameOverrides.CountAsync(r => r.OnlineHouseId == onlineHouseId);
     }
 }

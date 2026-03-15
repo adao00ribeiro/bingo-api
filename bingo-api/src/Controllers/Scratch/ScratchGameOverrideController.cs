@@ -15,13 +15,13 @@ namespace bingo_api.src.Controllers.Scratch;
 
 [Authorize]
 [ApiVersion("1.0")]
-public class ScratchSellerGameController(
-    IScratchGameOverrideRepository scratchSellerGameRepository,
+public class ScratchGameOverrideController(
+    IScratchGameOverrideRepository scratchGameOverrideRepository,
         IPunterRepository punterRepository
 
     ) : ApiControllerBase
 {
-    private readonly IScratchGameOverrideRepository _scratchSellerGameRepository = scratchSellerGameRepository;
+    private readonly IScratchGameOverrideRepository _scratchGameOverrideRepository = scratchGameOverrideRepository;
     private readonly IPunterRepository _punterRepository = punterRepository;
 
     [HttpGet]
@@ -35,8 +35,8 @@ public class ScratchSellerGameController(
         if (User.IsInRole(Roles.Admin))
         {
             // Se for Admin, retorna todas as recargas
-            totalCount = await _scratchSellerGameRepository.CountAsync();
-            ScratchGameOverrides = await _scratchSellerGameRepository.GetAllAsync(page, size, includeProperties: x => x.Include(x => x.ScratchGame));
+            totalCount = await _scratchGameOverrideRepository.CountAsync();
+            ScratchGameOverrides = await _scratchGameOverrideRepository.GetAllAsync(page, size, includeProperties: x => x.Include(x => x.ScratchGame));
         }
         else if (User.IsInRole(Roles.Punter) && Guid.TryParse(entityId, out _))
         {
@@ -45,8 +45,8 @@ public class ScratchSellerGameController(
             {
                 throw new Exception("Usuário não encontrado");
             }
-            totalCount = await _scratchSellerGameRepository.CountAsync(punter.OnlineHouseId);
-            ScratchGameOverrides = await _scratchSellerGameRepository.GetAllAsync(page, size, filter: r => r.OnlineHouseId == punter.OnlineHouseId,
+            totalCount = await _scratchGameOverrideRepository.CountAsync(punter.OnlineHouseId);
+            ScratchGameOverrides = await _scratchGameOverrideRepository.GetAllAsync(page, size, filter: r => r.OnlineHouseId == punter.OnlineHouseId,
                     includeProperties: x => x.Include(x => x.ScratchGame)
                 );
         }
@@ -82,14 +82,14 @@ public class ScratchSellerGameController(
     {
 
         var scratchSellerGame = ScratchGameOverrideRequestDto.ConvertToEntity(request);
-        var id = await _scratchSellerGameRepository.AddAsync(scratchSellerGame);
+        var id = await _scratchGameOverrideRepository.AddAsync(scratchSellerGame);
         return CreatedAtAction(nameof(GetById), new { id = id }, id);
     }
 
     [HttpGet("id/{id}")]
     public async Task<ActionResult<ScratchGameOverrideResponseDto>> GetById(Guid id)
     {
-        var scratchSellerGame = await _scratchSellerGameRepository.GetByIdAsync(id);
+        var scratchSellerGame = await _scratchGameOverrideRepository.GetByIdAsync(id);
 
         if (scratchSellerGame is null)
         {
